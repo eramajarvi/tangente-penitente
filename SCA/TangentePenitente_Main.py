@@ -6,14 +6,14 @@ Descripcion: Este modulo es para ejecutar el algoritmo de Tangente Penitente loc
 """
 
 # Importar modulos requeridos
-from exstracs_timer import Timer
-from exstracs_configparser import ConfigParser
-from exstracs_offlineenv import Offline_Environment
-from exstracs_onlineenv import Online_Environment
-from exstracs_algorithm import ExSTraCS
-from exstracs_constants import *
-from exstracs_at import AttributeTracking
-from exstracs_ek import ExpertKnowledge
+from tp_Cronometro import Timer
+from tp_configParseador import ConfigParser
+from tp_AmbienteOffline import Offline_Environment
+from tp_AmbienteOnline import Online_Environment
+from tp_Algoritmo import ExSTraCS
+from tp_Constantes import *
+from tp_SA import AttributeTracking
+from tp_CE import ExpertKnowledge
 #
 
 
