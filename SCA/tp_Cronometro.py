@@ -13,338 +13,340 @@ Descripcion: La función de este módulo es en gran medida para fines
 """
 
 # Importar modulos requeridos
-from exstracs_constants import *
+from tp_Constantes import *
 import time
 #
 
-class Timer:
+class Cronometro:
     def __init__(self):
-        """ Initializes all Timer values for the algorithm """        
-        # Global Time objects
-        self.globalStartRef = time.time()
-        self.globalTime = 0.0
-        self.addedTime = 0.0
+        """ Inicializa todos los valores de los cronometros para el algoritmo """      
+        # Objetos de Tiempo Globales
+        self.refInicioGlobal = time.time()
+        self.tiempoGlobal = 0.0
+        self.tiempoAgregado = 0.0
         
-        # Match Time Variables
-        self.startRefMatching = 0.0
-        self.globalMatching = 0.0
+        # Variables de tiempo de Coincidencias
+        self.iniciarRefCoincidencia = 0.0
+        self.coincidenciaGlobal = 0.0
 
-        # Covering Time Variables
-        self.startRefCovering = 0.0
-        self.globalCovering = 0.0
+        # Variables de tiempo de covering
+        self.iniciarRefCovering = 0.0
+        self.coveringGlobal = 0.0
         
-        # Deletion Time Variables
-        self.startRefDeletion = 0.0
-        self.globalDeletion = 0.0
+        # Varibales de tiempo de eliminacion
+        self.iniciarRefEliminacion = 0.0
+        self.eliminacionGlobal = 0.0
 
-        # Subsumption Time Variables
-        self.startRefSubsumption = 0.0
-        self.globalSubsumption = 0.0
+        # Variables de tiempo de subsuncion
+        self.iniciarRefSubsuncion = 0.0
+        self.subsuncionGlobal = 0.0
 
-        # Selection Time Variables
-        self.startRefSelection = 0.0
-        self.globalSelection = 0.0
+        # Variables de tiempo de seleccion
+        self.iniciarRefSeleccion = 0.0
+        self.seleccionGlobal = 0.0
         
-        # Crossover Time Variables
-        self.startRefCrossover = 0.0
-        self.globalCrossover = 0.0
+        # Variables de tiempo de cruzamiento
+        self.iniciarRefCruzamiento = 0.0
+        self.cruzamientoGlobal = 0.0
         
-        # Mutation Time Variables
-        self.startRefMutation = 0.0
-        self.globalMutation = 0.0
+        # Variables de tiempo de mutacion
+        self.iniciarRefMutacion = 0.0
+        self.mutacionGlobal = 0.0
         
-        # Attribute Tracking and Feedback
-        self.startRefAT = 0.0
-        self.globalAT = 0.0
+        # Seguimiento de atributos y feedback
+        self.iniciarRefSA = 0.0
+        self.SAGlobal = 0.0
 
-        # Expert Knowledge (EK)
-        self.startRefEK = 0.0
-        self.globalEK = 0.0
+        # Conocimiento Experto (CE)
+        self.iniciarRefCE = 0.0
+        self.CEGlobal = 0.0
 
-        # OutFile
-        self.startRefOutFile = 0.0
-        self.globalOutFile = 0.0
+        # Archivo de Salida
+        self.iniciarRefArchivoSalida = 0.0
+        self.archivoSalidaGlobal = 0.0
 
-        # Initialization
-        self.startRefInit = 0.0
-        self.globalInit = 0.0
+        # Inicializacion
+        self.iniciarRefInic = 0.0
+        self.inicGlobal = 0.0
         
-        # Add Classifier
-        self.startRefAdd = 0.0
-        self.globalAdd = 0.0
+        # Agregar clasificador
+        self.iniciarRefAgg = 0.0
+        self.aggGlobal = 0.0
         
-        # Evaluation Time Variables
-        self.startRefEvaluation = 0.0
-        self.globalEvaluation = 0.0  
+        # Variables de tiempo de evaluacion
+        self.iniciarRefEvaluacion = 0.0
+        self.evaluacionGlobal = 0.0  
         
-        # Rule Compaction
-        self.startRefRuleCmp = 0.0
-        self.globalRuleCmp = 0.0
+        # Compactacion de reglas
+        self.iniciarRefCompReg = 0.0
+        self.compRegGlobal = 0.0
 
-        # Rule Compaction
-        self.startRefTEST = 0.0
-        self.globalTEST = 0.0
+        # PRUEBA
+        self.iniciarRefPRUEBA = 0.0
+        self.PRUEBAGlobal = 0.0
         
-        #Debug Counter
-        self.globalTESTCounter = 0
+        # 
+        self.cronometroPRUEBAGlobal = 0
         
-    # ************************************************************
-    def startTimeMatching(self):
-        """ Tracks MatchSet Time """
-        self.startRefMatching = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoCoincidencias(self):
+        """ Cuenta el tiempo de coincidencias """
+        self.iniciarRefCoincidencia = time.time()
          
-    def stopTimeMatching(self):
-        """ Tracks MatchSet Time """
-        diff = time.time() - self.startRefMatching
-        self.globalMatching += diff        
+    def detenerTiempoCoincidencias(self):
+        """ Cuenta el tiempo de coincidencias """
+        diff = time.time() - self.iniciarRefCoincidencia
+        self.coincidenciaGlobal += diff        
 
-    # ************************************************************
-    def startTimeCovering(self):
-        """ Tracks MatchSet Time """
-        self.startRefCovering = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoCovering(self):
+        """ Cuenta el tiempo del covering """
+        self.iniciarRefCovering = time.time()
          
-    def stopTimeCovering(self):
-        """ Tracks MatchSet Time """
-        diff = time.time() - self.startRefCovering
-        self.globalCovering += diff        
+    def detenerTiempoCovering(self):
+        """ Cuenta el tiempo del covering """
+        diff = time.time() - self.iniciarRefCovering
+        self.coveringGlobal += diff        
         
-    # ************************************************************
-    def startTimeDeletion(self):
-        """ Tracks Deletion Time """
-        self.startRefDeletion = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoEliminacion(self):
+        """ Cuenta el tiempo de eliminacion """
+        self.iniciarRefEliminacion = time.time()
         
-    def stopTimeDeletion(self):
-        """ Tracks Deletion Time """
-        diff = time.time() - self.startRefDeletion
-        self.globalDeletion += diff
+    def detenerTiempoEliminacion(self):
+        """ Cuenta el tiempo de eliminacion """
+        diff = time.time() - self.iniciarRefEliminacion
+        self.eliminacionGlobal += diff
     
-    # ************************************************************
-    def startTimeCrossover(self):
-        """ Tracks Crossover Time """
-        self.startRefCrossover = time.time() 
+    # ------------------------------------------------------------
+    def iniciarTiempoCruzamiento(self):
+        """ Cuenta el tiempo del cruzamiento """
+        self.iniciarRefCruzamiento = time.time() 
                
-    def stopTimeCrossover(self):
-        """ Tracks Crossover Time """
-        diff = time.time() - self.startRefCrossover
-        self.globalCrossover += diff
+    def detenerTiempoCruzamiento(self):
+        """ Cuenta el tiempo del cruzamiento """
+        diff = time.time() - self.iniciarRefCruzamiento
+        self.cruzamientoGlobal += diff
         
-    # ************************************************************
-    def startTimeMutation(self):
-        """ Tracks Mutation Time """
-        self.startRefMutation = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoMutacion(self):
+        """ Cuenta el tiempo de la mutacion """
+        self.iniciarRefMutacion = time.time()
         
-    def stopTimeMutation(self):
-        """ Tracks Mutation Time """
-        diff = time.time() - self.startRefMutation
-        self.globalMutation += diff
+    def detenerTiempoMutacion(self):
+        """ Cuenta el tiempo de la mutacion """
+        diff = time.time() - self.iniciarRefMutacion
+        self.mutacionGlobal += diff
         
-    # ************************************************************
-    def startTimeSubsumption(self):
-        """Tracks Subsumption Time """
-        self.startRefSubsumption = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoSubsuncion(self):
+        """ Cuenta el tiempo de subsuncion """
+        self.iniciarRefSubsuncion = time.time()
 
-    def stopTimeSubsumption(self):
-        """Tracks Subsumption Time """
-        diff = time.time() - self.startRefSubsumption
+    def detenerTiempoSubsuncion(self):
+        """ Cuenta el tiempo de subsuncion """
+        diff = time.time() - self.iniciarRefSubsuncion
         self.globalSubsumption += diff    
         
-    # ************************************************************
-    def startTimeSelection(self):
-        """ Tracks Selection Time """
-        self.startRefSelection = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoSeleccion(self):
+        """ Cuenta el tiempo de seleccion """
+        self.iniciarRefSeleccion = time.time()
         
-    def stopTimeSelection(self):
-        """ Tracks Selection Time """
-        diff = time.time() - self.startRefSelection
+    def detenerTiempoSeleccion(self):
+        """ Cuenta el tiempo de seleccion """
+        diff = time.time() - self.iniciarRefSeleccion
         self.globalSelection += diff
     
-    # ************************************************************
-    def startTimeEvaluation(self):
-        """ Tracks Evaluation Time """
-        self.startRefEvaluation = time.time()
+    # ------------------------------------------------------------
+    def iniciarTiempoEvaluacion(self):
+        """ Cuenta el tiempo de evaluacion """
+        self.iniciarRefEvaluacion = time.time()
         
-    def stopTimeEvaluation(self):
-        """ Tracks Evaluation Time """
-        diff = time.time() - self.startRefEvaluation
+    def detenerTiempoEvaluacion(self):
+        """ Cuenta el tiempo de evaluacion """
+        diff = time.time() - self.iniciarRefEvaluacion
         self.globalEvaluation += diff 
     
-    # ************************************************************
-    def startTimeRuleCmp(self):
-        """  """
-        self.startRefRuleCmp = time.time()   
+    # ------------------------------------------------------------
+    def iniciarTiempoCompReg(self):
+        """ Cuenta el tiempo de compactacion de reglas """
+        self.iniciarRefCompReg = time.time()   
          
-    def stopTimeRuleCmp(self):
-        """  """
-        diff = time.time() - self.startRefRuleCmp
+    def detenerTiempoCompReg(self):
+        """ Cuenta el tiempo de compactacion de reglas """
+        diff = time.time() - self.iniciarRefCompReg
         self.globalRuleCmp += diff
         
-    # ***********************************************************  
-    def startTimeAT(self):
-        """  """
-        self.startRefAT = time.time()   
+    # ------------------------------------------------------------
+    def iniciarTiempoSA(self):
+        """ Cuenta el tiempo del seguimiento de atributos """
+        self.iniciarRefSA = time.time()   
          
-    def stopTimeAT(self):
-        """  """
-        diff = time.time() - self.startRefAT
+    def detenerTiempoSA(self):
+        """ Cuenta el tiempo del seguimiento de atributos """
+        diff = time.time() - self.iniciarRefSA
         self.globalAT += diff
         
-    # ***********************************************************
-    def startTimeEK(self):
-        """  """
-        self.startRefEK = time.time()   
+    # ------------------------------------------------------------
+    def iniciarTiempoCE(self):
+        """ Cuenta el tiempo de conocimiento experto """
+        self.iniciarRefCE = time.time()   
          
-    def stopTimeEK(self):
-        """  """
-        diff = time.time() - self.startRefEK
+    def detenerTiempoCE(self):
+        """ Cuenta el tiempo de conocimiento experto """
+        diff = time.time() - self.iniciarRefCE
         self.globalEK += diff
         
-    # ***********************************************************
-    def startTimeOutFile(self):
-        """  """
-        self.startRefOutFile = time.time()   
+    # ------------------------------------------------------------
+    def iniciarTiempoArchivoSalida(self):
+        """ Cuenta el tiempo del archivo de salida """
+        self.iniciarRefArchivoSalida = time.time()   
          
-    def stopTimeOutFile(self):
-        """  """
-        diff = time.time() - self.startRefOutFile
+    def detenerTiempoArchivoSalida(self):
+        """ Cuenta el tiempo del archivo de salida """
+        diff = time.time() - self.iniciarRefArchivoSalida
         self.globalOutFile += diff
         
-    # ***********************************************************
-    def startTimeInit(self):
-        """  """
-        self.startRefInit = time.time()   
+    # ------------------------------------------------------------
+    def iniciarTiempoInic(self):
+        """ Cuenta el tiempo de inicializacion """
+        self.iniciarRefInic = time.time()   
          
-    def stopTimeInit(self):
-        """  """
-        diff = time.time() - self.startRefInit
+    def detenerTiempoInic(self):
+        """ Cuenta el tiempo de inicializacion """
+        diff = time.time() - self.iniciarRefInic
         self.globalInit += diff
         
-    # ***********************************************************
-    def startTimeAdd(self):
-        """  """
-        self.startRefAdd = time.time()   
+    # ------------------------------------------------------------
+    def iniciarTiempoAgg(self):
+        """ Cuenta el tiempo de agregamiento """
+        self.iniciarRefAgg = time.time()   
          
-    def stopTimeAdd(self):
-        """  """
-        diff = time.time() - self.startRefAdd
+    def detenerTiempoAgg(self):
+        """ Cuenta el tiempo de agregamiento """
+        diff = time.time() - self.iniciarRefAgg
         self.globalAdd += diff
         
-    # ***********************************************************
-    def startTimeTEST(self):
+    # ------------------------------------------------------------
+    def iniciarTiempoPRUEBA(self):
         """  """
-        self.startRefTEST = time.time()   
+        self.iniciarRefPRUEBA = time.time()   
          
-    def stopTimeTEST(self):
+    def detenerTiempoPRUEBA(self):
         """  """
-        diff = time.time() - self.startRefTEST
+        diff = time.time() - self.iniciarRefPRUEBA
         self.globalTEST += diff
-    # ***********************************************************
+    # ------------------------------------------------------------
     
-    def returnGlobalTimer(self):
-        """ Set the global end timer, call at very end of algorithm. """
-        self.globalTime = (time.time() - self.globalStartRef) + self.addedTime #Reports time in minutes, addedTime is for population reboot.
-        return self.globalTime/ 60.0
+    def devolverCronometroGlobal(self):
+        """ Fija el cronometro final global. Llamado al final de toda la ejecucion """
+        self.tiempoGlobal = (time.time() - self.refInicioGlobal) + self.tiempoAgregad
+        return self.tiempoGlobal/ 60.0
         
         
-    def TESTCounter(self):
-        """ Set the global end timer, call at very end of algorithm. """
+    def cronometroPRUEBA(self):
+        """ Fija el cronometro final global. Llamado al final de toda la ejecucion """
         self.globalTESTCounter += 1
 
     
-    def setTimerRestart(self, remakeFile): 
-        """ Sets all time values to the those previously evolved in the loaded popFile.  """
-        print(remakeFile+"_PopStats.txt")
+    def fijarReinicioCronometro(self, rehacerArchivo): 
+        """ Fija todos los valores de los cronometros a los escritos previamente en el perfil cargado """
+        print(rehacerArchivo + "_EstadisticasPoblacion.txt")
         try:
-            fileObject = open(remakeFile+"_PopStats.txt", 'rU')  # opens each datafile to read.
+            objetoArchivo = open(rehacerArchivo+"_EstadisticasPoblacion.txt", 'rU')  # abre cada archivo de datos para leerlo
         except Exception as inst:
             print(type(inst))
             print(inst.args)
             print(inst)
-            print('cannot open', remakeFile+"_PopStats.txt")
+            print('No se pudo abrir', rehacerArchivo+"_EstadisticasPoblacion.txt")
             raise 
 
-        timeDataRef = 22
-        tempLine = None
-        for i in range(timeDataRef):
-            tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t')
-        self.addedTime = float(tempList[1]) * 60 #previous global time added with Reboot.
-        
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalMatching = float(tempList[1]) * 60
+        refDatosTiempo = 22
+        lineaTemp = None
 
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalCovering = float(tempList[1]) * 60
+        for i in range(refDatosTiempo):
+            lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t')
+        self.tiempoAgregado = float(listaTemp[1]) * 60 # tiempo previo global agregado con el reinicio
         
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalDeletion = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.coincidenciaGlobal = float(listaTemp[1]) * 60
 
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalSubsumption = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.coveringGlobal = float(listaTemp[1]) * 60
         
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalSelection = float(tempList[1]) * 60    
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.eliminacionGlobal = float(listaTemp[1]) * 60
+
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.subsuncionGlobal = float(listaTemp[1]) * 60
+        
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.seleccionGlobal = float(listaTemp[1]) * 60    
  
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalCrossover = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.cruzamientoGlobal = float(listaTemp[1]) * 60
 
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalMutation = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.mutacionGlobal = float(listaTemp[1]) * 60
 
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalAT = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.SAGlobal = float(listaTemp[1]) * 60
  
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalEK = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.CEGlobal = float(listaTemp[1]) * 60
 
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalOutFile = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.archivoSalidaGlobal = float(listaTemp[1]) * 60
 
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalInit = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.inicGlobal = float(listaTemp[1]) * 60
         
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalAdd = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.aggGlobal = float(listaTemp[1]) * 60
         
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalEvaluation = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.evaluacionGlobal = float(listaTemp[1]) * 60
                      
-        tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t') 
-        self.globalRuleCmp = float(tempList[1]) * 60
+        lineaTemp = objetoArchivo.readline()
+        listaTemp = lineaTemp.strip().split('\t') 
+        self.compRegGlobal = float(listaTemp[1]) * 60
         
-        fileObject.close()
+        objetoArchivo.close()
         
 
-    def reportTimes(self):
-        self.returnGlobalTimer()
-        """ Reports the time summaries for this run. Returns a string ready to be printed out."""
-        outputTime = "Global Time\t"+str(self.globalTime/ 60.0)+ \
-        "\nMatching Time\t" + str(self.globalMatching/ 60.0)+ \
-        "\nCovering Time\t" + str(self.globalCovering/ 60.0)+ \
-        "\nDeletion Time\t" + str(self.globalDeletion/ 60.0)+ \
-        "\nSubsumption Time\t" + str(self.globalSubsumption/ 60.0)+ \
-        "\nSelection Time\t"+str(self.globalSelection/ 60.0)+ \
-        "\nCrossover Time\t" + str(self.globalCrossover/ 60.0)+ \
-        "\nMutation Time\t" + str(self.globalMutation/ 60.0)+ \
-        "\nAttribute Tracking-Feedback Time\t"+str(self.globalAT/ 60.0) + \
-        "\nExpert Knowledge Time\t"+str(self.globalEK/ 60.0) + \
-        "\nOutput File Time\t"+str(self.globalOutFile/ 60.0) + \
-        "\nInitialization Time\t"+str(self.globalInit/ 60.0) + \
-        "\nAdd Classifier Time\t"+str(self.globalAdd/ 60.0) + \
-        "\nEvaluation Time\t"+str(self.globalEvaluation/ 60.0) + \
-        "\nRule Compaction Time\t"+str(self.globalRuleCmp/ 60.0) + "\n" 
+    def reportarTiempos(self):
+        self.devolverCronometroGlobal()
+        """ Reporta los resumenes de tiempo para esta ejecucion. Devuelve un string listo para imprimirse """
+
+        tiempoSalida = "Tiempo global\t"+str(self.tiempoGlobal/ 60.0)+ \
+        "\nTiempo de Coincidencia\t" + str(self.coincidenciaGlobal/ 60.0)+ \
+        "\nTiempo de Covering\t" + str(self.coveringGlobal/ 60.0)+ \
+        "\nTiempo de Eliminacion\t" + str(self.eliminacionGlobal/ 60.0)+ \
+        "\nTiempo de Subsuncion\t" + str(self.subsuncionGlobal/ 60.0)+ \
+        "\nTiempo de Seleccion\t"+str(self.seleccionGlobal/ 60.0)+ \
+        "\nTiempo de Cruzamiento\t" + str(self.cruzamientoGlobal/ 60.0)+ \
+        "\nTiempo de Mutacion\t" + str(self.mutacionGlobal/ 60.0)+ \
+        "\nTiempo de Seguimiento de Atributos/Feedback\t"+str(self.SAGlobal/ 60.0) + \
+        "\nTiempo de Conocimiento Experto\t"+str(self.CEGlobal/ 60.0) + \
+        "\nTiempo de Archivo de Salida\t"+str(self.archivoSalidaGlobal/ 60.0) + \
+        "\nTiempo de Inicializacion\t"+str(self.inicGlobal/ 60.0) + \
+        "\nTiempo de Agregar Clasificador\t"+str(self.aggGlobal/ 60.0) + \
+        "\nTiempo de Evaluacion\t"+str(self.evaluacionGlobal/ 60.0) + \
+        "\nTiempo de Compactacion de Reglas\t"+str(self.compRegGlobal/ 60.0) + "\n" 
         
-        return outputTime
+        return tiempoSalida
