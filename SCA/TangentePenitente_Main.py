@@ -6,126 +6,143 @@ Descripcion: Este modulo es para ejecutar el algoritmo de Tangente Penitente loc
 """
 
 # Importar modulos requeridos
-from tp_Cronometro import Timer
-from tp_configParseador import ConfigParser
-from tp_AmbienteOffline import Offline_Environment
-from tp_AmbienteOnline import Online_Environment
-from tp_Algoritmo import ExSTraCS
+from tp_Cronometro import Cronometro
+from tp_ConfigParseador import ConfigParseador
+from tp_AmbienteOffline import AmbienteOffline
+from tp_AmbienteOnline import AmbienteOnline
+from tp_Algoritmo import Algoritmo
 from tp_Constantes import *
-from tp_SA import AttributeTracking
-from tp_CE import ExpertKnowledge
+from tp_SA import SeguimientoAtributos
+from tp_CE import ConocimientoExperto
 #
 
 
 # Obtener el archivo de configuracion
 archivoConfiguracion = "Configuracion-TangentePenitente.txt"
 
-#Initialize the Parameters object - this will parse the configuration file and store all constants and parameters.
-ConfigParser(archivoConfiguracion)
+# Inicializa el objeto de parametros - esto parsea el archivo de configuracion y almacena todas las constantes y parametros
+ConfigParseador(archivoConfiguracion)
 
-if cons.offlineData:  
-    print('ExSTraCS Offline Environment Mode Initiated.')
-    if cons.internalCrossValidation == 0 or cons.internalCrossValidation == 1:  #No internal Cross Validation
-        #Engage Timer - tracks run time of algorithm and it's components.
-        timer = Timer() #TIME
-        cons.referenceTimer(timer)
-        cons.timer.startTimeInit()
-        #Initialize the Environment object - this manages the data presented to ExSTraCS 
-        env = Offline_Environment()
-        cons.referenceEnv(env) #Send reference to environment object to constants - to access from anywhere in ExSTraCS
-        cons.parseIterations() 
+if cons.datosOffline:  
+    print('Tangente Penitente: Modo con Ambiente Offline iniciado')
+
+    if cons.validacionCruzadaInterna == 0 or cons.validacionCruzadaInterna == 1:  # No se hace validacion cruzada interna
+        # Enganche del cronometro - cuenta el tiempo de ejecucion del algoritmo y sus componentes
+        tempo = Cronometro() # Tiempo
+        cons.referenciaCronometro(tempo)
+        cons.cronometro.startTimeInit()
+
+        # Inicializa el objeto del ambiente - esto administra los datos presentados a Tangente Penitente
+        amb = AmbienteOffline() 
+        cons.referenceEnv(amb) # Envia referencia del objeto ambiente a las constantes - para acceder desde cualquier lugar en TP
+        cons.parsearIteraciones() 
         
-        #Instantiate ExSTraCS Algorithm
-        algorithm = ExSTraCS()
-        if cons.onlyTest:
-            cons.timer.stopTimeInit()
-            algorithm.runTestonly()
+        # Instanciar el algoritmo de Tangente Penitente
+        algoritmo = Algoritmo()
+
+        if cons.soloPrueba:
+            cons.cronometro.stopTimeInit()
+            algoritmo.correrSoloPrueba()
+
         else:
-            if cons.onlyRC:
-                cons.timer.stopTimeInit()
-                algorithm.runRConly()
+            if cons.soloCR:
+                cons.cronometro.stopTimeInit()
+                algoritmo.correrSoloCR()
+
             else: 
-                if cons.onlyEKScores:
-                    cons.timer.stopTimeInit()
-                    EK = ExpertKnowledge(cons)
-                    print("Algorithm Run Complete")
-                else: #Run the ExSTraCS algorithm.
-                    if cons.useExpertKnowledge: #Transform EK scores into probabilities weights for covering. Done once. EK must be externally provided.
-                        cons.timer.startTimeEK()
-                        EK = ExpertKnowledge(cons)
-                        cons.referenceExpertKnowledge(EK)
-                        cons.timer.stopTimeEK()
+                if cons.soloPuntajesCE:
+                    cons.cronometro.stopTimeInit()
+                    CE = ConocimientoExperto(cons)
+                    print("Tangente Penitente: Ejecucion del algoritmo completada")
+
+                else: # Ejecuta el algoritmo de Tangente Penitente
+                    if cons.useExpertKnowledge: # Transforma los puntajes de CE en pesos de probabilidades para el covering. Se hace una vez. El CE desde ser proveido externamente
+                        cons.cronometro.startTimeEK() 
+                        CE = ConocimientoExperto(cons)
+                        cons.referenciaConocimientoExperto(CE)
+                        cons.cronometro.stopTimeEK()
                         
-                    if cons.doAttributeTracking:
-                        cons.timer.startTimeAT()
-                        AT = AttributeTracking(True)
-                        cons.timer.stopTimeAT()
+                    if cons.hacerSeguimientoAtributos:
+                        cons.cronometro.startTimeAT()
+                        AT = SeguimientoAtributos(True)
+                        cons.cronometro.stopTimeAT()
+
                     else:
-                        AT = AttributeTracking(False)
+                        AT = SeguimientoAtributos(False)
+
                     cons.referenceAttributeTracking(AT)
-                    cons.timer.stopTimeInit()
-                    algorithm.runExSTraCS()
+                    cons.cronometro.stopTimeInit()
+                    algoritmo.correrTP()
+
     else:
-        print("Running ExSTraCS with Internal Cross Validation") 
-        for part in range(cons.internalCrossValidation):
-            cons.updateFileNames(part)  
+        print("Ejecutando Tangente Penitente con validacion cruzada interna...") 
+        
+        for part in range(cons.validacionCruzadaInterna):
+            cons.actualizarNombresArchivos(part)  
             
-            #Engage Timer - tracks run time of algorithm and it's components.
-            timer = Timer() #TIME
-            cons.referenceTimer(timer)
-            cons.timer.startTimeInit()
-            #Initialize the Environment object - this manages the data presented to ExSTraCS 
-            env = Offline_Environment()
-            cons.referenceEnv(env) #Send reference to environment object to constants - to access from anywhere in ExSTraCS
-            cons.parseIterations() 
+            # Enganche del cronometro - cuenta el tiempo de ejecucion del algoritmo y sus componentes
+            tempo = Cronometro()
+            cons.referenciaCronometro(tempo)
+            cons.cronometro.startTimeInit()
+
+            # Inicializa el objeto del ambiente - esto administra los datos presentados a Tangente Penitente
+            amb = AmbienteOffline()
+            cons.referenciaAmb(amb) # Envia referencia del objeto ambiente a las constantes - para acceder desde cualquier lugar en TP
+            cons.parsearIteraciones() 
             
-            #Instantiate ExSTraCS Algorithm
-            algorithm = ExSTraCS()
-            if cons.onlyTest:
-                cons.timer.stopTimeInit()
-                algorithm.runTestonly()
+            # Instanciar el algoritmo de Tangente Penitente
+            algoritmo = Algoritmo()
+            if cons.soloPrueba:
+                cons.cronometro.stopTimeInit()
+                algoritmo.correrSoloPrueba()
+
             else:
-                if cons.onlyRC:
-                    cons.timer.stopTimeInit()
-                    algorithm.runRConly()
+                if cons.soloCR:
+                    cons.cronometro.stopTimeInit()
+                    algoritmo.correrSoloCR()
+
                 else: 
-                    if cons.onlyEKScores:
-                        cons.timer.stopTimeInit()
+                    if cons.soloPuntajesCE:
+                        cons.cronometro.stopTimeInit()
                         cons.runFilter()
-                        print("Algorithm Run Complete") 
+                        print("Tangente Penitente: Ejecucion del algoritmo completada")
+
                     else: #Run the ExSTraCS algorithm.
-                        if cons.useExpertKnowledge: #Transform EK scores into probabilities weights for covering. Done once. EK must be externally provided.
+                        if cons.useExpertKnowledge: #Transform CE scores into probabilities weights for covering. Done once. CE must be externally provided.
                             cons.timer.startTimeEK()
-                            EK = ExpertKnowledge(cons)
-                            cons.referenceExpertKnowledge(EK)
+                            CE = ConocimientoExperto(cons)
+                            cons.referenceExpertKnowledge(CE)
                             cons.timer.stopTimeEK()
                             
                         if cons.doAttributeTracking:
                             cons.timer.startTimeAT()
-                            AT = AttributeTracking(True)
+                            AT = SeguimientoAtributos(True)
                             cons.timer.stopTimeAT()
+
                         else:
-                            AT = AttributeTracking(False)
+                            AT = SeguimientoAtributos(False)
+
                         cons.referenceAttributeTracking(AT)
                         cons.timer.stopTimeInit()
-                        algorithm.runExSTraCS()
-else: #Online Dataset (Does not allow Expert Knowledge, Attribute Tracking, Attribute Feedback, or cross-validation)
-    #Engage Timer - tracks run time of algorithm and it's components.
-    print("ExSTraCS Online Environment Mode Initiated.") 
-    timer = Timer() #TIME
-    cons.referenceTimer(timer)
-    cons.timer.startTimeInit()
+                        algoritmo.correrTP()
+
+else: # Conjunto de datos online (No permite Conocimiento Experto, Seguimiento de Atributos, o validacion cruzada)
+    # Enganche del cronometro - cuenta el tiempo de ejecucion del algoritmo y sus componentes
+    print("Tangente Penitente: Modo con Ambiente Online iniciado") 
+    tempo = Cronometro()
+    cons.referenciaCronometro(tempo)
+    cons.cronometro.startTimeInit()
     cons.overrideParameters()
     
-    #Initialize the Environment object - this manages the data presented to ExSTraCS 
-    env = Online_Environment()
-    cons.referenceEnv(env) #Send reference to environment object to constants - to access from anywhere in ExSTraCS
-    cons.parseIterations() 
+    # Inicializa el objeto del ambiente - esto administra los datos presentados a Tangente Penitente
+    amb = AmbienteOnline()
+    cons.referenciaAmb(amb) # Envia referencia del objeto ambiente a las constantes - para acceder desde cualquier lugar en TP
+    cons.parsearIteraciones() 
     
     #Instantiate ExSTraCS Algorithm
-    algorithm = ExSTraCS()
-    cons.timer.stopTimeInit()
-    if cons.onlyRC:
-        algorithm.runRConly()
+    algoritmo = Algoritmo()
+    cons.cronometro.stopTimeInit()
+    if cons.soloCR:
+        algoritmo.correrSoloCR()
     else: 
-        algorithm.runExSTraCS()
+        algoritmo.correrTP()
