@@ -14,13 +14,13 @@ import copy
 import random
 #
 
-class AttributeTracking:
+class SeguimientoAtributos:
     def __init__(self, doAttTrack):
         """ Initialize Attribute Tracking Object"""
         self.percent = 0.0
         if doAttTrack:
             self.probabilityList = []
-            self.attAccuracySums = [[0]*cons.env.formatData.numAttributes for i in range(cons.env.formatData.numTrainInstances)]
+            self.attAccuracySums = [[0]*cons.amb.formatData.numAttributes for i in range(cons.amb.formatData.numTrainInstances)]
             if cons.doPopulationReboot:
                 self.rebootAT()
 
@@ -32,7 +32,7 @@ class AttributeTracking:
            
     def updateAttTrack(self, pop):
         """ Attribute Tracking update."""
-        dataRef = cons.env.dataRef
+        dataRef = cons.amb.dataRef
         for ref in pop.correctSet:
             for each in pop.popSet[ref].specifiedAttList:
                 self.attAccuracySums[dataRef][each] += (pop.popSet[ref].accuracy) #Add rule accuracy
@@ -46,7 +46,7 @@ class AttributeTracking:
     def genTrackProb(self):
         """ Calculate and return the attribute probabilities based on the attribute tracking scores. """
         #Choose a random data instance attribute tracking scores
-        currentInstance = random.randint(0,cons.env.formatData.numTrainInstances-1)
+        currentInstance = random.randint(0,cons.amb.formatData.numTrainInstances-1)
         #Get data set reference.
         trackList = copy.deepcopy(self.attAccuracySums[currentInstance])
         #----------------------------------------
@@ -56,7 +56,7 @@ class AttributeTracking:
         maxVal = max(trackList)
         #----------------------------------------
         probList = []
-        for i in range(cons.env.formatData.numAttributes):
+        for i in range(cons.amb.formatData.numAttributes):
             if maxVal == 0.0:
                 probList.append(0.5)
             else:
@@ -67,9 +67,9 @@ class AttributeTracking:
       
     def sumGlobalAttTrack(self):
         """ For each attribute, sum the attribute tracking scores over all instances. For Reporting and Debugging"""
-        globalAttTrack = [0.0 for i in range(cons.env.formatData.numAttributes)]
-        for i in range(cons.env.formatData.numAttributes):
-            for j in range(cons.env.formatData.numTrainInstances):
+        globalAttTrack = [0.0 for i in range(cons.amb.formatData.numAttributes)]
+        for i in range(cons.amb.formatData.numAttributes):
+            for j in range(cons.amb.formatData.numTrainInstances):
                 globalAttTrack[i] += self.attAccuracySums[j][i]
         return globalAttTrack
 
@@ -93,7 +93,7 @@ class AttributeTracking:
             f.close()
 
             #Reorder old att-track values to match new data shuffling.
-            dataLink = cons.env.formatData
+            dataLink = cons.amb.formatData
             for i in range(dataLink.numTrainInstances):
                 targetID = dataLink.trainFormatted[i][2] #gets each instance ID
                 notFound = True
