@@ -11,12 +11,12 @@ Descripcion: Este módulo contiene los métodos para generar los diferentes arch
 """
 
 # Importar modulos requeridos
-from exstracs_constants import *
-from exstracs_at import *
+from tp_Constantes import *
+from tp_SA import *
 import copy
 #
 
-class OutputFileManager:     
+class AdminSalida:     
 
     def writePopStats(self, outFile, trainEval, testEval, exploreIter, pop, correct):
         """ Makes output text file which includes all of the parameter settings used in the run as well as all of the evaluation stats including Time Track Output. """
@@ -57,7 +57,7 @@ class OutputFileManager:
             popStatsOut.write(str(len(pop.popSet))+"\t"+ str(pop.microPopSize)+"\t"+str(pop.aveGenerality)+"\n\n")
     
             popStatsOut.write("SpecificitySum:------------------------------------------------------------------------\n")       
-            headList = cons.env.formatData.trainHeaderList #preserve order of original dataset
+            headList = cons.amb.formatData.trainHeaderList #preserve order of original dataset
     
             for i in range(len(headList)): 
                 if i < len(headList)-1:
@@ -166,7 +166,7 @@ class OutputFileManager:
         """ Calculates pairwise attribute co-occurence througout all rules in the population."""
         if cons.outputAttCoOccur:
             print("Calculating Attribute Co-occurence Scores...")
-            dataLink = cons.env.formatData
+            dataLink = cons.amb.formatData
             dim = dataLink.numAttributes
             maxAtts = 50  #Test 10
             attList = []
@@ -258,16 +258,16 @@ class OutputFileManager:
             trackingSums = cons.AT.attAccuracySums
             #-------------------------------------------------------------------
             f.write(str(cons.labelInstanceID) + '\t') #Write InstanceID label
-            for att in cons.env.formatData.trainHeaderList:
+            for att in cons.amb.formatData.trainHeaderList:
                 f.write(str(att) + '\t')
             f.write(str(cons.labelPhenotype)+ '\n') #Write phenotype label
             #---------------------------------------------------------------
             for i in range(len(trackingSums)):
                 trackList = trackingSums[i]
-                f.write(str(cons.env.formatData.trainFormatted[i][2])+ '\t') #Write InstanceID
+                f.write(str(cons.amb.formatData.trainFormatted[i][2])+ '\t') #Write InstanceID
                 for att in trackList:
                     f.write(str(att) + '\t')
-                f.write(str(cons.env.formatData.trainFormatted[i][1]) +'\n') #Write phenotype
+                f.write(str(cons.amb.formatData.trainFormatted[i][1]) +'\n') #Write phenotype
     
             f.close()
 
@@ -288,16 +288,16 @@ class OutputFileManager:
 
             f.write(str(cons.labelInstanceID) + '\t'+'Endpoint Predictions'+'\t' + 'True Endpoint')
             if cons.env.formatData.discretePhenotype:
-                for eachClass in cons.env.formatData.phenotypeList:
+                for eachClass in cons.amb.formatData.phenotypeList:
                     f.write('\t'+ str(eachClass))
             f.write('\n')
             
             for i in range(len(predictionList)):
-                f.write(str(cons.env.formatData.testFormatted[i][2])+ '\t') #Write InstanceID
+                f.write(str(cons.amb.formatData.testFormatted[i][2])+ '\t') #Write InstanceID
                 f.write(str(predictionList[i])+'\t'+str(realList[i]))
                 if cons.env.formatData.discretePhenotype:
                     propList = []
-                    for eachClass in cons.env.formatData.phenotypeList:
+                    for eachClass in cons.amb.formatData.phenotypeList:
                         propList.append(predictionSets[i][eachClass])
                     for each in propList:
                         f.write('\t'+ str(each))
