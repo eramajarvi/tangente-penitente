@@ -30,48 +30,48 @@ if cons.datosOffline:
         # Enganche del cronometro - cuenta el tiempo de ejecucion del algoritmo y sus componentes
         tempo = Cronometro() # Tiempo
         cons.referenciaCronometro(tempo)
-        cons.cronometro.startTimeInit()
+        cons.cronometro.iniciarTiempoInic()
 
         # Inicializa el objeto del ambiente - esto administra los datos presentados a Tangente Penitente
         amb = AmbienteOffline() 
-        cons.referenceEnv(amb) # Envia referencia del objeto ambiente a las constantes - para acceder desde cualquier lugar en TP
-        cons.parsearIteraciones() 
+        cons.referenciaAmb(amb) # Envia referencia del objeto ambiente a las constantes - para acceder desde cualquier lugar en TP
+        cons.parsearIteraciones()
         
         # Instanciar el algoritmo de Tangente Penitente
         algoritmo = Algoritmo()
 
         if cons.soloPrueba:
-            cons.cronometro.stopTimeInit()
+            cons.cronometro.detenerTiempoInic()
             algoritmo.correrSoloPrueba()
 
         else:
             if cons.soloCR:
-                cons.cronometro.stopTimeInit()
+                cons.cronometro.detenerTiempoInic()
                 algoritmo.correrSoloCR()
 
             else: 
                 if cons.soloPuntajesCE:
-                    cons.cronometro.stopTimeInit()
+                    cons.cronometro.detenerTiempoInic()
                     CE = ConocimientoExperto(cons)
                     print("Tangente Penitente: Ejecucion del algoritmo completada")
 
                 else: # Ejecuta el algoritmo de Tangente Penitente
-                    if cons.useExpertKnowledge: # Transforma los puntajes de CE en pesos de probabilidades para el covering. Se hace una vez. El CE desde ser proveido externamente
-                        cons.cronometro.startTimeEK() 
+                    if cons.usarConocimientoExperto: # Transforma los puntajes de CE en pesos de probabilidades para el covering. Se hace una vez. El CE desde ser proveido externamente
+                        cons.cronometro.iniciarTiempoCE() 
                         CE = ConocimientoExperto(cons)
                         cons.referenciaConocimientoExperto(CE)
-                        cons.cronometro.stopTimeEK()
+                        cons.cronometro.detenerTiempoCE()
                         
                     if cons.hacerSeguimientoAtributos:
-                        cons.cronometro.startTimeAT()
+                        cons.cronometro.iniciarTiempoSA()
                         AT = SeguimientoAtributos(True)
-                        cons.cronometro.stopTimeAT()
+                        cons.cronometro.detenerTiempoSA()
 
                     else:
                         AT = SeguimientoAtributos(False)
 
                     cons.referenceAttributeTracking(AT)
-                    cons.cronometro.stopTimeInit()
+                    cons.cronometro.detenerTiempoInic()
                     algoritmo.correrTP()
 
     else:
