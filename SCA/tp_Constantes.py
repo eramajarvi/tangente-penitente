@@ -16,104 +16,107 @@ import os
 import time
 #
 
-class Constants:
-    def setConstants(self,par):
-        """ Takes the parameters parsed as a dictionary in ExSTraCS_ConfigParser and makes these parameters available throughout ExSTraCS. 
-        Default values are provided for some parameters through the use of try/except commands so that users can generate simpler
-        configuration files that only ."""
+class Constantes:
+    def fijarConstantes(self,par):
+        """ Toma los parámetros analizados como un diccionario en tp_ConfigParseador
+            y hace que estos parámetros estén disponibles en todo Tangente Penitente. 
+            Se proporcionan valores por defecto para algunos parámetros mediante el 
+            uso de comandos try/except para que los usuarios puedan generar archivos 
+            de configuración más sencillos que sólo. """
+
         try:
-            extCheck = par['trainFile'][len(par['trainFile'])-4:len(par['trainFile'])] #Check for included .txt file extension
-            if extCheck == '.txt':
-                self.trainFile = par['trainFile'][0:len(par['trainFile'])-4]
+            chequeoExt = par['archivoEntrenamiento'][len(par['archivoEntrenamiento'])-4:len(par['archivoEntrenamiento'])] #Check for included .txt file extension
+            if chequeoExt == '.txt':
+                self.archivoEntrenamiento = par['archivoEntrenamiento'][0:len(par['archivoEntrenamiento'])-4]
             else:
-                self.trainFile = par['trainFile']                                           #Saved as text
+                self.archivoEntrenamiento = par['archivoEntrenamiento']                                           #Saved as text
         except:
-            print('Constants: Error - Default value not available for "trainFile", please specify value in the configuration file.')
+            print('Constants: Error - Default value not available for "archivoEntrenamiento", please specify value in the configuration file.')
         try:
-            extCheck = par['testFile'][len(par['testFile'])-4:len(par['testFile'])]  #Check for included .txt file extension
-            if extCheck == '.txt':
-                self.testFile = par['testFile'][0:len(par['testFile'])-4]
+            chequeoExt = par['archivoPrueba'][len(par['archivoPrueba'])-4:len(par['archivoPrueba'])]  #Check for included .txt file extension
+            if chequeoExt == '.txt':
+                self.archivoPrueba = par['archivoPrueba'][0:len(par['archivoPrueba'])-4]
             else:
-                self.testFile = par['testFile']                                             #Saved as text
+                self.archivoPrueba = par['archivoPrueba']                                             #Saved as text
         except:
-            self.testFile = 'None'
-        trainName = self.trainFile.split('/')
-        trainName = trainName[len(trainName)-1] #Grab FileName only.
+            self.archivoPrueba = 'None'
+        nombreEntrenamiento = self.archivoEntrenamiento.split('/')
+        nombreEntrenamiento = nombreEntrenamiento[len(nombreEntrenamiento)-1] #Grab FileName only.
         try:
-            if str(par['outFileName']) == 'None' or str(par['outFileName']) == 'none':
-                self.originalOutFileName = trainName                               #Saved as text
-                self.outFileName = trainName +'_ExSTraCS'                          #Saved as text
+            if str(par['archivoSalida']) == 'None' or str(par['archivoSalida']) == 'none':
+                self.nombreOriginalArchivoSalida = nombreEntrenamiento                               #Saved as text
+                self.archivoSalida = nombreEntrenamiento +'_TangPenit'                          #Saved as text
             else:
-                self.originalOutFileName = str(par['outFileName'])+trainName           #Saved as text
-                self.outFileName = str(par['outFileName'])+trainName+'_ExSTraCS'                      #Saved as text
+                self.nombreOriginalArchivoSalida = str(par['archivoSalida'])+nombreEntrenamiento           #Saved as text
+                self.archivoSalida = str(par['archivoSalida'])+nombreEntrenamiento+'_TangPenit'                      #Saved as text
         except:
-            self.originalOutFileName = trainName                               #Saved as text
-            self.outFileName = trainName +'_ExSTraCS'                          #Saved as text
+            self.nombreOriginalArchivoSalida = nombreEntrenamiento                               #Saved as text
+            self.archivoSalida = nombreEntrenamiento +'_TangPenit'                          #Saved as text
         try:
-            self.offlineData = bool(int(par['offlineData']))                        #Saved as Boolean
+            self.datosOffline = bool(int(par['datosOffline']))                        #Saved as Boolean
         except: #Default
-            self.offlineData = True
+            self.datosOffline = True
         try:
-            self.internalCrossValidation = int(par['internalCrossValidation'])      #Saved as int
+            self.validacionCruzadaInterna = int(par['validacionCruzadaInterna'])      #Saved as int
         except: #Default
-            self.internalCrossValidation = 0
+            self.validacionCruzadaInterna = 0
             
         try:
-            if par['randomSeed'] == 'False' or par['randomSeed'] == 'false':
-                self.useSeed = False
+            if par['semillaAleatoria'] == 'False' or par['semillaAleatoria'] == 'false':
+                self.usarSemilla = False
             else:
-                self.useSeed = True
-                self.randomSeed = int(par['randomSeed'])                            #Saved as int
+                self.usarSemilla = True
+                self.semillaAleatoria = int(par['semillaAleatoria'])                            #Saved as int
         except: #Default
-            self.useSeed = False
+            self.usarSemilla = False
               
         #----------------------------------------------------------------------------------
         try:
-            self.labelInstanceID = par['labelInstanceID']                           #Saved as text
+            self.etiquetaIDInstancia = par['etiquetaIDInstancia']                           #Saved as text
         except: #Default
-            self.labelInstanceID = 'InstanceID'
+            self.etiquetaIDInstancia = 'IDInstancia'
         try:
-            self.labelPhenotype = par['labelPhenotype']                             #Saved as text
+            self.etiquetaFenotipo = par['etiquetaFenotipo']                             #Saved as text
         except: #Default
-            self.labelPhenotype = 'Class'
+            self.etiquetaFenotipo = 'Clase'
         try:
-            self.discreteAttributeLimit = int(par['discreteAttributeLimit'])        #Saved as int
+            self.limiteAtributoDiscreto = int(par['limiteAtributoDiscreto'])        #Saved as int
         except: #Default
-            self.discreteAttributeLimit = 10
+            self.limiteAtributoDiscreto = 10
         try:
-            self.labelMissingData = par['labelMissingData']                         #Saved as text
+            self.etiquetaDatosFaltantes = par['etiquetaDatosFaltantes']                         #Saved as text
         except: #Default
-            self.labelMissingData = 'NA'
+            self.etiquetaDatosFaltantes = 'NA'
         try:
-            self.outputSummary = bool(int(par['outputSummary']))                    #Saved as Boolean
+            self.salidaResumen = bool(int(par['salidaResumen']))                    #Saved as Boolean
         except: #Default
-            self.outputSummary = True
+            self.salidaResumen = True
         try:
-            self.outputPopulation = bool(int(par['outputPopulation']))              #Saved as Boolean
+            self.salidaPoblacion = bool(int(par['salidaPoblacion']))              #Saved as Boolean
         except: #Default
-            self.outputPopulation = True
+            self.salidaPoblacion = True
         try:
-            self.outputAttCoOccur = bool(int(par['outputAttCoOccur']))              #Saved as Boolean  
+            self.salidaAttCoOccur = bool(int(par['salidaAttCoOccur']))              #Saved as Boolean  
         except: #Default
-            self.outputAttCoOccur = True     
+            self.salidaAttCoOccur = True     
         try:
-            self.outputTestPredictions = bool(int(par['outputTestPredictions']))              #Saved as Boolean  
+            self.salidaPrediccionesPrueba = bool(int(par['salidaPrediccionesPrueba']))              #Saved as Boolean  
         except: #Default
-            self.outputTestPredictions = True  
+            self.salidaPrediccionesPrueba = True  
         try:
-            self.onlyTest = bool(int(par['onlyTest']))              #Saved as Boolean  
+            self.soloPrueba = bool(int(par['soloPrueba']))              #Saved as Boolean  
         except: #Default
-            self.onlyTest = False
+            self.soloPrueba = False
 
         #----------------------------------------------------------------------------------
         try:
-            self.trackingFrequency = int(par['trackingFrequency'])      #Saved as int
+            self.frecuenciaSeguimiento = int(par['frecuenciaSeguimiento'])      #Saved as int
         except: #Default
-            self.trackingFrequency = 0
+            self.frecuenciaSeguimiento = 0
         try:
-            self.learningIterations = par['learningIterations']         #Saved as text
+            self.iteracionesAprendizaje = par['iteracionesAprendizaje']         #Saved as text
         except: #Default
-            self.learningIterations ='5000.10000.20000.100000'
+            self.iteracionesAprendizaje ='5000.10000.20000.100000'
         try:
             self.N = int(par['N'])                                      #Saved as int
         except: #Default
@@ -127,9 +130,9 @@ class Constants:
         except: #Default
             self.chi = 0.8
         try:
-            self.upsilon = float(par['upsilon'])                        #Saved as float
+            self.epsilon = float(par['epsilon'])                        #Saved as float
         except: #Default
-            self.upsilon = 0.04
+            self.epsilon = 0.04
         try:
             self.theta_GA = int(par['theta_GA'])                        #Saved as int
         except: #Default
@@ -155,13 +158,13 @@ class Constants:
         except: #Default
             self.delta = 0.1
         try:
-            self.init_fit = float(par['init_fit'])                      #Saved as float
+            self.init_apt = float(par['init_apt'])                      #Saved as float
         except: #Default
-            self.init_fit = 0.01
+            self.init_apt = 0.01
         try:
-            self.fitnessReduction = float(par['fitnessReduction'])      #Saved as float
+            self.reduccionAptitud = float(par['reduccionAptitud'])      #Saved as float
         except: #Default
-            self.fitnessReduction = 0.1
+            self.reduccionAptitud = 0.1
         try:
             self.theta_sel = float(par['theta_sel'])                    #Saved as float
         except: #Default
@@ -172,186 +175,189 @@ class Constants:
             self.RSL_Override = 0
         
         try:
-            self.doSubsumption = bool(int(par['doSubsumption']))                #Saved as Boolean
+            self.hacerSubsuncion = bool(int(par['hacerSubsuncion']))                #Saved as Boolean
         except: #Default
-            self.doSubsumption = True
+            self.hacerSubsuncion = True
         try:
-            self.selectionMethod = par['selectionMethod']                       #Saved as text
+            self.metodoSeleccion = par['metodoSeleccion']                       #Saved as text
         except: #Default
-            self.selectionMethod = 'tournament'
+            self.metodoSeleccion = 'torneo'
         
         try:
-            self.doAttributeTracking = bool(int(par['doAttributeTracking']))    #Saved as Boolean
+            self.hacerSeguimientoAtributos = bool(int(par['hacerSeguimientoAtributos']))    #Saved as Boolean
         except: #Default
-            self.doAttributeTracking = True
+            self.hacerSeguimientoAtributos = True
         try:
-            self.doAttributeFeedback = bool(int(par['doAttributeFeedback']))    #Saved as Boolean
+            self.hacerFeedbackAtributos = bool(int(par['hacerFeedbackAtributos']))    #Saved as Boolean
         except: #Default
-            self.doAttributeFeedback = True
+            self.hacerFeedbackAtributos = True
             
         #Expert Knowledge Parameters -----------------------------------------------------------------------
         try:
-            self.useExpertKnowledge = bool(int(par['useExpertKnowledge']))          #Saved as Boolean
+            self.usarConocimientoExperto = bool(int(par['usarConocimientoExperto']))          #Saved as Boolean
         except: #Default
-            self.useExpertKnowledge = True
+            self.usarConocimientoExperto = True
             
-        if self.useExpertKnowledge:
+        if self.usarConocimientoExperto:
             try:
-                if str(par['external_EK_Generation']) == 'None' or str(par['external_EK_Generation']) == 'none':
-                    self.internal_EK_Generation = True
+                if str(par['generacionExternaCE']) == 'None' or str(par['generacionExternaCE']) == 'none':
+                    self.generacionInternaCE = True
                     try:
-                        if par['outEKFileName'] == 'None' or par['outEKFileName'] == 'none':
-                            self.outEKFileName = trainName 
-                            self.originalOutEKFileName = trainName
+                        if par['nombrearchivoSalidaCE'] == 'None' or par['nombrearchivoSalidaCE'] == 'none':
+                            self.nombrearchivoSalidaCE = nombreEntrenamiento 
+                            self.originalnombrearchivoSalidaCE = nombreEntrenamiento
                         else:
-                            self.outEKFileName = par['outEKFileName']+trainName          #Saved as text
-                            self.originalOutEKFileName = par['outEKFileName']+trainName
+                            self.nombrearchivoSalidaCE = par['nombrearchivoSalidaCE']+nombreEntrenamiento          #Saved as text
+                            self.originalnombrearchivoSalidaCE = par['nombrearchivoSalidaCE']+nombreEntrenamiento
                     except:
-                        self.outEKFileName = trainName 
-                        self.originalOutEKFileName = trainName
+                        self.nombrearchivoSalidaCE = nombreEntrenamiento 
+                        self.originalnombrearchivoSalidaCE = nombreEntrenamiento
                     
                 else:
-                    self.internal_EK_Generation = False
+                    self.generacionInternaCE = False
                     try:
-                        self.EK_source = str(par['external_EK_Generation'])  #Saved as text
+                        self.fuenteCE = str(par['generacionExternaCE'])  #Saved as text
                     except:
                         print('Constants: Error - No default available for external EK file.')
      
-            except: #Default - external_EK_Generation is not specified.
-                self.internal_EK_Generation = True
+            except: #Default - generacionExternaCE is not specified.
+                self.generacionInternaCE = True
                 try:
-                    if par['outEKFileName'] == 'None' or par['outEKFileName'] == 'none':
-                        self.outEKFileName = trainName 
-                        self.originalOutEKFileName = trainName
+                    if par['nombrearchivoSalidaCE'] == 'None' or par['nombrearchivoSalidaCE'] == 'none':
+                        self.nombrearchivoSalidaCE = nombreEntrenamiento 
+                        self.originalnombrearchivoSalidaCE = nombreEntrenamiento
                     else:
-                        self.outEKFileName = par['outEKFileName']+trainName          #Saved as text
-                        self.originalOutEKFileName = par['outEKFileName']+trainName
+                        self.nombrearchivoSalidaCE = par['nombrearchivoSalidaCE']+nombreEntrenamiento          #Saved as text
+                        self.originalnombrearchivoSalidaCE = par['nombrearchivoSalidaCE']+nombreEntrenamiento
                 except:
-                    self.outEKFileName = trainName 
-                    self.originalOutEKFileName = trainName
+                    self.nombrearchivoSalidaCE = nombreEntrenamiento 
+                    self.originalnombrearchivoSalidaCE = nombreEntrenamiento
                     
         try:
-            self.filterAlgorithm = par['filterAlgorithm']                       #Saved as text
+            self.algoritmoFiltro = par['algoritmoFiltro']                       #Saved as text
         except: #Default
-            self.filterAlgorithm = 'multisurf'
+            self.algoritmoFiltro = 'multisurf'
         try:
-            self.turfPercent = float(par['turfPercent'])                       #Saved as Boolean
+            self.porcentajeTurf = float(par['porcentajeTurf'])                       #Saved as Boolean
         except: #Default
-            self.turfPercent=0.05                              
+            self.porcentajeTurf = 0.05                              
 
-        if self.filterAlgorithm == 'relieff':
+        if self.algoritmoFiltro == 'relieff':
             try:
-                self.reliefNeighbors = int(par['reliefNeighbors'])                  #Saved as int
+                self.vecinosRelief = int(par['vecinosRelief'])                  #Saved as int
             except: #Default
-                self.reliefNeighbors = 10
-        if self.filterAlgorithm != 'multisurf': 
+                self.vecinosRelief = 10
+        if self.algoritmoFiltro != 'multisurf': 
             try:
-                self.reliefSampleFraction = float(par['reliefSampleFraction'])      #Saved as float
+                self.fraccionMuestreoRelief = float(par['fraccionMuestreoRelief'])      #Saved as float
             except: #Default
-                self.reliefSampleFraction = 1.0 
+                self.fraccionMuestreoRelief = 1.0 
         try:
-            self.onlyEKScores = bool(int(par['onlyEKScores']))                  #Saved as Boolean
+            self.soloPuntajesCE = bool(int(par['soloPuntajesCE']))                  #Saved as Boolean
         except: #Default
-            self.onlyEKScores = False
+            self.soloPuntajesCE = False
             
         #Rule Compaction Parameters--------------------------------------------------------------------------------
         try:
-            self.doRuleCompaction = bool(int(par['doRuleCompaction']))          #Saved as Boolean
+            self.hacerCompactacionReglas = bool(int(par['hacerCompactacionReglas']))          #Saved as Boolean
         except: #Default
-            self.doRuleCompaction = True
+            self.hacerCompactacionReglas = True
         try:
-            self.onlyRC = bool(int(par['onlyRC']))                              #Saved as Boolean
+            self.soloCR = bool(int(par['soloCR']))                              #Saved as Boolean
         except: #Default
-            self.onlyRC = False
+            self.soloCR = False
         try:
-            self.ruleCompactionMethod = par['ruleCompactionMethod']             #Saved as text
+            self.metodoCompactacionReglas = par['metodoCompactacionReglas']             #Saved as text
         except: #Default
-            self.ruleCompactionMethod = 'QRF'
+            self.metodoCompactacionReglas = 'QRF'
         #Population Reboot Parameters------------------------------------------------------------------
         try:
-            self.doPopulationReboot = bool(int(par['doPopulationReboot']))      #Saved as Boolean
+            self.hacerReinicioPoblacion = bool(int(par['hacerReinicioPoblacion']))      #Saved as Boolean
         except: #Default
-            self.doPopulationReboot = False
-        if self.doPopulationReboot:
+            self.hacerReinicioPoblacion = False
+        if self.hacerReinicioPoblacion:
             try:
-                self.popRebootPath = self.outFileName+'_'+par['popRebootIteration']                           #Saved as text
+                self.rutaReinicioPob = self.archivoSalida+'_'+par['iteracionReinicioPob']                           #Saved as text
             except:
-                print('Constants: Error - Default value not available for "popRebootPath", please specify value in the configuration file.')
+                print('Constants: Error - Default value not available for "rutaReinicioPob", please specify value in the configuration file.')
     
-        self.firstEpochComplete = False
+        self.primeraEpocaCompleta = False
         
         #CALLBACKS - GUI
-        self.epochCallbacks = []
-        self.iterationCallbacks = []
-        self.checkpointCallbacks = []
+        self.llamadasEpoca = []
+        self.llamadasIteracion = []
+        self.llamadasPuntosControl = []
         
         #CONTROL OBJECTS - GUI
-        self.stop = False
-        self.forceCheckpoint = False
+        self.parar = False
+        self.forzarPuntoControl = False
         
-        if self.internalCrossValidation == 0 or self.internalCrossValidation == 1: 
+        if self.validacionCruzadaInterna == 0 or self.validacionCruzadaInterna == 1: 
             pass
         else: #Do internal CV
-            self.originalTrainFile = copy.deepcopy(self.trainFile)
-            self.originalTestFile = copy.deepcopy(self.testFile) 
+            self.originalarchivoEntrenamiento = copy.deepcopy(self.archivoEntrenamiento)
+            self.originalarchivoPrueba = copy.deepcopy(self.archivoPrueba) 
         
         
-    def referenceTimer(self, timer):
-        """ Store reference to the timer object. """
-        self.timer = timer
+    def referenciaCronometro(self, cronometro):
+        """ Guarda la referencia al objeto del cronometro """
+        self.cronometro = cronometro
         
         
-    def referenceEnv(self, e):
-        """ Store reference to environment object. """
-        self.env = e
+    def referenciaAmb(self, e):
+        """ Guarda la referencia al objeto del ambiente """
+        self.amb = e
 
 
-    def referenceAttributeTracking(self, AT):
-        """ Store reference to attribute tracking object. """
-        self.AT = AT
+    def referenceAttributeTracking(self, SA):
+        """ Guarda la referencia al objeto del seguimiento de atributos """
+        self.SA = SA
 
 
-    def referenceExpertKnowledge(self, EK):
-        """ Store reference to attribute tracking object. """
-        self.EK = EK
+    def referenciaConocimientoExperto(self, CE):
+        """ Guarda la referencia al objeto del conocimiento experto """
+        self.CE = CE
     
     
-    def parseIterations(self):
-        """ Format other key run parameters (i.e. maximum iterations, full evaluation checkpoints, and local evaluation tracking frequency. """
-        checkpoints = self.learningIterations.split('.') #Parse the string specifying evaluation checkpoints, and the maximum number of learning iterations.
-        for i in range(len(checkpoints)): #Convert checkpoint iterations from strings to ints.
-            checkpoints[i] = int(checkpoints[i])
-        self.learningCheckpoints = checkpoints
-        self.maxLearningIterations = self.learningCheckpoints[(len(self.learningCheckpoints)-1)] 
-        if self.trackingFrequency == 0:
-            self.trackingFrequency = self.env.formatData.numTrainInstances  #Adjust tracking frequency to match the training data size - learning tracking occurs once every epoch
+    def parsearIteraciones(self):
+        """ Formatea otros parámetros clave de ejecución (es decir, iteraciones máximas, puntos de control de evaluación completa y frecuencia de seguimiento de la evaluación local). """
+        puntoscontrol = self.iteracionesAprendizaje.split('.') # Analizar el string que especifica los puntos de control de evaluación, y el número máximo de iteraciones de aprendizaje.
+        
+        for i in range(len(puntoscontrol)): # Convierte las iteraciones de los puntos de control de strings a ints.
+            puntoscontrol[i] = int(puntoscontrol[i])
+
+        self.puntoscontrolAprendizaje = puntoscontrol
+        self.maxiteracionesAprendizaje = self.puntoscontrolAprendizaje[(len(self.puntoscontrolAprendizaje)-1)]
+
+        if self.frecuenciaSeguimiento == 0:
+            self.frecuenciaSeguimiento = self.amb.datosFormateados.numInstanciasEntrenamiento # Ajustar la frecuencia de seguimiento para que coincida con el tamaño de los datos de entrenamiento - el seguimiento del aprendizaje ocurre una vez cada época
 
 
-    def updateFileNames(self, part):
-        """ A naming update method used when internal cross validation is applied. """
-        tempName = copy.deepcopy(self.originalTrainFile)
-        folderName = self.originalTrainFile#[0:len(self.originalTrainFile)-4]
-        fileName = tempName.split('\\')
+    def actualizarNombresArchivos(self, part):
+        """ Un método de actualización de nombres utilizado cuando se aplica la validación cruzada interna """
+        nombreTemp = copy.deepcopy(self.originalarchivoEntrenamiento)
+        folderName = self.originalarchivoEntrenamiento # [0:len(self.originalarchivoEntrenamiento)-4]
+        fileName = nombreTemp.split('\\')
         fileName = fileName[len(fileName)-1]
-        #fileName = fileName[0:len(self.originalTrainFile)-4]
+        #fileName = fileName[0:len(self.originalarchivoEntrenamiento)-4]
         
-        self.trainFile = folderName+'\\'+fileName+'_CV_'+str(part)+'_Train'
-        self.testFile = folderName+'\\'+fileName+'_CV_'+str(part)+'_Test'
-        self.outFileName = self.originalOutFileName+'_CV_'+str(part)+'_ExSTraCS'
-        self.outEKFileName = self.originalOutEKFileName+'_CV_'+str(part)+'_ExSTraCS'
+        self.archivoEntrenamiento = folderName+'\\'+fileName+'_CV_'+str(part)+'_Train'
+        self.archivoPrueba = folderName+'\\'+fileName+'_CV_'+str(part)+'_Test'
+        self.archivoSalida = self.nombreOriginalArchivoSalida+'_CV_'+str(part)+'_TangPenit'
+        self.nombrearchivoSalidaCE = self.originalnombrearchivoSalidaCE+'_CV_'+str(part)+'_TangPenit'
             
             
     def overrideParameters(self):
         """ Overrides user specified parameters for algorithm features that can not be applied to online datasets. """
-        self.doAttributeTracking = False    #Saved as Boolean
-        self.doAttributeFeedback = False    #Saved as Boolean
-        self.useExpertKnowledge = False     #Saved as Boolean
-        self.internal_EK_Generation = False #Saved as Boolean
-        self.testFile = 'None'
-        self.trainFile = 'None'
-        self.doRuleCompaction = False       #Saved as Boolean
-        self.onlyRC = False                 #Saved as Boolean
-        if self.trackingFrequency == 0:
-            self.trackingFrequency = 50
+        self.hacerSeguimientoAtributos = False    #Saved as Boolean
+        self.hacerFeedbackAtributos = False    #Saved as Boolean
+        self.usarConocimientoExperto = False     #Saved as Boolean
+        self.generacionInternaCE = False #Saved as Boolean
+        self.archivoPrueba = 'None'
+        self.archivoEntrenamiento = 'None'
+        self.hacerCompactacionReglas = False       #Saved as Boolean
+        self.soloCR = False                 #Saved as Boolean
+        if self.frecuenciaSeguimiento == 0:
+            self.frecuenciaSeguimiento = 50
     
-cons = Constants() #To access one of the above constant values from another module, import GHCS_Constants * and use "cons.Xconstant"
+cons = Constantes() #To access one of the above constant values from another module, import GHCS_Constants * and use "cons.Xconstant"
