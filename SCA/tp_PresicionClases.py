@@ -7,7 +7,7 @@ Descripcion: Se utiliza para evaluaciones globales de la población de reglas
              discreto incluye dos o más clases posibles.
 """
 
-class ClassAccuracy:
+class PresicionClases:
     def __init__(self):
         """ Initialize the accuracy calculation for a single class """
         self.T_myClass = 0      #true positive for binary class problems
