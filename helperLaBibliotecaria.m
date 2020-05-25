@@ -15,8 +15,8 @@ datasetTodosDias = zeros(cantidadDias * 720, 7);
 
 % Rutas para importar los perfiles optimos de forma recursiva con los datos
 % de todos los dias y guardar los datasets generados
-rutaCargaPerfiles = 'C:\Users\james\Documents\Github\tangente-penitente\perfiles\';
-rutaGuardadoDatasets = 'C:\Users\james\Documents\Github\tangente-penitente\datasets\';
+rutaCargaPerfiles = 'C:\Users\james\Documents\Github\tp-legacy\perfiles\';
+rutaGuardadoDatasets = 'C:\Users\james\Documents\Github\ExctractsBase\Datasets\';
 
 % Funciones anonimas
 % Usadas para controlar el indice de asignacion de la matriz dataset que 
@@ -73,7 +73,7 @@ for i = 1 : 1 : cantidadDias
 
 end
 
-exportarDataset(rutaGuardadoDatasets, datasetTodosDias);
+%exportarDataset(rutaGuardadoDatasets, datasetTodosDias);
 exportarDatasetMinimo(rutaGuardadoDatasets, datasetTodosDias);
 
 fprintf('La Bibliotecaria ha terminado de analizar %d perfiles óptimos en %f segundos \n\n', cantidadDias, toc);
@@ -94,12 +94,12 @@ end
 
 function exportarDatasetMinimo(rutaGuardadoDatasets, datasetTodosDias)
 
-    fileID = fopen([rutaGuardadoDatasets, 'datasetTP.txt'], 'w');
+    fileID = fopen([rutaGuardadoDatasets, 'datasetTPTEST.txt'], 'w');
     formatoEncabezado = ['%s %1s %1s %1s %1s %1s %1s\r\n'];
     formatoDatos = ['%.4f %1.4f %1.4f %1.4f %1.4f %1.4f %1.0f\r\n'];
     
     fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'R_3', 'R_4', 'R_5', 'Class');
-    fprintf(fileID, formatoDatos, datasetTodosDias(1:1000, :)');
+    fprintf(fileID, formatoDatos, datasetTodosDias(21601:43200, :)');
     fclose(fileID);
 end
 
