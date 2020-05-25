@@ -10,537 +10,667 @@ Descripcion: El principal módulo de control de Tangente Penitente. Incluye el b
 
 # Importar modulos requeridos
 from tp_Constantes import *
-from tp_ConjuntoClasificadores import ClassifierSet
+from tp_ConjuntoClasificadores import ConjuntoClasificadores
 from tp_Prediccion import *
 from tp_SA import *
-from tp_CR import RuleCompaction
-from tp_PrecisionClases import ClassAccuracy
-from tp_Salida import OutputFileManager
+from tp_CR import CompactacionReglas
+from tp_PresicionClases import PresicionClases
+from tp_Salida import AdminSalida
+
 import copy
 import random
 import math
+import random
 # 
 
-class ExSTraCS:
+class Algoritmo:
     def __init__(self):
-        """ Initializes the ExSTraCS algorithm """
-        print("ExSTraCS: Initializing Algorithm...")
-        #Global Parameters-------------------------------------------------------------------------------------
-        self.population = None
-        self.learnTrackOut = None  #Output file that stores tracking information during learning
+        """ Inicializa el algoritmo de Tangente Penitente """
+
+        print("Algoritmo: Inicializando...")
+
+        # Parametros globales
+        self.poblacion = None
+        self.salidaSeguimientoAprendizaje = None  # Archivo de salida que guarda la informacion del seguimiento durante el aprendizaje     
+
         #-------------------------------------------------------
-        # POPULATION REBOOT - Begin ExSTraCS learning from an existing saved rule population
-        #-------------------------------------------------------
-        if cons.doPopulationReboot: #If we are restarting from a previously saved rule population.
-            try: #Re-open track learning file for continued tracking of progress.
-                filename = "{}._LearnTrack.txt".format(cons.outFileName)
-                os.makedirs(os.path.dirname(filename), exist_ok=True)
-                self.learnTrackOut = open(filename,'a')
+        # REINICIO DE LA POBLACION
+        # Inicia el aprendizaje desde una poblacion existente de reglas guardada
+        #-------------------------------------------------------  
+        
+        if cons.hacerReinicioPoblacion: # Si estamos reiniciando desde una poblacion de reglas previamente guardadas           
+            try: # Reabrir el archivo de aprendizaje para continuar el seguimiento continuado del progreso
+                nombrearchivo = "{}._SeguimientoAprendizaje.txt".format(cons.archivoSalida)
+                os.makedirs(os.path.dirname(nombrearchivo), exist_ok=True)
+                self.salidaSeguimientoAprendizaje = open(nombrearchivo,'a')
+
             except Exception as inst:
                 print(type(inst))
                 print(inst.args)
                 print(inst)
-                print('cannot open', cons.outFileName+'_LearnTrack.txt')
+                print('No se pudo abrir', cons.archivoSalida + '_SeguimientoAprendizaje.txt')
                 raise
-            self.populationReboot()
+
+            self.reinicioPoblacion()
 
         #-------------------------------------------------------
-        # NORMAL ExSTraCS - Run ExSTraCS from scratch on given data
+        # TANGENTE PENITENTE NORMAL
+        # Ejecuta Tangente Penitente desde cero con los datos dados
         #-------------------------------------------------------
         else:
-            try: #Establish output file to store learning progress.
-                filename = "{}._LearnTrack.txt".format(cons.outFileName)
-                os.makedirs(os.path.dirname(filename), exist_ok=True)
-                self.learnTrackOut = open(filename,'w')
+            try: # Establece el archivo de salida para guardar el progreso de aprendizaje
+                nombrearchivo = "{}._SeguimientoAprendizaje.txt".format(cons.archivoSalida)
+                os.makedirs(os.path.dirname(nombrearchivo), exist_ok=True)
+                self.salidaSeguimientoAprendizaje = open(nombrearchivo,'w')
+
             except Exception as inst:
                 print(type(inst))
                 print(inst.args)
                 print(inst)
-                print('cannot open', cons.outFileName+'_LearnTrack.txt')
+                print('No se pudo abrir', cons.archivoSalida+'_SeguimientoAprendizaje.txt')
                 raise
             else:
-                self.learnTrackOut.write("Explore_Iteration\tMacroPopSize\tMicroPopSize\tAccuracy_Estimate\tAveGenerality\tExpRules\tTime(min)\n")
+                self.learnTrackOut.write("Iteracion_Exploracion\tTamanoMacroPob\tTamanoMicroPop\tEstimado_Precision\tGeneralidadProm\tReglasExp\tTiempo(min)\n")
 
-            # Instantiate Population---------
-            self.population = ClassifierSet()
+            # Instanciar poblacion
+            self.poblacion = ConjuntoClasificadores()
             self.exploreIter = 0
-            self.correct  = [0.0 for i in range(cons.trackingFrequency)]
-            self.predictionList = [] #For outputting raw testing predictions
-            self.realList = []
-            self.predictionSets = []
+            self.correcto  = [0.0 for i in range(cons.frecuenciaSeguimiento)]
+            self.listaPrediccion = [] # Para ir sacando predicciones de prueba crudas
+            self.listaReal = []
+            self.conjuntoPrediccion = []
 
-    def runExSTraCS(self):
-        """ Runs the initialized ExSTraCS algorithm. """
-        print("Beginning ExSTraCS learning iterations.")
-        print("------------------------------------------------------------------------------------------------------------------------------------------------------")
+    def correrTP(self):
+        """ Ejecuta el algoritmo de Tangente Penitente inicializado """
+        print("Iniciando iteraciones de aprendizaje")
+        print("----------------------------------------------------")
+
         #-------------------------------------------------------
-        # MAJOR LEARNING LOOP
+        # MAYOR BUCLE DE APRENDIZAJE
         #-------------------------------------------------------
-        while self.exploreIter < cons.maxLearningIterations and not cons.stop: #Major Learning Loop
-            #-------------------------------------------------------
-            # GET NEW INSTANCE AND RUN A LEARNING ITERATION
-            #-------------------------------------------------------
-            state_phenotype = cons.env.getTrainInstance()
-            self.runIteration(state_phenotype, self.exploreIter)
+        while self.exploreIter < cons.maxiteracionesAprendizaje and not cons.parar:
+            #---------------------------------------------------------------------
+            # Obtener una nueva instancia y ejecutar una iteracion de aprendizaje
+            #---------------------------------------------------------------------
+            estadoFenotipo = cons.amb.obtenerInstanciaEntrenamiento()
+            self.correrIteracion(estadoFenotipo, self.exploreIter)
 
-            #-------------------------------------------------------------------------------------------------------------------------------
-            # EVALUATIONS OF ALGORITHM
-            #-------------------------------------------------------------------------------------------------------------------------------
-            cons.timer.startTimeEvaluation()
-            #-------------------------------------------------------
-            # TRACK LEARNING ESTIMATES
-            #-------------------------------------------------------
-            #Learning Tracking----------------------------------------------------------------------------------------------------------------------------------------
-            if (self.exploreIter%cons.trackingFrequency) == (cons.trackingFrequency - 1) and self.exploreIter > 0:
-                self.population.runPopAveEval(self.exploreIter)
-                trackedAccuracy = sum(self.correct)/float(cons.trackingFrequency) #Accuracy over the last "trackingFrequency" number of iterations.
-                self.learnTrackOut.write(self.population.getPopTrack(trackedAccuracy, self.exploreIter+1,cons.trackingFrequency)) #Report learning progress to standard out and tracking file.
-                for observer in cons.epochCallbacks:
-                    observer(self.exploreIter, self.population, trackedAccuracy)
-            cons.timer.stopTimeEvaluation()
-            #-------------------------------------------------------
-            # CHECKPOINT - COMPLETE EVALUTATION OF POPULATION - Evaluation strategy different for discrete vs continuous phenotypes
-            #-------------------------------------------------------
-            if (self.exploreIter + 1) in cons.learningCheckpoints or cons.forceCheckpoint:
-                if(cons.forceCheckpoint):
-                    cons.forceCheckpoint = False
-                cons.timer.startTimeEvaluation()
-                print("------------------------------------------------------------------------------------------------------------------------------------------------------")
-                print("Running Population Evaluation after " + str(self.exploreIter + 1)+ " iterations.")
-                self.population.runPopAveEval(self.exploreIter)
-                self.population.runAttGeneralitySum()
-                cons.env.startEvaluationMode()
-                if cons.testFile != 'None': #If a testing file is available.
-                    if cons.env.formatData.discretePhenotype:
-                        trainEval = self.doPopEvaluation(True)
-                        testEval = self.doPopEvaluation(False)
-                    else:
-                        print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
-                elif cons.trainFile != 'None':
-                    if cons.env.formatData.discretePhenotype:
-                        trainEval = self.doPopEvaluation(True)
-                        testEval = None
-                    else:
-                        print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
-                else: #Online Environment
-                    trainEval = None
-                    testEval = None
-                cons.env.stopEvaluationMode() #Returns to learning position in training data
-                cons.timer.stopTimeEvaluation()
-                #-----------------------------------------------------------------------------------------------------------------------------------------
-                # WRITE OUTPUT FILES
-                #-----------------------------------------------------------------------------------------------------------------------------------------
-                cons.timer.startTimeOutFile()
-                OutputFileManager().writePopStats(cons.outFileName, trainEval, testEval, self.exploreIter + 1, self.population, self.correct)
-                OutputFileManager().writePop(cons.outFileName, self.exploreIter + 1, self.population)
-                OutputFileManager().attCo_Occurence(cons.outFileName, self.exploreIter + 1, self.population)
-                OutputFileManager().save_tracking(self.exploreIter, cons.outFileName)
-                OutputFileManager().writePredictions(self.exploreIter, cons.outFileName, self.predictionList, self.realList, self.predictionSets)
-                cons.timer.stopTimeOutFile()
+            #---------------------------------
+            # Evaluaciones del algoritmo
+            #---------------------------------
+            cons.cronometro.iniciarTiempoEvaluacion()
 
-                #GUI ONLY--------------------------------
-                for observer in cons.checkpointCallbacks:
-                    observer(trainEval, testEval)
-                #----------------------------------------
-                print("Continue Learning...")
-                print("------------------------------------------------------------------------------------------------------------------------------------------------------")
-                #-----------------------------------------------------------------------------------------------------------------------------------------
-                # RULE COMPACTION
-                #-----------------------------------------------------------------------------------------------------------------------------------------
-                if self.exploreIter + 1 == cons.maxLearningIterations and cons.doRuleCompaction:
-                    cons.timer.startTimeRuleCmp()
-                    if testEval == None:
-                        RuleCompaction(self.population, trainEval[0], None)
+            #-----------------------------------
+            # SEGUIR ESTIMADOS DE APRENDIZAJE
+            #-----------------------------------
+            if (self.exploreIter % cons.frecuenciaSeguimiento) == (cons.frecuenciaSeguimiento - 1) and self.exploreIter > 0:
+
+                self.poblacion.ejecutarEvalPobProm(self.exploreIter)
+
+                presicionSeguida = sum(self.correcto)/float(cons.frecuenciaSeguimiento) # Presicion sobre el ultimo numero de iteracion de "frecuenciaSeguimiento" 
+
+                self.salidaSeguimientoAprendizaje.write(self.poblacion.obtenerSeguimientoPob(presicionSeguida, self.exploreIter + 1, cons.frecuenciaSeguimiento)) # Reporta el progreso de aprendizaje al archivo de salida estandar y de segumineto
+
+                for observador in cons.llamadasEpoca:
+                    observador(self.exploreIter, self.poblacion, presicionSeguida)
+
+            cons.cronometro.detenerTiempoEvaluacion()
+
+            #-------------------------------------------------------------------------------
+            # PUNTO DE CONTROL - Evaluacion completa de la poblacion
+            # La estrategia de evaluacion es diferente para fenotipos discretos vs continuos
+            #-------------------------------------------------------------------------------
+            if (self.exploreIter + 1) in cons.puntoscontrolAprendizaje or cons.forzarPuntoControl:
+
+                if(cons.forzarPuntoControl):
+                    cons.forzarPuntoControl = False
+
+                cons.cronometro.iniciarTiempoEvaluacion()
+
+                print("-----------------------------------------------------------")
+                print("Ejecutando evaluacion de la poblacion despues de " + str(self.exploreIter + 1) + " iteraciones.")
+                self.poblacion.ejecutarEvalPobProm(self.exploreIter)
+                self.poblacion.ejecutarSumaGeneralidadAtributos()
+
+                cons.amb.iniciarModoEvaluacion()
+
+                if cons.archivoPrueba != 'None': # Si hay un archivo de prueba disponible
+                    if cons.amb.datosFormateados.fenotipoDiscreto:
+                        evalEntrena = self.hacerEvaluacionPob(True)
+                        evalPrueba = self.hacerEvaluacionPob(False)
+
                     else:
-                        RuleCompaction(self.population, trainEval[0], testEval[0])
-                    cons.timer.stopTimeRuleCmp()
-                    #-----------------------------------------------------------------------------------------------------------------------------------------
-                    # GLOBAL EVALUATION OF COMPACTED RULE POPULATION
-                    #-----------------------------------------------------------------------------------------------------------------------------------------
-                    cons.timer.startTimeEvaluation()
-                    self.population.recalculateNumerositySum()
-                    self.population.runPopAveEval(self.exploreIter)
-                    self.population.runAttGeneralitySum()
+                        print("Algoritmo - Error: Tangente Penitente no puede manejar endpoints continuos")
+
+                elif cons.archivoEntrenamiento != 'None':
+                    if cons.amb.datosFormateados.fenotipoDiscreto:
+                        evalEntrena = self.hacerEvaluacionPob(True)
+                        evalPrueba = None
+
+                    else:
+                        print("Algoritmo - Error: Tangente Penitente no puede manejar endpoints continuos.")
+
+                else: # Ambiente online
+                    evalEntrena = None
+                    evalPrueba = None
+
+                cons.amb.detenerModoEvaluacion() # Se devuelve a la posicion de aprendizaje en los datos de entrenamiento
+                cons.cronometro.detenerTiempoEvaluacion()
+
+                #-----------------------------
+                # ESCRIBIR ARCHIVOS DE SALIDA
+                #-----------------------------
+                cons.cronometro.iniciarTiempoArchivoSalida()
+                AdminSalida().escribirEstadisticasPob(cons.archivoSalida, evalEntrena, evalPrueba, self.exploreIter + 1, self.poblacion, self.correcto)
+                AdminSalida().escribirPob(cons.archivoSalida, self.exploreIter + 1, self.population)
+                AdminSalida().occurenciaAttCo(cons.archivoSalida, self.exploreIter + 1, self.population)
+                AdminSalida().guardarSeguimiento(self.exploreIter, cons.archivoSalida)
+                AdminSalida().escribirPredicciones(self.exploreIter, cons.archivoSalida, self.listaPrediccion, self.listaReal, self.conjuntoPrediccion)
+                cons.cronometro.detenerTiempoArchivoSalida()
+
+                #
+                for observador in cons.llamadasPuntosControl:
+                    observador(evalEntrena, evalPrueba)
+                #
+
+                print("Algoritmo: Continua aprendiendo...")
+                print("--------------------------------------------------------------------------------")
+                #------------------------
+                # COMPACTACION DE REGLAS
+                #------------------------
+                if self.exploreIter + 1 == cons.maxiteracionesAprendizaje and cons.hacerCompactacionReglas:
+                    cons.cronometro.iniciarTiempoCompReg()
+                    if evalPrueba == None:
+                        CompactacionReglas(self.poblacion, evalEntrena[0], None)
+
+                    else:
+                        CompactacionReglas(self.poblacion, evalEntrena[0], evalPrueba[0])
+
+                    cons.cronometro.detenerTiempoCompReg()
+
+                    #-----------------------------------------------------
+                    # EVALUACION GLOBAL DE POBLACION DE REGLAS COMPACTADA
+                    #-----------------------------------------------------
+                    cons.cronometro.iniciarTiempoEvaluacion()
+                    self.poblacion.recalculateNumerositySum()
+                    self.poblacion.runPopAveEval(self.exploreIter)
+                    self.poblacion.runAttGeneralitySum()
                     #----------------------------------------------------------
-                    cons.env.startEvaluationMode()
-                    if cons.testFile != 'None': #If a testing file is available.
-                        if cons.env.formatData.discretePhenotype:
-                            trainEval = self.doPopEvaluation(True)
-                            testEval = self.doPopEvaluation(False)
+
+                    cons.amb.iniciarModoEvaluacion()
+
+                    if cons.archivoPrueba != 'None': # Si hay disponible un archivo de prueba
+                        if cons.env.datosFormateados.fenotipoDiscreto:
+                            evalEntrena = self.hacerEvaluacionPob(True)
+                            evalPrueba = self.hacerEvaluacionPob(False)
+
                         else:
-                            print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
+                            print("Algoritmo - Error: Tangente Penitente no puede manipular endpoints continuos")
                     else:
                         if cons.env.formatData.discretePhenotype:
-                            trainEval = self.doPopEvaluation(True)
-                            testEval = None
+                            evalEntrena = self.hacerEvaluacionPob(True)
+                            evalPrueba = None
+
                         else:
-                            print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
-                    cons.env.stopEvaluationMode()
-                    cons.timer.stopTimeEvaluation()
+                            print("Algoritmo - Error: Tangente Penitente no puede manipular endpoints continuos")
 
-                    #-----------------------------------------------------------------------------------------------------------------------------------------
-                    # WRITE OUTPUT FILES
-                    #-----------------------------------------------------------------------------------------------------------------------------------------
-                    cons.timer.startTimeOutFile()
-                    OutputFileManager().writePopStats(cons.outFileName+"_RC_"+cons.ruleCompactionMethod, trainEval, testEval, self.exploreIter + 1, self.population, self.correct)
-                    OutputFileManager().writePop(cons.outFileName+"_RC_"+cons.ruleCompactionMethod, self.exploreIter + 1, self.population)
-                    OutputFileManager().attCo_Occurence(cons.outFileName+"_RC_"+cons.ruleCompactionMethod, self.exploreIter + 1, self.population)
-                    OutputFileManager().writePredictions(self.exploreIter, cons.outFileName+"_RC_"+cons.ruleCompactionMethod, self.predictionList, self.realList, self.predictionSets)
-                    cons.timer.stopTimeOutFile()
+                    cons.amb.detenerModoEvaluacion()
+                    cons.cronometro.detenerTiempoEvaluacion()
 
-            #GUI ONLY--------------------------------
-            for observer in cons.iterationCallbacks:
-                observer()
+                    #-----------------------------
+                    # ESCRIBIR ARCHIVOS DE SALIDA
+                    #-----------------------------
+                    cons.cronometro.iniciarTiempoArchivoSalida()
 
-            #-------------------------------------------------------
-            # ADJUST MAJOR VALUES FOR NEXT ITERATION
-            #-------------------------------------------------------
+                    AdminSalida().escribirEstadisticasPob(cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, evalEntrena, evalPrueba, self.exploreIter + 1, self.population, self.correcto)
+                    AdminSalida().escribirPob(cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, self.exploreIter + 1, self.population)
+                    AdminSalida().occurenciaAttCo(cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, self.exploreIter + 1, self.population)
+                    AdminSalida().escribirPredicciones(self.exploreIter, cons.archivoSalida + "_RC_" + cons.metodoCompactacionReglas, self.listaPrediccion, self.listaReal, self.conjuntoPrediccion)
+                    cons.cronometro.detenerTiempoArchivoSalida()
+
+            #
+            for observador in cons.iterationCallbacks:
+                observador()
+            #
+
+            #-----------------------------------------------------
+            # AJUSTAR VALORES MAYORES PARA LA SIGUIENTE ITERACION
+            #-----------------------------------------------------
             self.exploreIter += 1
-            cons.env.newInstance(True) #move to next instance in training set
+            cons.amb.nuevaInstancia(True) # Mover a la siguiente instancia en el conjunto de entrenamiento
 
-        # Once ExSTraCS has reached the last learning iteration, close the tracking file
-        self.learnTrackOut.close()
-        print("ExSTraCS Run Complete")
+        # Una vez Tangente Penitente ha alcanzado la ultima iteracion de aprendizaje, cerrar el archivo de seguimiento
+        self.salidaSeguimientoAprendizaje.close()
+        print("Ejecucion de Tangente Penitente completada")
 
 
-    def runIteration(self, state_phenotype, exploreIter):
-        """ Run single ExSTraCS learning iteration. """
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # FORM A MATCH SET - includes covering
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        self.population.makeMatchSet(state_phenotype, exploreIter)
+    def correrIteracion(self, estado_fenotipo, exploreIter):
+        """ Ejecuta una unica iteracion de aprendizaje """
+        #------------------------------------
+        # FORMA UN CONJUNTO DE COINCIDENCIAS
+        # Incluyendo el covering
+        #------------------------------------
+        self.poblacion.hacerConjuntoCoincidencias(estado_fenotipo, exploreIter)
         cons.timer.startTimeEvaluation()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # MAKE A PREDICTION - Utilized here for tracking estimated learning progress.  Typically used in the explore phase of many LCS algorithms.
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        prediction = Prediction(self.population)
-        phenotypePrediction = prediction.getDecision()
-        #-------------------------------------------------------
-        # PREDICTION NOT POSSIBLE
-        #-------------------------------------------------------
-        if phenotypePrediction == None or phenotypePrediction == 'Tie':
-            if cons.env.formatData.discretePhenotype:
-                phenotypePrediction = random.choice(cons.env.formatData.phenotypeList)
+
+        #--------------------------------------------------------------------------
+        # HACER UNA PREDICCION
+        # Utilizado aqui para seguir el progreso estimado de aprendizaje
+        # Normalmente usado en la fase de exploracion de varios algoritmos de LCS
+        #--------------------------------------------------------------------------
+        prediccion = Prediccion(self.poblacion)
+        prediccionFenotipo = prediccion.obtenerDecision()
+
+        #-----------------------
+        # PREDICCION NO POSIBLE
+        #-----------------------
+        if prediccionFenotipo == None or prediccionFenotipo == 'Tie':
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                prediccionFenotipo = random.choice(cons.amb.datosFormateados.listaFenotipos)
+
             else:
-                phenotypePrediction = random.randrange(cons.env.formatData.phenotypeList[0],cons.env.formatData.phenotypeList[1],(cons.env.formatData.phenotypeList[1]-cons.env.formatData.phenotypeList[0])/float(1000))
+                prediccionFenotipo = random.randrange(cons.amb.datosFormateados.listaFenotipos[0], cons.amb.datosFormateados.listaFenotipos[1], (cons.amb.datosFormateados.listaFenotipos[1] - cons.amb.datosFormateados.listaFenotipos[0])/float(1000))
+
         else:
-        #-------------------------------------------------------
-        # DISCRETE PHENOTYPE PREDICTION
-        #-------------------------------------------------------
-            if cons.env.formatData.discretePhenotype:
-                if phenotypePrediction == state_phenotype[1]:
-                    self.correct[exploreIter%cons.trackingFrequency] = 1
+        #-------------------------------
+        # PREDICCION FENOTIPO DISCRETO
+        #-------------------------------
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                if prediccionFenotipo == estado_fenotipo[1]:
+                    self.correcto[exploreIter % cons.frecuenciaSeguimiento] = 1
+
                 else:
-                    self.correct[exploreIter%cons.trackingFrequency] = 0
+                    self.correcto[exploreIter % cons.frecuenciaSeguimiento] = 0
             else:
-        #-------------------------------------------------------
-        # CONTINUOUS PHENOTYPE PREDICTION
-        #-------------------------------------------------------
-                predictionError = math.fabs(phenotypePrediction - float(state_phenotype[1]))
-                phenotypeRange = cons.env.formatData.phenotypeList[1] - cons.env.formatData.phenotypeList[0]
-                accuracyEstimate = 1.0 - (predictionError / float(phenotypeRange))
-                self.correct[exploreIter%cons.trackingFrequency] = accuracyEstimate
-        cons.timer.stopTimeEvaluation()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # FORM A CORRECT SET
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        self.population.makeCorrectSet(state_phenotype[1])
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # UPDATE PARAMETERS
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        self.population.updateSets(exploreIter)
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # SUBSUMPTION - APPLIED TO CORRECT SET - A heuristic for addition additional generalization pressure to ExSTraCS
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        if cons.doSubsumption:
-            cons.timer.startTimeSubsumption()
-            self.population.doCorrectSetSubsumption()
-            cons.timer.stopTimeSubsumption()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # ATTRIBUTE TRACKING AND FEEDBACK - A long-term memory mechanism tracked for each instance in the dataset and used to help guide the GA
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        if cons.doAttributeTracking:
-            cons.timer.startTimeAT()
-            cons.AT.updateAttTrack(self.population)
-            if cons.doAttributeFeedback:
-                cons.AT.updatePercent(exploreIter)
-                cons.AT.genTrackProb()
-            cons.timer.stopTimeAT()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # RUN THE GENETIC ALGORITHM - Discover new offspring rules from a selected pair of parents
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        self.population.runGA(exploreIter, state_phenotype[0], state_phenotype[1]) #GA is run within the correct set.
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # SELECT RULES FOR DELETION - This is done whenever there are more rules in the population than 'N', the maximum population size.
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        self.population.deletion(exploreIter)
-        self.population.clearSets() #Clears the match and correct sets for the next learning iteration
+        #------------------------------
+        # PREDICCION FENOTIPO CONTINUO
+        #------------------------------
+                prediccionError = math.fabs(prediccionFenotipo - float(estado_fenotipo[1]))
+                rangoFenotipo = cons.amb.datosFormateados.listaFenotipos[1] - cons.amb.datosFormateados.listaFenotipos[0]
+                estimadoPrecision = 1.0 - (prediccionError / float(rangoFenotipo))
+                self.correcto[exploreIter % cons.frecuenciaSeguimiento] = estimadoPrecision
+
+        cons.cronometro.detenerTiempoEvaluacion()
+
+        #------------------------------
+        # FORMAR CONJUNTO CORRECTO
+        #------------------------------
+        self.poblacion.hacerConjuntoCorrecto(estado_fenotipo[1])
+
+        #------------------------
+        # ACTUALIZAR PARAMETROS
+        #------------------------
+        self.poblacion.actualizarConjuntos(exploreIter)
+
+        #--------------------------------------------------------------------------------------
+        # SUBSUNCION
+        # Aplicado a un conjunto correcto
+        # Un heuristico para agregar presion de generalizacion adicional a Tangente Penitente
+        #--------------------------------------------------------------------------------------
+        if cons.hacerSubsuncion:
+            cons.cronometro.iniciarTiempoSubsuncion()
+            self.poblacion.hacerSubsuncionConjuntoCorrecto()
+            cons.cronometro.detenerTiempoSubsuncion()
+
+        #----------------------------------------------------------------------------------
+        # SEGUIMIENTO DE ATRIBUTOS Y FEEDBACK
+        # Un mecanismo de memoria a largo plazo que rastrea cada instancia en el conjunto
+        # de datos y es usado para ayudar a guiar al algoritmo genetico
+        #----------------------------------------------------------------------------------
+        if cons.hacerSeguimientoAtributos:
+            cons.cronometro.iniciarTiempoSA()
+            cons.SA.updateAttTrack(self.poblacion)
+
+            if cons.hacerFeedbackAtributos:
+                cons.SA.updatePercent(exploreIter)
+                cons.SA.genTrackProb()
+
+            cons.cronometro.detenerTiempoSA()
+        #----------------------------------------------------------------
+        # EJECUTAR EL ALGORITMO GENETICO
+        # Descubrir nuevas reglas hijas de un par seleccionado de padres
+        #----------------------------------------------------------------
+        self.poblacion.ejecutarAG(exploreIter, estado_fenotipo[0], estado_fenotipo[1]) # El AG es ejecutado dentro del conjunto correcto
+
+        #---------------------------------------------------------------------------------------------------------------
+        # SELECCIONAR REGLAS PARA ELIMINACION
+        # Esto se hace cuando sea que haya mas reglas en la poblacion que "N", el maximo tamano posible de la poblacion
+        #---------------------------------------------------------------------------------------------------------------
+        self.poblacion.eliminacion(exploreIter)
+        self.poblacion.limpiarConjuntos() # Limpia los conjuntos correctos y de coincidencias para la siguiente iteracion de aprendizaje
 
 
-    def doPopEvaluation(self, isTrain):
-        """ Performs a complete evaluation of the current rule population.  Discrete phenotype only.  The population is unchanged throughout this evaluation. Works on both training and testing data. """
-        if isTrain:
-            myType = "TRAINING"
+    def hacerEvaluacionPob(self, esEntrenamiento):
+        """ Lleva a cabo una evaluacion completa de la poblacion de reglas actual. Solo a fenotipos discretos. La poblacion no cambia en esta evaluacion. Funciona en los datos de entrenamiento y de prueba """
+        if esEntrenamiento:
+            miTipo = "ENTRENANDO"
+
         else:
-            myType = "TESTING"
-        noMatch = 0                     # How often does the population fail to have a classifier that matches an instance in the data.
-        tie = 0                         # How often can the algorithm not make a decision between classes due to a tie.
-        cons.env.resetDataRef(isTrain)  # Go to the first instance in dataset
-        phenotypeList = cons.env.formatData.phenotypeList
-        #Initialize dictionary entry for each class----
-        classAccDict = {}
-        for each in phenotypeList:
-            classAccDict[each] = ClassAccuracy()
+            miTipo = "PROBANDO"
+
+        sinCoincidencia = 0 # Que tan a menudo la poblacion falla en tener un clasificador que que coincide en una instancia en los datos
+        empate = 0 # Que tan a menudo puede el algoritmo no hacer una decision entre las clases debido a un empate
+        cons.amb.resetearDataRef(esEntrenamiento)  # Ir a la primera instancia en el conjunto de datos
+        listaFenotipos = cons.amb.datosFormateados.listaFenotipos
+
+        # Inicializa entrada de directoria para cada clase
+        diccPrecClase = {}
+        for each in listaFenotipos:
+            diccPrecClase[each] = PresicionClases()
         #----------------------------------------------
-        if isTrain:
-            instances = cons.env.formatData.numTrainInstances
+        if esEntrenamiento:
+            instancias = cons.amb.datosFormateados.numInstanciasEntrenamiento
+
         else:
-            instances = cons.env.formatData.numTestInstances
-        self.predictionList = []
-        self.predictionSets = []
-        self.realList = []
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # GET PREDICTION AND DETERMINE PREDICTION STATUS
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        for inst in range(instances):
-            if isTrain:
-                state_phenotype = cons.env.getTrainInstance()
+            instancias = cons.amb.datosFormateados.numInstanciasPrueba
+
+        self.listaPrediccion = []
+        self.conjuntoPrediccion = []
+        self.listaReal = []
+
+        #-------------------------------------------------------
+        # OBTENER PREDICCION Y DETERMINAR ESTADO DE PREDICCION
+        #-------------------------------------------------------
+        for inst in range(instancias):
+            if esEntrenamiento:
+                estado_fenotipo = cons.amb.obtenerInstanciaEntrenamiento()
+
             else:
-                state_phenotype = cons.env.getTestInstance()
-            #-----------------------------------------------------------------------------
-            self.population.makeEvalMatchSet(state_phenotype[0])
-            prediction = Prediction(self.population)
-            phenotypeSelection = prediction.getDecision()
-            if not isTrain:
-                phenotypeSet = prediction.getSet()
-                self.predictionList.append(phenotypeSelection) #Used to output raw test predictions.
-                self.predictionSets.append(phenotypeSet)
-                self.realList.append(state_phenotype[1])
-            #-----------------------------------------------------------------------------
-            if phenotypeSelection == None:
-                noMatch += 1
-            elif phenotypeSelection == 'Tie':
-                tie += 1
-            else: #Instances which failed to be covered are excluded from the initial accuracy calculation
-                for each in phenotypeList:
-                    thisIsMe = False
-                    accuratePhenotype = False
-                    truePhenotype = state_phenotype[1]
-                    if each == truePhenotype:
-                        thisIsMe = True #Is the current phenotype the true data phenotype.
-                    if phenotypeSelection == truePhenotype:
-                        accuratePhenotype = True
-                    classAccDict[each].updateAccuracy(thisIsMe, accuratePhenotype)
+                estado_fenotipo = cons.amb.obtenerInstanciaPrueba()
 
-            cons.env.newInstance(isTrain) #next instance
-            self.population.clearSets()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # CALCULATE ACCURACY - UNLIKELY SITUATION WHERE NO MATCHING RULES FOUND - In either Training or Testing data (this can happen in testing data when strong training overfitting occurred)
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        if noMatch == instances:
-            randomProb = float (1.0 / len(cons.env.formatData.phenotypeList))
-            print("-----------------------------------------------")
-            print(str(myType)+" Accuracy Results:-------------")
-            print("Instance Coverage = "+ str(0)+ '%')
-            print("Prediction Ties = "+ str(0)+ '%')
-            print(str(0) + ' out of ' + str(instances) + ' instances covered and correctly classified.')
-            print("Standard Accuracy (Adjusted) = " + str(randomProb))
-            print("Balanced Accuracy (Adjusted) = " + str(randomProb))
-            #Balanced and Standard Accuracies will only be the same when there are equal instances representative of each phenotype AND there is 100% covering. (NOTE even at 100% covering, the values may differ due to subtle float calculation differences in the computer)
-            resultList = [randomProb, 0]
-            return resultList
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # CALCULATE ACCURACY
-        #-----------------------------------------------------------------------------------------------------------------------------------------
+            # ---------------------------------------------------
+            self.population.makeEvalMatchSet(estado_fenotipo[0])
+            prediccion = Prediccion(self.population)
+            seleccionFenotipo = prediccion.obtenerDecision()
+
+            if not esEntrenamiento:
+                conjuntoFenotipo = prediccion.obtenerConjunto()
+
+                self.listaPrediccion.append(seleccionFenotipo) # Usado para sacar predicciones de prueba crudas
+                self.conjuntoPrediccion.append(conjuntoFenotipo)
+                self.listaReal.append(estado_fenotipo[1])
+            # ---------------------------------------------------
+            if seleccionFenotipo == None:
+                sinCoincidencia += 1
+
+            elif seleccionFenotipo == 'Empate':
+                empate += 1
+
+            else: # Instancias en que fallaron en ser cubiertas son excluidas de los calculos iniciales de precision
+                for each in listaFenotipos:
+                    soyYo = False
+                    fenotipoPreciso = False
+                    fenotipoReal = estado_fenotipo[1]
+
+                    if each == fenotipoReal:
+                        soyYo = True # Es el fenotipo actual el fenotipo real?
+
+                    if seleccionFenotipo == fenotipoReal:
+                        fenotipoPreciso = True
+                        
+                    diccPrecClase[each].actualizarPrecision(soyYo, fenotipoPreciso)
+
+            cons.amb.nuevaInstancia(esEntrenamiento) # Siguiente instancia
+
+            self.poblacion.limpiarConjuntos()
+
+        #-----------------------------------------------------------------------------
+        # CALCULAR PRECISION
+        # Situacion improbable en que no se encuentran reglas de coincidencia
+        # En los datos de entrenamiento o de prueba (esto puede suceder en los datos 
+        # de prueba cuando se produce una fuerte sobrecarga de entrenamiento)
+        #-----------------------------------------------------------------------------
+        if sinCoincidencia == instancias:
+            probAleatoria = float (1.0 / len(cons.amb.datosFormateados.listaFenotipos))
+            print("-------------------------------------------")
+            print(str(miTipo)+" Resultados de precision: ")
+            print("Cubrimiento de instancias = " + str(0) + '%')
+            print("Empates de prediccion = " + str(0) + '%')
+            print(str(0) + ' de ' + str(instancias) + ' instancias cubiertas y correctamente clasificadas')
+            print("Precision estandar (ajustada) = " + str(probAleatoria))
+            print("Precision balanceada (ajustada) = " + str(probAleatoria))
+
+            # Las precisiones estandar y balanceadas solo seran iguales cuando hay
+            # la misma cantidad de instancias representativas de cada fenotipo Y hay un
+            # covering del 100%. (NOTA: incluso con un covering del 100%, los valores
+            # pueden diferir debido a pequenas diferencias de calculo)
+
+            listaResultados = [probAleatoria, 0]
+            return listaResultados
+
+        #--------------------
+        # CALCULAR PRECISION 
+        #--------------------
         else:
-            #----------------------------------------------------------------------------------------------
-            #Calculate Standard Accuracy------------------------------------
-            standardAccuracy = 0
-            for each in phenotypeList:
-                instancesCorrectlyClassified = classAccDict[each].T_myClass + classAccDict[each].T_otherClass
-                instancesIncorrectlyClassified = classAccDict[each].F_myClass + classAccDict[each].F_otherClass
-                classAccuracy = float(instancesCorrectlyClassified) / float(instancesCorrectlyClassified + instancesIncorrectlyClassified)
-                standardAccuracy += classAccuracy
-            standardAccuracy = standardAccuracy / float(len(phenotypeList))
+            # Calcular precision estandar
+            precisionEstandar = 0
 
-            #Calculate Balanced Accuracy---------------------------------------------
-            balancedAccuracy = 0
-            for each in phenotypeList:
+            for each in listaFenotipos:
+                instanciasCorrectamenteClasificadas = diccPrecClase[each].T_myClass + diccPrecClase[each].T_otherClass
+                instanciasIncorrectamenteClasificadas = diccPrecClase[each].F_myClass + diccPrecClase[each].F_otherClass
+
+                precisionClases = float(instanciasCorrectamenteClasificadas) / float(instanciasCorrectamenteClasificadas + instanciasIncorrectamenteClasificadas)
+                precisionEstandar += precisionClases
+
+            precisionEstandar = precisionEstandar / float(len(listaFenotipos))
+
+            # Calcular precision balanceada
+            precisionBalanceada = 0
+            for each in listaFenotipos:
                 try:
-                    sensitivity = classAccDict[each].T_myClass / (float(classAccDict[each].T_myClass + classAccDict[each].F_otherClass))
+                    sensibilidad = diccPrecClase[each].T_myClass / (float(diccPrecClase[each].T_myClass + diccPrecClase[each].F_otherClass))
+
                 except:
-                    sensitivity = 0.0
+                    sensibilidad = 0.0
+
                 try:
-                    specificity = classAccDict[each].T_otherClass / (float(classAccDict[each].T_otherClass + classAccDict[each].F_myClass))
+                    especifidad = diccPrecClase[each].T_otherClass / (float(diccPrecClase[each].T_otherClass + diccPrecClase[each].F_myClass))
+
                 except:
-                    specificity = 0.0
+                    especifidad = 0.0
 
-                balancedClassAccuracy = (sensitivity + specificity) / 2.0
-                balancedAccuracy += balancedClassAccuracy
+                precisionClasesBalanceada = (sensibilidad + especifidad) / 2.0
+                precisionBalanceada += precisionClasesBalanceada
 
-            balancedAccuracy = balancedAccuracy / float(len(phenotypeList))
+            precisionBalanceada = precisionBalanceada / float(len(listaFenotipos))
 
-            #Adjustment for uncovered instances - to avoid positive or negative bias we incorporate the probability of guessing a phenotype by chance (e.g. 50% if two phenotypes)---------------------------------------
-            predictionFail = float(noMatch)/float(instances)
-            predictionTies = float(tie)/float(instances)
-            instanceCoverage = 1.0 - predictionFail
-            predictionMade = 1.0 - (predictionFail + predictionTies)
+            # Ajuste para instancias no cubiertas
+            # Para evitar sesgos positivos o negativos se incorpora la probabilidad de adivinar un fenotipo (ej. 50% si son dos fenotipos)
+            falloPrediccion = float(sinCoincidencia)/float(instancias)
+            empatePrediccion = float(empate)/float(instancias)
+            cubrimientoInstancia = 1.0 - falloPrediccion
+            prediccionHecha = 1.0 - (falloPrediccion + empatePrediccion)
 
-            adjustedStandardAccuracy = (standardAccuracy * predictionMade) + ((1.0 - predictionMade) * (1.0 / float(len(phenotypeList))))
-            adjustedBalancedAccuracy = (balancedAccuracy * predictionMade) + ((1.0 - predictionMade) * (1.0 / float(len(phenotypeList))))
+            precisionEstandarAjustada = (precisionEstandar * prediccionHecha) + ((1.0 - prediccionHecha) * (1.0 / float(len(listaFenotipos))))
+            precisionBalanceadaAjustada = (precisionBalanceada * prediccionHecha) + ((1.0 - prediccionHecha) * (1.0 / float(len(listaFenotipos))))
 
-            #Adjusted Balanced Accuracy is calculated such that instances that did not match have a consistent probability of being correctly classified in the reported accuracy.
-            print("-----------------------------------------------")
-            print(str(myType)+" Accuracy Results:-------------")
-            print("Instance Coverage = "+ str(instanceCoverage*100.0)+ '%')
-            print("Prediction Ties = "+ str(predictionTies*100.0)+ '%')
-            print(str(instancesCorrectlyClassified) + ' out of ' + str(instances) + ' instances covered and correctly classified.')
-            print("Standard Accuracy (Adjusted) = " + str(adjustedStandardAccuracy))
-            print("Balanced Accuracy (Adjusted) = " + str(adjustedBalancedAccuracy))
-            #Balanced and Standard Accuracies will only be the same when there are equal instances representative of each phenotype AND there is 100% covering. (NOTE even at 100% covering, the values may differ due to subtle float calculation differences in the computer)
-            resultList = [adjustedBalancedAccuracy, instanceCoverage]
-            return resultList
+            # La precision balanceada ajustada es calculada de tal manera que
+            # las instancias que no coincidieron tienen una probabilidad
+            # de ser correctamente classificadas en la precision reportada
+            print("-------------------------------------------")
+            print(str(miTipo)+" Resultados de precision: ")
+            print("Cubrimiento de instancias = "+ str(cubrimientoInstancia * 100.0) + '%')
+            print("Empates de prediccion = "+ str(empatePrediccion * 100.0) + '%')
+            print(str(instanciasCorrectamenteClasificadas) + ' de ' + str(instancias) + ' instancias cubiertas y correctamente clasificadas.')
+            print("Precision estandar (ajustada) = " + str(precisionEstandarAjustada))
+            print("Precision balanceada (ajustada) = " + str(precisionBalanceadaAjustada))
+
+            # Las precisiones estandar y balanceadas solo seran iguales cuando hay
+            # la misma cantidad de instancias representativas de cada fenotipo Y hay un
+            # covering del 100%. (NOTA: incluso con un covering del 100%, los valores
+            # pueden diferir debido a pequenas diferencias de calculo)
+            listaResultados = [precisionBalanceadaAjustada, cubrimientoInstancia]
+            return listaResultados
 
 
-    def populationReboot(self):
-        """ Manages the loading and continued learning/evolution of a previously saved ExSTraCS classifier population. """
-        cons.timer.setTimerRestart(cons.popRebootPath) #Rebuild timer objects
+    def reinicioPoblacion(self):
+        """ Maneja el cargado y la evolucion/aprendizaje continuado de una poblacion de clasificadores previamente guardada """
+        cons.cronometro.fijarTiempoReinicio(cons.rutaReinicioPob) # Reconstruir objetos de tiempo
 
-        #Extract last iteration from file name---------------------------------------------
-        temp = cons.popRebootPath.split('_')
+        # Extraer la ultima iteracion
+        temp = cons.rutaReinicioPob.split('_')
         iterRef = len(temp)-1
-        completedIterations = int(temp[iterRef])
-        print("Rebooting rule population after " +str(completedIterations)+ " iterations.")
-        self.exploreIter = completedIterations-1
-        for i in range(len(cons.learningCheckpoints)):
-            cons.learningCheckpoints[i] += completedIterations
-        cons.maxLearningIterations += completedIterations
+        iteracionesCompletadas = int(temp[iterRef])
+        print("Reiniciando poblacion despues de " +str(iteracionesCompletadas)+ " iteraciones.")
 
-        #Rebuild existing population from text file.--------
-        self.population = ClassifierSet(cons.popRebootPath)
-        #---------------------------------------------------
-        try: #Obtain correct track
-            f = open(cons.popRebootPath+"_PopStats.txt", 'rU')
-            correctRef = 39 #Reference for tracking learning accuracy estimate stored in PopStats.
-            tempLine = None
+        self.exploreIter = iteracionesCompletadas - 1
+
+        for i in range(len(cons.puntoscontrolAprendizaje)):
+            cons.learningCheckpoints[i] += iteracionesCompletadas
+
+        cons.maxiteracionesAprendizaje += iteracionesCompletadas
+
+        # Reconstruir poblacion existente del archivo de texto
+        self.poblacion = ConjuntoClasificadores(cons.rutaReinicioPob)
+
+        try:
+            f = open(cons.popRebootPath+"_EstadisticasPob.txt", 'rU')
+            correctRef = 39 # Referencia para rastrear estimado de precision de aprendizaje guardado en EstadisticasPob 
+            
+            lineaTemp = None
+
             for i in range(correctRef):
-                tempLine = f.readline()
-            tempList = tempLine.strip().split('\t')
-            self.correct = tempList
-            if cons.env.formatData.discretePhenotype:
-                for i in range(len(self.correct)):
-                    self.correct[i] = int(self.correct[i])
+                lineaTemp = f.readline()
+
+            listaTemp = lineaTemp.strip().split('\t')
+
+            self.correcto = listaTemp
+
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                for i in range(len(self.correcto)):
+                    self.correcto[i] = int(self.correcto[i])
+
             else:
-                for i in range(len(self.correct)):
-                    self.correct[i] = float(self.correct[i])
+                for i in range(len(self.correcto)):
+                    self.correcto[i] = float(self.correcto[i])
+
             f.close()
-        except IOError as xxx_todo_changeme3:
-            (errno, strerror) = xxx_todo_changeme3.args
-            print(("I/O error(%s): %s" % (errno, strerror)))
+
+        except IOError as excepcion:
+            (errno, strerror) = excepcion.args
+            print(("Error de I/O (%s): %s" % (errno, strerror)))
             raise
 
 
-    def runRConly(self):
-        """ Run rule compaction on an existing rule population. """
-        print("Initializing Rule Compaction...")
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # CHECK FOR POPULATION REBOOT - Required for running Rule Compaction only on an existing saved rule population.
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        if not cons.doPopulationReboot:
-            print("Algorithm: Error - Existing population required to run rule compaction alone.")
+    def correrSoloCR(self):
+        """ Ejecutar compactacion de reglas en una poblacion de reglas existente """
+
+        print("Iniciando compactacion de reglas...")
+        #---------------------------------------------------------------------------------------------------
+        # CHEQUEAR PARA REINICIO DE POBLACION
+        # Requerida para ejecutar solo compactacion de reglas en una poblacion de reglas guardada existente
+        #---------------------------------------------------------------------------------------------------
+        if not cons.hacerReinicioPoblacion:
+            print("Algoritmo - Error: - Poblacion de reglas existente se requiere para ejecutar solo la compactacion de reglas")
             return
 
         try:
-            fileObject = open(cons.popRebootPath+"_PopStats.txt", 'rU')  # opens each datafile to read.
+            fileObject = open(cons.rutaReinicioPob + "_EstadisticasPob.txt", 'rU')
+
         except Exception as inst:
             print(type(inst))
             print(inst.args)
             print(inst)
-            print('cannot open', cons.popRebootPath+"_PopStats.txt")
+            print('No se puede abrir', cons.rutaReinicioPob + "_EstadisticasPob.txt")
             raise
 
+        # Recupera las últimas precisiones de entrenamiento y prueba del archivo guardado
+        lineaTemp = None
 
-        #Retrieve last training and testing accuracies from saved file---------
-        tempLine = None
         for i in range(3):
-            tempLine = fileObject.readline()
-        tempList = tempLine.strip().split('\t')
-        trainAcc = float(tempList[0])
-        if cons.testFile != 'None': #If a testing file is available.
-            testAcc = float(tempList[1])
+            lineaTemp = fileObject.readline()
+
+        listaTemp = lineaTemp.strip().split('\t')
+        precEntrena = float(listaTemp[0])
+
+        if cons.archivoPrueba != 'None': # Si hay disponible un archivo de prueba
+            precPrueba = float(listaTemp[1])
+
         else:
-            testAcc = None
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # RULE COMPACTION
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        cons.timer.startTimeRuleCmp()
-        RuleCompaction(self.population, trainAcc, testAcc)
-        cons.timer.stopTimeRuleCmp()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # GLOBAL EVALUATION OF COMPACTED RULE POPULATION
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        cons.timer.startTimeEvaluation()
-        self.population.recalculateNumerositySum()
-        self.population.runPopAveEval(self.exploreIter)
-        self.population.runAttGeneralitySum()
-        #----------------------------------------------------------
-        cons.env.startEvaluationMode()
-        if cons.testFile != 'None': #If a testing file is available.
-            if cons.env.formatData.discretePhenotype:
-                trainEval = self.doPopEvaluation(True)
-                testEval = self.doPopEvaluation(False)
+            precPrueba = None
+
+        #-------------------------
+        # COMPACTACION DE REGLAS
+        #-------------------------
+        cons.cronometro.iniciarTiempoCompReg()
+        CompactacionReglas(self.poblacion, precEntrena, precPrueba)
+        cons.cronometro.detenerTiempoCompReg()
+
+        #-----------------------------------------------------
+        # EVALUACION GLOBAL DE POBLACION DE REGLAS COMPACTADA
+        #-----------------------------------------------------
+        cons.cronometro.iniciarTiempoEvaluacion()
+        self.poblacion.recalcularSumaNumerosidad()
+        self.poblacion.ejecutarEvalPobProm(self.exploreIter)
+        self.poblacion.ejecutarSumaGeneralidadAtributos()
+
+        
+        cons.amb.iniciarModoEvaluacion()
+
+        if cons.archivoPrueba != 'None': # Si hay un archivo de prueba disponible
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                evalEntrena = self.hacerEvaluacionPob(True)
+                evalPrueba = self.hacerEvaluacionPob(False)
+
             else:
-                print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
-        elif cons.trainFile != 'None':
-            if cons.env.formatData.discretePhenotype:
-                trainEval = self.doPopEvaluation(True)
-                testEval = None
+                print("Algoritmo - Error: Tangente Penitente no puede manipular endpoints continuos.")
+
+        elif cons.archivoEntrenamiento != 'None':
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                evalEntrena = self.hacerEvaluacionPob(True)
+                evalPrueba = None
+
             else:
-                print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
-        else: #Online Environment
-            trainEval = None
-            testEval = None
+                print("Algoritmo - Error: Tangente Penitente no puede manipular endpoints continuos")
 
-        cons.env.stopEvaluationMode()
-        cons.timer.stopTimeEvaluation()
-        #------------------------------------------------------------------------------
-        cons.timer.returnGlobalTimer()
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # WRITE OUTPUT FILES
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        OutputFileManager().writePopStats(cons.outFileName+"_RC_"+cons.ruleCompactionMethod, trainEval, testEval, self.exploreIter + 1, self.population, self.correct)
-        OutputFileManager().writePop(cons.outFileName+"_RC_"+cons.ruleCompactionMethod, self.exploreIter + 1, self.population)
-        OutputFileManager().attCo_Occurence(cons.outFileName+"_RC_"+cons.ruleCompactionMethod, self.exploreIter + 1, self.population)
-        OutputFileManager().writePredictions(self.exploreIter, cons.outFileName+"_RC_"+cons.ruleCompactionMethod, self.predictionList, self.realList, self.predictionSets)
-        #------------------------------------------------------------------------------------------------------------
-        print("Rule Compaction Complete")
+        else: # Ambiente online
+            evalEntrena = None
+            evalPrueba = None
+
+        cons.amb.detenerModoEvaluacion()
+        cons.cronometro.detenerTiempoEvaluacion()
+        
+        cons.cronometro.devolverCronometroGlobal()
+        
+        # -----------------------------
+        # ESCRIBIR ARCHIVOS DE SALIDA
+        #------------------------------
+        AdminSalida().escribirEstadisticasPob(cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, evalEntrena, evalPrueba, self.exploreIter + 1, self.population, self.correcto)
+        AdminSalida().escribirPob(cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, self.exploreIter + 1, self.population)
+        AdminSalida().occurenciaAttCo(cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, self.exploreIter + 1, self.population)
+        AdminSalida().escribirPredicciones(self.exploreIter, cons.archivoSalida + "_CR_" + cons.metodoCompactacionReglas, self.listaPrediccion, self.listaReal, self.conjuntoPrediccion)
+
+        print("Compactacion de reglas completada")
 
 
-    def runTestonly(self):
-        """ Run testing dataset evaluation on an existing rule population. """
-        print("Initializing Evaluation of Testing Dataset...")
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        # CHECK FOR POPULATION REBOOT - Required for running Testing Evaluation only on an existing saved rule population.
-        #-----------------------------------------------------------------------------------------------------------------------------------------
-        if not cons.doPopulationReboot:
-            print("Algorithm: Error - Existing population required to run rule compaction alone.")
+    def correrSoloPrueba(self):
+        """ Ejecuta evaluacion del conjunto de prueba en una poblacion de reglas existene """
+
+        print("Inicializando evaluacion de conjunto de datos de prueba")
+        #---------------------------------------------------------------------------------------------
+        # CHEQUEAR REINICIO DE POBLACION
+        # Requerido para ejecutar solamente evaluacion de prueba en una poblacion de reglas existente
+        #---------------------------------------------------------------------------------------------
+        if not cons.hacerReinicioPoblacion:
+            print("Algoritmo - Error: Se requiere poblacion de reglas para ejecutar compactacion de reglas solamente")
             return
 
-        #----------------------------------------------------------
-        cons.env.startEvaluationMode()
-        if cons.testFile != 'None': #If a testing file is available.
-            if cons.env.formatData.discretePhenotype:
-                testEval = self.doPopEvaluation(False)
+        cons.amb.iniciarModoEvaluacion()
+
+        if cons.archivoPrueba != 'None': # Si hay un archivo de prueba disponible
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                evalPrueba = self.hacerEvaluacionPob(False)
+
             else:
-                print("Algorithm - Error: ExSTraCS 2.0 can not handle continuous endpoints.")
-        else: #Online Environment
-            testEval = None
+                print("Algoritmo - Error: Tangente Penitente no puede manipular endpoints continuos")
 
-        cons.env.stopEvaluationMode()
-        cons.timer.stopTimeEvaluation()
-        #------------------------------------------------------------------------------
-        cons.timer.returnGlobalTimer()
-        OutputFileManager().editPopStats(testEval)
-        OutputFileManager().writePredictions(self.exploreIter, cons.outFileName, self.predictionList, self.realList, self.predictionSets)
-        print("Testing Evaluation Complete")
+        else: # Ambiente online
+            evalPrueba = None
 
+        cons.amb.detenerModoEvaluacion()
+        cons.cronometro.detenerTiempoEvaluacion()
+
+        cons.cronometro.devolverCronometroGlobal()
+        
+        AdminSalida().editarEstadsPob(evalPrueba)
+        AdminSalida().escribirPredicciones(self.exploreIter, cons.archivoSalida, self.listaPrediccion, self.listaReal, self.conjuntoPrediccion)
