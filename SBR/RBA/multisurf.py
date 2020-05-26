@@ -15,3 +15,20 @@ características relevantes.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 """
 
+def Ejecutar_MultiSURF(datos):
+    """ Se llama para ejecutar el algoritmo MultiSURF. \n
+    PARAM x - es una matriz que contiene los atributos de todas las instancias en el conjunto de datos \n
+    PARAM y - es una matriz que contiene la clase de una instancia de datos"""
+
+    x = [row[0] for row in datos.entrenamientoFormateados]
+    y = [row[1] for row in datos.entrenamientoFormateados]
+
+    print("Ejecutando algoritmo MultiSURF...")
+
+    puntajes = MultiSURF(x, y, datos)
+
+    print("Ejecucion de MultiSURF completada")
+
+    return puntajes
+
+
