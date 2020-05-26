@@ -1,0 +1,110 @@
+# TANGENTE PENITENTE
+# --------------------------------------------------------------------------------------------------------------------------------
+# Archivo de Configuracion:
+# Las lineas que empiezan con '#' no seran cargadas, '=' asigna un valor a un parametro de ejecucion.
+# Se incluyen valores por defecto para cada parametro. Notese que el valor por defecto de 'archivoPrueba' es 'None', y no hay valor 
+# por defecto disponible para 'archivoEntrenamiento'.
+# --------------------------------------------------------------------------------------------------------------------------------
+# Formato de los datos:
+# Los conjuntos de datos deben ser un archivo de texto (.txt) delimitado con tabuladores. Deben incluir un encabezado con 
+# identificadores de los atributos, y una columna llamada "Clase" con su respectivo valor de clase para cada instancia.
+# Esta la opcion para incluir una columna llamada "IDInstancia" que incluya un identificador unico para cada instancia del conjunto 
+# de datos. Los identificadores de instancias son utiles para agrupar las instancias en el conjunto de datos más adelante por las 
+# puntuaciones de seguimiento de atributos de cada instancia.
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# PARAMETROS DEL CONJUNTO DE DATOS
+#
+# --------------------------------------------------------------------------------------------------------------------------------
+archivoEntrenamiento = datasets/datasetTP.txt # Es obligatorio el archivo de entrenamiento (Se puede agregar opcionalmente la extension .txt)
+archivoPrueba = None # Es opcional el archivo de prueba. Si no hay disponibles datos de prueba o no se desean, escribir None. Por defecto es None (Se puede agregar opcionalmente la extension .txt)
+archivoSalida = salidaLocal/ # Ruta de salida opcional y prefijo del nombre del archivo
+datosOffline = 1 # Se esta cargando un conjunto de datos finito ( 1 = TRUE), o se estan usando datos online de una 'fuente infinita' ( 0 = FALSE)
+validacionCruzadaInterna = 0 # 1 es True, 0 es False. Generar archivos de conjuntos de datos de validacion cruzada y ejecutar TP en ellos serialmente (NO ESTA PROBADO TOTALMENTE)
+semillaAleatoria = 1 # Determina si se usa una semilla aleatoria fija. Si no, escribir False, si si, escribir el valor de la semilla como un entero
+etiquetaIDInstancia = IDInstancia # Etiqueta para la columna de datos que contiene los identificadores de instancias
+etiquetaFenotipo = Clase # Etiqueta para la columna de datos que contiene la etiqueta del fenotipo
+limiteAtributoDiscreto = 10 # El maximo numero de atributos de estado permitidos antes de que un atributo se considere continuo. El usuario debe asegurarse que este valor sea mayor o igual numero de estados para cualquier cantidad de atributos en el conjunto de datos
+etiquetaDatosFaltantes = NA # Indica como los datos faltantes son etiquetados en el conjunto de datos
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# PARAMETROS DE EJECUCION GENERALES
+#
+# --------------------------------------------------------------------------------------------------------------------------------
+frecuenciaSeguimiento = 0 # Si es 0, entonces el rastreo/seguimiento de aprendizaje se hara en cada epoca, esto es, cada que se pasa por todas las instancias en los datos de entrenamiento. De otra manera ocurrira despues del numero especificado de iteraciones de aprendizaje
+iteracionesAprendizaje = 5000.10000 # Especifica cada iteración en la que se realizará una evaluación completa del algoritmo y se guardarán los archivos de salida.  El último valor o el más grande indica el punto de parada. Separe los valores con un punto (.).
+salidaResumen = 1 # 1 es True, 0 es False
+salidaPoblacion = 1 # 1 es True, 0 es False
+salidaAttCoOccur = 1 # 1 es True, 0 es False
+salidaPrediccionesPrueba = 1 # 1 es True, 0 es False
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# PARAMETROS DE APRENDIZAJE SUPERVISADO
+# Los identificadores de los parámetros de aprendizaje se ajustan en gran medida a la descripción algorítmica del XCS de Butz y Wilson, 2001 ("An algorithmic description of XCS"), pero sólo se utilizan los parámetros de aprendizaje supervisado pertinentes de Bernado-Mansilla y Garrell-Guiu, 2003
+#
+# --------------------------------------------------------------------------------------------------------------------------------
+N = 2000 # Tamano maximo de la poblacion (en micro-clasificadores. Esto es, N es la suma de la numerosidad de los clasificadores)
+nu = 1 # (v) Parámetro de potencia utilizado para determinar la importancia de la alta precisión en el cálculo de la aptitud. (Normalmente se establece en 5-10 para problemas limpios, sin embargo hemos observado que un valor de 1 es mejor para problemas ruidosos)
+chi = 0.8 # (X) La probabilidad de aplicar el cruce/cruzamiento en el AG (Algoritmo Genetico). Típicamente fijado en 0.5-1.0
+epsilon = 0.04 # (u) La probabilidad de mutar un alelo dentro de una descendencia (típicamente fijado en 0.01-0.05)
+theta_GA = 25 # El umbral del algoritmo genético. El AG se aplica en un conjunto cuando el tiempo medio desde el último algoritmo genético del conjunto es mayor que theta_GA.
+theta_del = 20 # El umbral de eliminación de la experiencia. El cálculo de la probabilidad de supresión cambia una vez que se supera este umbral.
+theta_sub = 20 # El umbral de subsunción de la experiencia
+acc_sub = 0.99 # Requisito de exactitud de subsunción
+beta = 0.2 # Parámetro de aprendizaje. Se utiliza para calcular el promedio del tamaño correcto del conjunto
+delta = 0.1 # Parámetro de eliminación. Se utiliza para determinar el cálculo del voto de eliminación.
+init_apt = 0.01 # La aptitud inicial para un nuevo clasificador. (Típicamente muy pequeño --> cero)
+reduccionAptitud = 0.1 #	Reduccion de la aptitud inicial en la descendencia del algortimo genetico
+theta_sel = 0.5 # La fracción del conjunto correcto que se incluirá en la selección del torneo.
+RSL_Override = 0 # Opcional: Permite la especificación manual de un límite de especificidad de la regla (RSL/LER).  Cualquier valor mayor que cero anulará el cálculo automático del LER.
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# PARAMETROS DEL MECANISMO
+# 
+# --------------------------------------------------------------------------------------------------------------------------------
+hacerSubsuncion = 1 # 1 es True, 0 es False
+metodoSeleccion = torneo # Mecanismo de seleccion del Algoritmo Genetico. Se especifica "torneo" o "ruleta"
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# SEGUIMIENTO DE ATRIBUTOS Y FEEDBACK
+# Memoria a largo plazo de Tangente Penitente implementado para caracterizar patrones heterogéneos, y refinar el aprendizaje. 
+# El seguimiento debe estar activado, para que se utilice la retroalimentación.
+#
+# --------------------------------------------------------------------------------------------------------------------------------
+hacerSeguimientoAtributos = 1 # 1 es True, 0 es False
+hacerFeedbackAtributos = 1 # 1 es True, 0 es False
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# CONOCIMIENTO EXPERTO
+# Utilizar un archivo espeficifamente formateado de conocimientos experto para ponderar el covering de las reglas en TP
+# para que los atributos tengan mayor probabilidad de ser predictivos.
+# 
+# --------------------------------------------------------------------------------------------------------------------------------
+usarConocimientoExperto = 1 # 1 es True, 0 es False
+generacionExternaCE = None # Especifica la ruta/archivo de un archivo apropiadamente formateado de conocimiento experto CE. Si se usa CE interno, escribir None. (No escribir la extension .txt)
+nombrearchivoSalidaCE = salidaLocal/ # Opcional. Usado cuando los puntajes de CE son generados internamente dentro de TP
+algoritmoFiltro = multisurf # Especifica el algoritmo filtro a usar: "relieff", "surf", "surfstar", "multisurf". Agregar TuRF con "relieff_turf", "surf_turf", "surfstar_turf, "multisurf_turf"
+porcentajeTurf = 0.2 #
+vecinosRelief = 10 # El número de vecinos considerados en los cálculos del relieve.
+fraccionMuestreoRelief = 1 # El número de iteraciones del algoritmo de peso del CE.  Dado como porcentaje de instancias del conjunto de datos (0-1) se sugiere 1.
+soloPuntajesCE = 0 # 1 es True, 0 es False. Si es True, se saltará la ejecución del LCS y sólo ejecutará el algoritmo de filtrado en el conjunto de datos de entrenamiento especificado.
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# COMPACTACION DE REGLAS
+# Despues de completar la ejecucion de Tangente Penitente, este mecanismo busca eliminar reglas inutiles y obtener un subconjunto
+# de reglas refinadas mientras se sigue preservando la presicion de prediccion
+#
+# --------------------------------------------------------------------------------------------------------------------------------
+hacerCompactacionReglas = 1 # 1 es True, 0 es False
+soloCR = 0 # 1 es TRUE, 0 es False. Si es True, se saltara la ejecucin del LCS y solo ejecutara la compactacion de reglas es un archivo de poblacion de reglas pre-existente
+metodoCompactacionReglas = QRF # Selecciona la estrategia de compactacion de reglas. Las opciones son: "QRF", "PDRC", "QRC", "CRA2", "Fu2" y "Fu1". Se recomienda QRF por ser la mas rapida, simple y la que probablemente preserva/mejora el desempeno.
+# --------------------------------------------------------------------------------------------------------------------------------
+#
+# REINICIO DE POBLACION
+# Reinicia el aprendizaje de Tangente Penitente a partir de una poblacion de reglas guardadas. Los datos de entrenamiento son
+# re-barajados durante el reinicio.
+# 
+# --------------------------------------------------------------------------------------------------------------------------------
+hacerReinicioPoblacion = 0 # 1 es True, 0 es False. Carga una poblacion existente de reglas para continuar la evolucion de la poblacion de reglas. Se requiere que sea True cuando soloCR es True
+iteracionReinicioPob = 100000 # Usa nombreArchivoCE y la iteracion especificada aqui para construir la ruta de la poblacion de reglas existentes para el reinicio
+soloPrueba = 0 # 1 es True, 0 es False. Carga una poblacion de reglas existente y las aplica a un conjunto de datos de prueba. No ocurre aprendizaje.
