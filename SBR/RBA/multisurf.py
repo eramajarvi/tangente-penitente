@@ -31,4 +31,38 @@ def Ejecutar_MultiSURF(datos):
 
     return puntajes
 
+def MultiSURF(x, y, datos):
+    """ Controla el principal bucle del MultiSURF """
 
+    listaPuntajes = []
+
+    # Inicializa los puntajes de los atributos en 0
+    for i in range(datos.numAtributos):
+        listaPuntajes.append(0)
+
+    #Precomputa las distancias entre todos los pares de instancias unicas dentro del conjunto de datos
+    print("Pre-computando la matriz de distancias...")
+    
+def multiClaseMultiSURF(x, y, datos):
+    pass
+
+def obtenerDesviacionEstandar(vectorDistancias, promedio):
+    pass
+
+def obtenerPromedio(vectorDistancias):
+    pass
+
+def obtenerDistanciasIndividuales(i, datos, matrizDistancias):
+    pass
+
+def calcularMatrizDistancias(x, datos):
+    pass
+
+def hacerMapaMultiClase(y, datos):
+    pass
+
+def haceMapaParClase(mapaMulticlase):
+    pass
+
+def calcularDistancia(a, b, datos):
+    pass
