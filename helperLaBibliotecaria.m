@@ -73,8 +73,8 @@ end
 %% Preparacion para exportar
 % Editar las siguientes dos lineas la cantidad de dias deseados en el
 % conjunto de datos resultante:
-cantidadDiasEntrenamiento = 30;
-cantidadDiasPrueba = 15;
+cantidadDiasEntrenamiento = 60;
+cantidadDiasPrueba = 1;
 
 cantidadDiasExportar = cantidadDiasEntrenamiento + cantidadDiasPrueba;
 
