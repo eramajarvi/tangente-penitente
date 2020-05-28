@@ -16,7 +16,7 @@ datasetTodosDias = zeros(cantidadDias * 720, 4);
 % Rutas para importar los perfiles optimos de forma recursiva con los datos
 % de todos los dias y guardar los datasets generados
 rutaCargaPerfiles = 'C:\Users\james\Documents\Github\tp-legacy\perfiles\';
-rutaGuardadoDatasets = 'C:\Users\james\Documents\Github\ExctractsBase\Datasets\';
+rutaGuardadoDatasets = 'C:\Users\james\Documents\Github\tangente-penitente\datasets\';
 
 % Funciones anonimas
 % Usadas para controlar el indice de asignacion de la matriz dataset que 
@@ -73,7 +73,7 @@ end
 %% Preparacion para exportar
 % Editar las siguientes dos lineas la cantidad de dias deseados en el
 % conjunto de datos resultante:
-cantidadDiasEntrenamiento = 60;
+cantidadDiasEntrenamiento = 10;
 cantidadDiasPrueba = 1;
 
 cantidadDiasExportar = cantidadDiasEntrenamiento + cantidadDiasPrueba;
@@ -86,10 +86,20 @@ diasPrueba = diasExportar(cantidadDiasEntrenamiento + 1 : end);
 datasetEntrenamiento = seleccionDias(diasEntrenamiento, datasetTodosDias);
 datasetPrueba = seleccionDias(diasPrueba, datasetTodosDias);
 
+% Conjunto de datos de entrenamiento balanceado
+activado = datasetTodosDias(datasetTodosDias(:, 4) == 1, :);
+noactivado = datasetTodosDias(datasetTodosDias(:, 4) == 0, :);
+
+tamanoDatasetEntrenamientoBalanceado = cantidadDiasEntrenamiento * 720;
+activado = activado(randperm(length(activado), tamanoDatasetEntrenamientoBalanceado/2), :);
+noactivado = noactivado(randperm(length(noactivado), tamanoDatasetEntrenamientoBalanceado/2), :);
+
 % Llamada a las funciones de exportacion
 exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias);
-exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
+
+%exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
 exportarDatasetPrueba(rutaGuardadoDatasets, datasetPrueba, diasPrueba);
+exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
 
 fprintf('La Bibliotecaria ha terminado de analizar %d perfiles óptimos en %f segundos \n\n', cantidadDias, toc);
 
@@ -154,8 +164,24 @@ function exportarDatasetPrueba(rutaGuardadoDatasets, datasetDiasPrueba, diasPrue
     fprintf(fileID, formatoDatos, datasetDiasPrueba');
     fclose(fileID);
     
-    fprintf('\nLa Bibliotecaria ha exportado los perfiles de prueba en un conjunto de datos en %s de los siguientes dias: \n', rutaGuardadoDatasets);
+    fprintf('La Bibliotecaria ha exportado los perfiles de prueba en un conjunto de datos en %s de los siguientes dias: \n', rutaGuardadoDatasets);
     disp(diasPrueba);
 end
 
+function exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado)
+%% exportarDatasetEntrenamientoBalanceado
+% Exporta solo los dias de entrenamiento (balanceados) indicados en un archivo
 
+    datasetDiasEntrenamiento = [activado; noactivado];
+
+    fileID = fopen([rutaGuardadoDatasets, 'datasetTP.txt'], 'w');
+    formatoEncabezado = ['%s %1s %1s %1s\r\n'];
+    formatoDatos = ['%.4f %1.4f %1.4f %1.0f\r\n'];
+    
+    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'Class');
+    fprintf(fileID, formatoDatos, datasetDiasEntrenamiento');
+    fclose(fileID);
+    
+    fprintf('La Bibliotecaria ha exportado los perfiles de entrenamiento (balanceados) en un conjunto de datos en %s \n', rutaGuardadoDatasets);
+
+end
