@@ -1,6 +1,6 @@
 # Tangente Penitente - Registro de Salidas
 
-## Prueba 5
+## Prueba 6
 
 - Iteraciones: 300000
 - Cantidad de instancias de entrenamiento: 10 días
