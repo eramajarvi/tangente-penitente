@@ -73,8 +73,8 @@ end
 %% Preparacion para exportar
 % Editar las siguientes dos lineas la cantidad de dias deseados en el
 % conjunto de datos resultante:
-cantidadDiasEntrenamiento = 10;
-cantidadDiasPrueba = 1;
+cantidadDiasEntrenamiento = 1;
+cantidadDiasPrueba = 2;
 
 cantidadDiasExportar = cantidadDiasEntrenamiento + cantidadDiasPrueba;
 
@@ -95,11 +95,11 @@ activado = activado(randperm(length(activado), tamanoDatasetEntrenamientoBalance
 noactivado = noactivado(randperm(length(noactivado), tamanoDatasetEntrenamientoBalanceado/2), :);
 
 % Llamada a las funciones de exportacion
-exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias);
+%exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias);
 
 %exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
 exportarDatasetPrueba(rutaGuardadoDatasets, datasetPrueba, diasPrueba);
-exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
+%exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
 
 fprintf('La Bibliotecaria ha terminado de analizar %d perfiles óptimos en %f segundos \n\n', cantidadDias, toc);
 
