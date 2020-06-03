@@ -33,8 +33,9 @@ for i = 1 : 1 : cantidadDias
     ruta = [rutaCargaPerfiles, nombreArchivo, '.mat'];
     load(ruta);
     
-    activado = find(control == 15); % Encuentra la posicion cuando se activa la irrigacion
-    noActivado = find(control == 0);
+    activado = (control == 15); % Encuentra la posicion cuando se activa la irrigacion
+    noActivado = (control == 0);
+    
     horasActivacion = tiempo./3600 + 6; % El rango es de 6:00h a 18:00h, se encuentra la hora exacta de activacion
     
     % Valores de las variables de interes cuando hay activacion de la irrigacion
@@ -73,8 +74,8 @@ end
 %% Preparacion para exportar
 % Editar las siguientes dos lineas la cantidad de dias deseados en el
 % conjunto de datos resultante:
-cantidadDiasEntrenamiento = 1;
-cantidadDiasPrueba = 2;
+cantidadDiasEntrenamiento = 60;
+cantidadDiasPrueba = 1;
 
 cantidadDiasExportar = cantidadDiasEntrenamiento + cantidadDiasPrueba;
 
@@ -99,7 +100,7 @@ noactivado = noactivado(randperm(length(noactivado), tamanoDatasetEntrenamientoB
 
 %exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
 exportarDatasetPrueba(rutaGuardadoDatasets, datasetPrueba, diasPrueba);
-%exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
+exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
 
 fprintf('La Bibliotecaria ha terminado de analizar %d perfiles óptimos en %f segundos \n\n', cantidadDias, toc);
 
