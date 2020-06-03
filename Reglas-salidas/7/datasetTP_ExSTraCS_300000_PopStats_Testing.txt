@@ -1,0 +1,36 @@
+Performance Statistics:------------------------------------------------------------------------
+Training Accuracy	Testing Accuracy	Training Coverage	Testing Coverage
+0.7878866238006654	0.6001477882063464	1.0	1.0
+
+Population Characterization:------------------------------------------------------------------------
+MacroPopSize	MicroPopSize	Generality
+1621	2000	0.4591666666666682
+
+SpecificitySum:------------------------------------------------------------------------
+R_0	R_1	R_2
+1763	269	1213
+
+AccuracySum:------------------------------------------------------------------------
+R_0	R_1	R_2
+1410.6317552038215	186.7171486800852	888.3187086172252
+
+AttributeTrackingGlobalSums:------------------------------------------------------------------------
+R_0	R_1	R_2
+42783390.701897815	17838333.57001661	32601312.058423243
+
+Run Time(in minutes):------------------------------------------------------------------------
+Global Time	43.18224944273631
+Matching Time	15.99772306283315
+Covering Time	0.0
+Deletion Time	2.4547790050506593
+Subsumption Time	1.9091004053751628
+Selection Time	0.37475014925003053
+Crossover Time	0.01802341143290202
+Mutation Time	0.041272632280985516
+Attribute Tracking-Feedback Time	0.9068294922510783
+Expert Knowledge Time	4.2116019368171695
+Output File Time	0.02814197540283203
+Initialization Time	4.214447295665741
+Add Classifier Time	1.1745375593503316
+Evaluation Time	3.7262534300486245
+Rule Compaction Time	0.0
