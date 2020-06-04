@@ -143,11 +143,59 @@ def MultiSURF(x, y, datos):
                     if (d > distanciasPromedio[i] + D[i]):
                         # Endpoint discreto
                         if datos.fenotipoDiscreto:
-                            pass
+                            if y[i] == y [j]:
+                                conteoLejosDe += 1
+
+                                # Atributo continuo
+                                if datos.infoAtributos[k][0]:
+                                    # Atributo siendo similar es mas importante
+                                    diferenciaLejosDe -= (abs(x[i][k] - x[j][k])) / (maxA - minA)
+
+                                # Atributo discreo
+                                else:
+                                    if x[i][k] == x[j][k]:
+                                        diferenciaLejosDe -= 1
+
+                            else:
+                                conteoFallidoLejosDe += 1
+
+                                # Atributo continuo
+                                if datos.infoAtributos[k][0]:
+                                    # Atributo siendo similar es mas importante
+                                    diferenciaFallidosLejosDe += abs(x[i][k] - x[j][k])/(maxA - minA)
+
+                                # Atributo discreto
+                                else:
+                                    if x[i][k] == x[j][k]:
+                                        diferenciaFallidosLejosDe += 1
 
                         # Endpoint continuo
                         else:
-                            pass
+                            if abs(y[i] - y[j]) < limitesMismaClase:
+                                conteoLejosDe += 1
+
+                                # Atributo continuo
+                                if datos.infoAtributos[k][0]:
+                                    # Atributo siendo similar es mas importante
+                                    diferenciaLejosDe -= (abs(x[i][k] - x[j][k])) / (maxA - minA)
+
+                                # Atributo discreto
+                                else:
+                                    if x[i][j] == x[j][k]:
+                                        diferenciaLejosDe -= 1
+
+                            else:
+                                conteoFallidoLejosDe += 1
+
+                                # Atributo continuo
+                                if datos.infoAtributos[k][0]:
+                                    # Atributo siendo similar es mas importante
+                                    diferenciaFallidosLejosDe += abs(x[i][k] - x[j][k]) / (maxA - minA)
+
+                                # Atributo discreto
+                                else:
+                                    if x[i][k] == x[j][k]:
+                                        diferenciaFallidosLejosDe += 1
 
         proporcionCercanos = conteoCercaDe / float(conteoCercaDe + conteoFallidoCercaDe)
         proporcionFallidos = conteoFallidoCercaDe / float(conteoCercaDe + conteoFallidoCercaDe)
