@@ -118,7 +118,6 @@ def hacerMapaMulticlases(y, instMax, datos):
 
     return mapaMulticlases
 
-
 def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, matrizDistancia, instMax, mapaMulticlase):
     pass
 
@@ -132,7 +131,20 @@ def evaluarReliefF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMa
     pass
 
 def encontrarIndiceMax(matriz):
-    pass
+    valorMax = None
+    indiceMax = None
+
+    for i in range(len(matriz)):
+        if matriz[i] == None:
+            indiceMax = i
+            return indiceMax
+
+        else:
+            if (valorMax == None) or (matriz[i] > valorMax):
+                valorMax = matriz[i]
+                indiceMax = i
+            
+    return indiceMax
 
 def calcularDistancia(a, b, datos):
     pass
