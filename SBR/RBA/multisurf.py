@@ -246,7 +246,14 @@ def multiClaseMultiSURF(x, y, datos):
         D.append(desviacionEstandar / 2.0)
 
 def obtenerDesviacionEstandar(vectorDistancias, promedio):
-    pass
+    suma = 0
+
+    for i in range(len(vectorDistancias)):
+        suma += (vectorDistancias[i] - promedio) ** 2
+
+    suma = suma / float(len(vectorDistancias))
+
+    return (suma ** 0.5)
 
 def obtenerPromedio(vectorDistancias):
     suma = 0
