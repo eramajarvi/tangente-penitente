@@ -245,6 +245,28 @@ def multiClaseMultiSURF(x, y, datos):
         desviacionEstandar = obtenerDesviacionEstandar(vectorDistancias, distanciasPromedio[i])
         D.append(desviacionEstandar / 2.0)
 
+    # Haciendo bucle a traves de los atributos
+    for i in range(datos.numAtributos):
+        
+        # Atributo continuo
+        if datos.infoAtributos[k][0]:
+            minA = datos.infoAtributos[k][1][0]
+            maxA = datos.infoAtributos[k][1][1]
+
+        conteoCercaDe = 0
+        conteoFallidosCerca = 0
+        conteoLejos = 0
+        conteoFallidosLejos = 0
+
+        # Inicializando el puntaje en 0
+        diferenciaCerca = 0
+        diferenciaFallidosCerca = 0
+        diferenciaLejos = 0
+        diferenciaFallidosLejos = 0
+
+        almacenClasesCerca = 0
+        almacenClasesLejos = 0
+
 def obtenerDesviacionEstandar(vectorDistancias, promedio):
     suma = 0
 
