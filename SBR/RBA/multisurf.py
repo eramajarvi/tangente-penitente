@@ -338,7 +338,22 @@ def hacerMapaMultiClase(y, datos):
     return mapaMultiClase
 
 def haceMapaParClase(mapaMulticlase):
-    pass
+    """ Encuentra el numero de clases en el conjunto de datos y lo guarda en el mapa """
+
+    mapaParClase = {}
+
+    for each in mapaMulticlase:
+        for otro in mapaMulticlase:
+            if each != otro:
+                ubicador = [each, otro]
+                ubicador = sorted(ubicador, reverse = True)
+                
+                textoTemp = str(ubicador[0]) + str(ubicador[1])
+
+                if (textoTemp not in mapaParClase):
+                    mapaParClase[textoTemp] = [0, 0]
+
+    return mapaParClase
 
 def calcularDistancia(a, b, datos):
     pass
