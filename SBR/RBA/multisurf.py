@@ -229,6 +229,22 @@ def multiClaseMultiSURF(x, y, datos):
     matrizDistancias = calcularMatrizDistancias(x, datos)
     print("Calculado.")
 
+    # Solo para matrices multiclase
+    mapaMulticlase = None
+
+    if datos.fenotipoDiscreto and len(datos.listaFenotipos) > 2:
+        mapaMulticlase = hacerMapaMultiClase(y, datos)
+
+    D = []
+    distanciasPromedio = []
+
+    for i in range(datos.numInstanciasEntrenamiento):
+        vectorDistancias = []
+        vectorDistancias = obtenerDistanciasIndividuales(i, datos, matrizDistancias)
+        distanciasPromedio.append(obtenerPromedio(vectorDistancias))
+        desviacionEstandar = obtenerDesviacionEstandar(vectorDistancias, distanciasPromedio[i])
+        D.append(desviacionEstandar / 2.0)
+
 def obtenerDesviacionEstandar(vectorDistancias, promedio):
     pass
 
