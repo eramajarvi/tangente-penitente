@@ -252,7 +252,19 @@ def obtenerPromedio(vectorDistancias):
     pass
 
 def obtenerDistanciasIndividuales(i, datos, matrizDistancias):
-    pass
+    D = []
+
+    for j in range(datos.numInstanciasEntrenamiento):
+        if (i != j):
+            ubicador = [i, j]
+
+            # Acceder a la mitad correcta de la tabla
+            # (resultado de renundancia de la tabla eliminada)
+            ubicador = sorted(ubicador, reverse = True)
+
+            D.append(matrizDistancias[ubicador[0]][ubicador[1]])
+
+    return D
 
 def calcularMatrizDistancias(x, datos):
     # Hacer un contenedor vacio para la matriz de distancias
