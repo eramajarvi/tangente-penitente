@@ -122,10 +122,10 @@ def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, ma
     """ Metodo que encuentra los vecinos mas cercanos en todo el
     conjunto de datos basado ya sea en una metrica de distancia
     o en una especificacion de los k-vecinos mas proximos
-    # PARAM x- matriz que contiene los atributos de todos las instancias de datos
-    # PARAM y- matriz que contiene las etquetas de clase de todas las instancias de datos
-    # PARAM k- un numero entero que denota el numero de vecinos cercanos a considerar
-    # PARAM r- Ninguno si el usuario quiere vecinos cercanos de todas las instancias de datos o indice si una instancia de datos que el usuario quiere considerar
+    #PARAM x- matriz que contiene los atributos de todos las instancias de datos
+    #PARAM y- matriz que contiene las etquetas de clase de todas las instancias de datos
+    #PARAM k- un numero entero que denota el numero de vecinos cercanos a considerar
+    #PARAM r- Ninguno si el usuario quiere vecinos cercanos de todas las instancias de datos o indice si una instancia de datos que el usuario quiere considerar
     """
 
     NN = []
@@ -253,18 +253,64 @@ def encontrarVecinosMasCercanos_ReliefFContinuo(x, y, vecinos, inst, datos, matr
 
     return NN
 
-
 def encontrarVecinosMasCercanos_ReliefFDiscreto(x, y, vecinos, inst, datos, matrizDistancia, instMax):
     """ Metodo que encuentra los vecinos mas cercanos en todo el
     conjunto de datos basado ya sea en una metrica de distancia
     o en una especificacion de los k-vecinos mas proximos
-    # PARAM x- matriz que contiene los atributos de todos las instancias de datos
-    # PARAM y- matriz que contiene las etquetas de clase de todas las instancias de datos
-    # PARAM k- un numero entero que denota el numero de vecinos cercanos a considerar
-    # PARAM r- Ninguno si el usuario quiere vecinos cercanos de todas las instancias de datos o indice si una instancia de datos que el usuario quiere considerar
+    #PARAM x- matriz que contiene los atributos de todos las instancias de datos
+    #PARAM y- matriz que contiene las etquetas de clase de todas las instancias de datos
+    #PARAM k- un numero entero que denota el numero de vecinos cercanos a considerar
+    #PARAM r- Ninguno si el usuario quiere vecinos cercanos de todas las instancias de datos o indice si una instancia de datos que el usuario quiere considerar
     """
 
-    pass
+    NN = []
+
+    # Encontrar los k-correctos y k-fallidos mas cercanos
+    D_correctos = [] # Matriz para correctos mas cercanos - mide distancias
+    indicesMinCorrectos = []
+    D_fallidos = [] # Matris para fallidos mas cercanos - mide distancias
+    indicesMinFallidos = []
+
+    for n in range(vecinos):
+        D_correctos.append(None)
+        indicesMinCorrectos.append(None)
+        D_fallidos.append(None)
+        indicesMinFallidos.append(None)
+
+    for j in range(instMax):
+        if inst != j:
+            ubicador = [inst, j]
+            # Accede a la mitad correcta de la tabla
+            ubicador = sorted(ubicador, reverse = True)
+            d = matrizDistancia[ubicador[0]][ubicador[1]]
+
+            if y[j] == y[inst]:
+                indiceMax = encontrarIndiceMax(D_correctos)
+
+                # Si una distancia mas cercana se descubre,
+                # se hace una sustitucion
+                if D_correctos[indiceMax] == None or d < D_correctos[indiceMax]:
+                    D_correctos[indiceMax] = d
+                    indicesMinCorrectos[indiceMax] = j
+
+            else:
+                indiceMax = encontrarIndiceMax(D_fallidos)
+
+                # Si una distancia mas cercana se descubre,
+                # se hace una sustitucion
+                if D_fallidos[indiceMax] == None or d < D_fallidos[indiceMax]:
+                    D_fallidos[indiceMax] = d
+                    indicesMinFallidos[indiceMax] = j
+
+    # Guardar los k-correctos mas cercanos
+    for k in range(vecinos):
+        if indicesMinCorrectos[k] != None:
+            NN.append(indicesMinCorrectos[k])
+        
+        if indicesMinFallidos[k] != None:
+            NN.append(indicesMinFallidos[k])
+
+    return NN
 
 def evaluarReliefF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
     pass
