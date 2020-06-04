@@ -246,7 +246,7 @@ def multiClaseMultiSURF(x, y, datos):
         D.append(desviacionEstandar / 2.0)
 
     # Haciendo bucle a traves de los atributos
-    for i in range(datos.numAtributos):
+    for k in range(datos.numAtributos):
         
         # Atributo continuo
         if datos.infoAtributos[k][0]:
@@ -264,8 +264,124 @@ def multiClaseMultiSURF(x, y, datos):
         diferenciaLejos = 0
         diferenciaFallidosLejos = 0
 
-        almacenClasesCerca = 0
-        almacenClasesLejos = 0
+        almacenClasesCerca = hacerMapaParClase(mapaMulticlase)
+        almacenClasesLejos = hacerMapaParClase(mapaMulticlase)
+
+        for i in range(datos.numInstanciasEntrenamiento):
+            for j in range(i, datos.numInstanciasEntrenamiento):
+                if i != j and x[i][k] != datos.etiquetaDatosFaltantes and x[j][k] != datos.etiquetaDatosFaltantes:
+
+                    ubicador = [i, j]
+
+                    # Acceder a la mitad correcta de la tabla
+                    ubicador = sorted(ubicador, reverse = True)
+
+                    d = matrizDistancias[ubicador[0]][ubicador[1]]
+
+                    # Cerca
+                    if (d < distanciasPromedio[i] - D[i]):
+
+                        if y[i] == y[j]:
+                            conteoCercaDe += 1
+
+                            if x[i][k] != x[j][k]:
+
+                                # Atributo continuo
+                                if datos.infoAtributos[k][0]:
+                                    diferenciaCerca -= abs(x[i][k] - x[j][k]) / (maxA - minA)
+
+                                # Atributo discreto
+                                else:
+                                    diferenciaCerca -= 1
+
+                        else:
+                            conteoFallidosCerca += 1
+                            ubicador = [y[i], y[j]]
+                            ubicador = sorted(ubicador, reverse = True)
+
+                            textoTemp = str(ubicador[0]) + str(ubicador[1])
+                            almacenClasesCerca[textoTemp][0] += 1
+
+                            if x[i][k] != x[j][k]:
+                                # Atributo continuo
+                                if datos.infoAtributos[k][0]:
+                                    almacenClasesCerca[textoTemp][1] += abs(x[i][k] - x[j][k]) / (maxA - minA)
+
+                                # Atributo discreto
+                                else:
+                                    almacenClasesCerca[textoTemp][1] += 1
+
+                    # Lejos
+                    if (d > distanciasPromedio[i] + D[i]):
+
+                        if y[i] == y[j]:
+                            conteoLejos += 1
+
+                            # Atributo continuo
+                            if datos.infoAtributos[k][0]:
+                                # Atributo siendo similar es mas importante
+                                diferenciaLejos -= (1 - abs(x[i][k] - x[j][k])) / (maxA - minA)
+
+                            # Atributo discreto
+                            else:
+                                if x[i][k] == x[j][k]:
+                                    diferenciaLejos -= 1
+
+                        else:
+                            conteoFallidosLejos += 1
+                            ubicador = [y[i], y[j]]
+                            ubicador = sorted(ubicador, reverse = True)
+
+                            textoTemp = str(ubicador[0]) + str(ubicador[1])
+                            almacenClasesLejos[textoTemp][0] += 1
+
+                            # Atributo continuo
+                            if datos.infoAtributos[k][0]:
+                                # Atributo siendo similar es mas importante
+                                almacenClasesLejos[textoTemp][1] += abs(x[i][k] - x[j][k]) / (maxA - minA)
+
+                            # Atributo discreto 
+                            else:
+                                if x[i][k] == x[j][k]:
+                                    almacenClasesLejos[textoTemp][1] += 1
+
+        # Cerca
+        sumaFallidos = 0
+
+        for each in almacenClasesCerca:
+            sumaFallidos += almacenClasesCerca[each][0]
+
+        # Corrigiendo para datos faltantes
+        proporcionCorrectos = conteoCercaDe / float(conteoCercaDe + conteoFallidosCerca)
+        proporcionFallidos = conteoFallidosCerca / float(conteoCercaDe + conteoFallidosCerca)
+
+        for each in almacenClasesCerca:
+            diferenciaFallidosCerca += (almacenClasesCerca[each][0] / float(sumaFallidos)) * almacenClasesCerca[each][1]
+
+        diferenciaFallidosCerca = diferenciaFallidosCerca * float(len(almacenClasesCerca))
+
+        diferencia = diferenciaFallidosCerca * proporcionCorrectos + diferenciaCerca * proporcionFallidos
+
+        # Lejos
+        sumaFallidos = 0
+
+        for each in almacenClasesLejos:
+            sumaFallidos += almacenClasesLejos[each][0]
+
+        # Corrigiendo para datos faltantes
+        proporcionCorretos = conteoLejos / float(conteoLejos + conteoFallidosLejos)
+        proporcionFallidos = conteoFallidosLejos / float(conteoLejos + conteoFallidosLejos)
+
+        for each in almacenClasesLejos:
+            diferenciaFallidosLejos += (almacenClasesLejos[each][0] / float(sumaFallidos)) * almacenClasesLejos[each][1]
+
+        diferenciaFallidosLejos = diferenciaFallidosLejos * float(len(almacenClasesLejos))
+
+        diferencia += diferenciaFallidosLejos * proporcionCorrectos + diferenciaLejos * proporcionFallidos
+
+        listaPuntajes[k] += diferencia
+
+    return listaPuntajes
 
 def obtenerDesviacionEstandar(vectorDistancias, promedio):
     suma = 0
@@ -337,7 +453,7 @@ def hacerMapaMultiClase(y, datos):
 
     return mapaMultiClase
 
-def haceMapaParClase(mapaMulticlase):
+def hacerMapaParClase(mapaMulticlase):
     """ Encuentra el numero de clases en el conjunto de datos y lo guarda en el mapa """
 
     mapaParClase = {}
