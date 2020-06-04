@@ -147,4 +147,30 @@ def encontrarIndiceMax(matriz):
     return indiceMax
 
 def calcularDistancia(a, b, datos):
-    pass
+    """ Calcula la distancia entre dos clases en el conjunto de
+    datos. Maneja atributos continuos y discretos. Los atributos
+    continuos son acomodados al escalar la diferencia de distancia
+    dentro del contexto del rango del atributo observado. Si un
+    respectivo punto de datos esta faltando de cualquier instancia,
+    es dejado por fuera de los calculos de distancia """
+
+    # Distancia
+    d = 0
+
+    for i in range(datos.numAtributos):
+        if a[i] != datos.etiquetaDatosFaltantes and b[i] != datos.etiquetaDatosFaltantes:
+            # Atributo discreto
+            if not datos.infoAtributos[i][0]:
+                if a[i] != b[i]:
+                    d += 1
+
+            # Atributo continuo
+            else:
+                limiteMin = float(datos.infoAtributos[i][1][0])
+                limiteMax = float(datos.infoAtributos[i][1][1])
+
+                # Kira & Rendell, 1992
+                # "Handling continuous attributes" - "Manejando atributos discretos"
+                d += abs(float(a[i]) - float(b[i])) / float(limiteMax - limiteMin)
+    
+    return d
