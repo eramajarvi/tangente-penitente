@@ -215,7 +215,19 @@ def MultiSURF(x, y, datos):
 
     
 def multiClaseMultiSURF(x, y, datos):
-    pass
+    """ Controla bucles principales del MultiSURF """
+
+    listaPuntajes = []
+
+    # Inicializando puntajes de los atributos en 0
+    for i in range(datos.numAtributos):
+        listaPuntajes.append(0)
+
+    # Pre-calcular distancias entre todos los pares de identificadores
+    # unicos dentro del conjunto de datos
+    print("Precalculando matriz de distancias...")
+    matrizDistancias = calcularMatrizDistancias(x, datos)
+    print("Calculado.")
 
 def obtenerDesviacionEstandar(vectorDistancias, promedio):
     pass
