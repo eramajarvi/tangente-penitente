@@ -119,7 +119,76 @@ def hacerMapaMulticlases(y, instMax, datos):
     return mapaMulticlases
 
 def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, matrizDistancia, instMax, mapaMulticlase):
-    pass
+    """ Metodo que encuentra los vecinos mas cercanos en todo el
+    conjunto de datos basado ya sea en una metrica de distancia
+    o en una especificacion de los k-vecinos mas proximos
+    # PARAM x- matriz que contiene los atributos de todos las instancias de datos
+    # PARAM y- matriz que contiene las etquetas de clase de todas las instancias de datos
+    # PARAM k- un numero entero que denota el numero de vecinos cercanos a considerar
+    # PARAM r- Ninguno si el usuario quiere vecinos cercanos de todas las instancias de datos o indice si una instancia de datos que el usuario quiere considerar
+    """
+
+    NN = []
+
+    # Encontrarndo los k-mas cercanos y los k-fallidos
+    D_correctos = [] # Matriz de los mas cercanos - mide distancias
+    indiceMinCorrectos = []
+
+    almacenFallidos = {}
+
+    for each in mapaMulticlase:
+        # Se guarda todas las clases fallidas
+        if each != y[inst]:
+            almacenFallidos[each] = [[], []] # Guarda D_fallidos e indiceMinFallidos
+
+            for n in range(vecinos):
+                almacenFallidos[each][0].append(None)
+                almacenFallidos[each][1].append(None)
+
+    for n in range(vecinos):
+        D_correctos.append(None)
+        indiceMinCorrectos.append(None)
+
+    for j in range(instMax):
+        if inst != j:
+            ubicador = [inst, j]
+            # Acceder a la mitad correcta de la tabla
+            ubicador = sorted(ubicador, reverse = True)
+
+            d = matrizDistancia[ubicador[0]][ubicador[1]]
+
+            # Correctos
+            if y[j] == y[inst]:
+                indiceMax = encontrarIndiceMax(D_correctos)
+
+                # Si una distancia mas cercana es descubierta,
+                # se hace una sustitucion
+                if D_correctos[indiceMax] = None or d < D_correctos[indiceMax]:
+                    D_correctos[indiceMax] = d
+                    indiceMinCorrectos[indiceMax] = j
+
+            # Fallidos
+            else:
+                for each in almacenFallidos:
+                    if y[j] == each:
+                        indiceMax = encontrarIndiceMax(almacenFallidos[each][0])
+
+                        if almacenFallidos[each][0][indiceMax] == None or d < almacenFallidos[each][0][indiceMax]:
+                            almacenFallidos[each][0][indiceMax] == d # D_fallidos
+                            almacenFallidos[each][1][indiceMax] == j #indiceMinFallidos
+
+    # Guardar los k-correctos mas cercanos
+    for k in range(vecinos):
+        if indiceMinCorrectos[k] != None:
+            NN.append(indiceMinCorrectos[k])
+
+    for each in almacenFallidos:
+        for k in range(vecinos):
+            if almacenFallidos[each][1][k] != None:
+                NN.append(almacenFallidos[each][1][k])
+
+    return NN
+
 
 def encontrarVecinosMasCercanos_ReliefFContinuo(x, y, vecinos, inst, datos, matrizDistancia, instMax):
     pass
