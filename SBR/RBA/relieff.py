@@ -17,32 +17,34 @@ características relevantes.
 ---------------------------------------------------------------------------------------------------------------------------------------------------------
 """
 
-def EjecutarReliefF(parameter_list):
+def EjecutarReliefF(datos, fraccionMuestreoRelief, vecinosRelief):
+    """ Llamada a ejecutar el algoritmo ReliefF 
+    #PARAM x - es una matriz que contiene los atributos de todas las instancias en el conjunto de datos
+    #PARAM y - es una matriz que conteiene la clase de una instancia de datos """
+
+def ReliefF(x, y, instMax, vecinos, datos, fraccionMuestreoRelief):
     pass
 
-def ReliefF(parameter_list):
+def calcularMatrizDistancias(x, datos, instMax):
     pass
 
-def calcularMatrizDistancias(parameter_list):
+def hacerMapaMulticlases(y, instMax, datos):
     pass
 
-def hacerMapaMulticlases(parameter_list):
+def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, matrizDistancia, instMax, mapaMulticlase):
     pass
 
-def encontrarVecinosMasCercanos_ReliefFMulticlase(parameter_list):
+def encontrarVecinosMasCercanos_ReliefFContinuo(x, y, vecinos, inst, datos, matrizDistancia, instMax):
     pass
 
-def encontrarVecinosMasCercanos_ReliefFContinuo(parameter_list):
+def encontrarVecinosMasCercanos_ReliefFDiscreto(x, y, vecinos, inst, datos, matrizDistancia, instMax):
     pass
 
-def encontrarVecinosMasCercanos_ReliefFDiscreto(parameter_list):
+def evaluarReliefF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
     pass
 
-def evaluarReliefF(parameter_list):
+def encontrarIndiceMax(matriz):
     pass
 
-def encontrarIndiceMax(parameter_list):
-    pass
-
-def calcularDistancia(parameter_list):
+def calcularDistancia(a, b, datos):
     pass
