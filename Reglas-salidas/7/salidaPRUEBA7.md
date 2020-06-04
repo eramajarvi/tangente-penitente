@@ -2,7 +2,7 @@
 
 ## Prueba 7
 
-- Iteraciones: 300000
+- Iteraciones: 900000
 - Cantidad de instancias de entrenamiento: 60 días
 - Cantidad de instancias de prueba: 0
 - Algoritmo de compactación de reglas: QRF
@@ -14,7 +14,9 @@
 
 ### Observaciones
 
-Se le entregó a Tangente Penitente un conjunto de datos de entrenamiento balanceado. Se continuaron las iteraciones 
+Se le entregó a Tangente Penitente un conjunto de datos de entrenamiento balanceado. Se continuaron las iteraciones.
+
+`acc_sub` cambió de 0.99 a 0.7 en las iteraciones 0.6M a 0.9M
 
 
 
@@ -30,6 +32,13 @@ No se hizo prueba
 
 - Precisión estándar (ajustada): 0.7913888888888889
 - Precisión balanceada (ajustada): 0.7955731983404467
+
+A las 0.9M de iteraciones:
+
+32960 de 43200 instancias cubiertas y correctamente clasificadas
+
+- Precisión estándar (ajustada): 0.7629
+- Precisión balanceada (ajustada): 0.763
 
 ### Precisión de prueba
 
