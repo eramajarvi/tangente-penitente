@@ -163,7 +163,7 @@ def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, ma
 
                 # Si una distancia mas cercana es descubierta,
                 # se hace una sustitucion
-                if D_correctos[indiceMax] = None or d < D_correctos[indiceMax]:
+                if D_correctos[indiceMax] == None or d < D_correctos[indiceMax]:
                     D_correctos[indiceMax] = d
                     indiceMinCorrectos[indiceMax] = j
 
@@ -189,11 +189,81 @@ def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, ma
 
     return NN
 
-
 def encontrarVecinosMasCercanos_ReliefFContinuo(x, y, vecinos, inst, datos, matrizDistancia, instMax):
-    pass
+    """ Metodo que encuentra los vecinos mas cercanos en todo el
+    conjunto de datos basado ya sea en una metrica de distancia o
+    una especificacion de los k-vecinos mas cercanos.
+    #PARAM x- matriz que contiene los atributos de todos los datos instancias
+    #PARAM y- matriz que contiene las etiquetas de clase de todos los datos instancias
+    #PARAM k- un numero entero que denota el numero de los vecinos mas cercanos a considerar
+    #PARAM r- Ninguno si el usuario quiere los vecinos mas cercanos de todos los datos instancias o el indice de una instancia de datos que el usuario quiere considerar
+    # """
+
+    NN =[]
+
+    # Limite para determinar similaridad entre clases de atributos continuos
+    # DE = Desviacion Estandar
+    limiteMismaClase = datos.DEFenotipo
+
+    # Encontrar los k-correctos y k-fallidos mas cercanos
+    D_correctos = [] # Matriz para correctos mas cercanos - mide distancias
+    indiceMinCorrectos = []
+    D_fallidos = [] # Matriz para fallidos mas cercanos - mide distancias
+    indiceMinFallidos = []
+
+    for n in range(vecinos):
+        D_correctos.append(None)
+        indiceMinCorrectos(None)
+        D_fallidos.append(None)
+        indiceMinFallidos.append(None)
+
+    for j in range(instMax):
+        if inst != j:
+            ubicador = [inst, j]
+            # Acceder a la mitad correcta de la tabla
+            ubicador = sorted(ubicador, reverse = True)
+
+            d = matrizDistancia[ubicador[0]][ubicador[1]]
+
+            if abs(y[j] - y[inst]) < limiteMismaClase:
+                indiceMax = encontrarIndiceMax(D_correctos)
+
+                # Si se encuentra una distancia mas cercana, se
+                # hace una sustitucion
+                if D_correctos[indiceMax] == None or d < D_correctos[indiceMax]:
+                    D_correctos[indiceMax] = d
+                    indiceMinCorrectos[indiceMax] = j
+
+            else:
+                indiceMax = encontrarIndiceMax(D_fallidos)
+
+                # Si se encuentra una distancia mas cercana, se
+                # hace una sustitucion
+                if D_fallidos[indiceMax] == None or d< D_fallidos[indiceMax]:
+                    D_fallidos[indiceMax] = d
+                    indiceMinFallidos[indiceMax] = j
+
+    # Guardar los k-correctos mas cercanos
+    for k in range(vecinos):
+        if indiceMinCorrectos[k] != None:
+            NN.append(indiceMinCorrectos[k])
+
+        if indiceMinFallidos[k] != None:
+            NN.append(indiceMinFallidos[k])
+
+    return NN
+
 
 def encontrarVecinosMasCercanos_ReliefFDiscreto(x, y, vecinos, inst, datos, matrizDistancia, instMax):
+    """ Metodo que encuentra los vecinos mas cercanos en todo el
+    conjunto de datos basado ya sea en una metrica de distancia
+    o en una especificacion de los k-vecinos mas proximos
+    # PARAM x- matriz que contiene los atributos de todos las instancias de datos
+    # PARAM y- matriz que contiene las etquetas de clase de todas las instancias de datos
+    # PARAM k- un numero entero que denota el numero de vecinos cercanos a considerar
+    # PARAM r- Ninguno si el usuario quiere vecinos cercanos de todas las instancias de datos o indice si una instancia de datos que el usuario quiere considerar
+    """
+
     pass
 
 def evaluarReliefF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
