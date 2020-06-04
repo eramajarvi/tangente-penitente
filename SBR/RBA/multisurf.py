@@ -272,7 +272,24 @@ def calcularMatrizDistancias(x, datos):
     return matrizDistancias
 
 def hacerMapaMultiClase(y, datos):
-    pass
+    # Encontrar numero de clases en el conjunto de datos y
+    # guardarlos en el mapa
+
+    mapaMultiClase = {}
+
+    for i in range(datos.numInstanciasEntrenamiento):
+        if (y[i] not in mapaMultiClase):
+            mapaMultiClase[y[i]] = 0
+
+        else:
+            mapaMultiClase[y[i]] += 1
+
+    # Para cada clase guardar su probabilidad de ocurrencia en el
+    # conjunto de datos
+    for each in datos.listaFenotipos:
+        mapaMultiClase[each] = mapaMultiClase[each] / float(datos.numInstanciasEntrenamiento)
+
+    return mapaMultiClase
 
 def haceMapaParClase(mapaMulticlase):
     pass
