@@ -82,7 +82,21 @@ def ReliefF(x, y, instMax, vecinos, datos, fraccionMuestreoRelief):
         return listaPuntajes
 
 def calcularMatrizDistancias(x, datos, instMax):
-    pass
+    # Hace un contenedor vacio para la matriz de distancias
+    # (Solo se llenara la mitad no redundante de la matriz)
+    matrizDistancias = []
+
+    for i in range(instMax):
+        matrizDistancias.append([])
+
+        for j in range(instMax):
+            matrizDistancias[i].append(None)
+
+    for i in range(1, instMax):
+        for j in range(0, i):
+            matrizDistancias[i][j] = calcularDistancia(x[i], x[j], datos)
+
+    return matrizDistancias
 
 def hacerMapaMulticlases(y, instMax, datos):
     pass
