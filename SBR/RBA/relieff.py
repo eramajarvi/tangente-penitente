@@ -99,7 +99,25 @@ def calcularMatrizDistancias(x, datos, instMax):
     return matrizDistancias
 
 def hacerMapaMulticlases(y, instMax, datos):
-    pass
+    """ Encuentra el numero de clases en el conjunto de datos y
+    los guarda en el mapa """
+
+    mapaMulticlases = {}
+
+    for i in range(instMax):
+        if (y[i] not in mapaMulticlases):
+            mapaMulticlases[y[i]] = 0
+
+        else:
+            mapaMulticlases[y[i]] += 1
+
+    # Para cada clase guardar su probabilida de ocurrencia en el 
+    # conjunto de datos
+    for each in datos.listaFenotipos:
+        mapaMulticlases[each] = mapaMulticlases[each] / float(instMax)
+
+    return mapaMulticlases
+
 
 def encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, matrizDistancia, instMax, mapaMulticlase):
     pass
