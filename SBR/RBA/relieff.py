@@ -39,7 +39,47 @@ def EjecutarReliefF(datos, fraccionMuestreoRelief, vecinosRelief):
     return puntajes
 
 def ReliefF(x, y, instMax, vecinos, datos, fraccionMuestreoRelief):
-    pass
+    """ Contra el principal bucle de ReliefF """
+
+    listaPuntajes = []
+
+    # Inicializando puntajes de los atributos en 0
+    for i in range(datos.numAtributos):
+        listaPuntajes.append(0)
+
+    # Precalculas distancias entre todas los pares unicos de instancias
+    # dentro del conjunto de datos.
+    print("Precalculando matriz de distancias...")
+    matrizDistancias = calcularMatrizDistancias(x, datos, instMax)
+    print("Calculada")
+
+    # Solo para matrices multiclases
+    mapaMulticlases = None
+
+    if datos.fenotipoDiscreto and len(datos.listaFenotipos) > 2:
+        mapaMulticlases = hacerMapaMulticlases(y, instMax, datos)
+
+    # Evaluando cada atributo sobre ejecutarIter
+    for inst in range(instMax):
+        if datos.fenotipoDiscreto: # Si es discreto
+            if len(datos.listaFenotipos) > 2:
+                # Se encuentra sus vecinos mas cercanos
+                NN = encontrarVecinosMasCercanos_ReliefFMulticlase(x, y, vecinos, inst, datos, matrizDistancias, instMax, mapaMulticlases)
+
+            else:
+                # Se encuentra sus vecinos mas cercanos
+                NN = encontrarVecinosMasCercanos_ReliefFDiscreto(x, y, vecinos, inst, datos, matrizDistancias, instMax)
+
+        else:
+            # Se encuentra sus vecinos mas cercanos
+            NN = encontrarVecinosMasCercanos_ReliefFContinuo(x, y, vecinos, inst, datos, matrizDistancias, instMax)
+
+        # Promediando los puntajes (Tal vez se necesite normalizar
+        # antes para permitir ajustes de datos faltantes)
+        for j in range(datos.numAtributos):
+            listaPuntajes[j] = listaPuntajes[j] / (float(instMax) * vecinos)
+
+        return listaPuntajes
 
 def calcularMatrizDistancias(x, datos, instMax):
     pass
