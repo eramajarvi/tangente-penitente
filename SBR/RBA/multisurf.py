@@ -239,7 +239,21 @@ def obtenerDistanciasIndividuales(i, datos, matrizDistancias):
     pass
 
 def calcularMatrizDistancias(x, datos):
-    pass
+    # Hacer un contenedor vacio para la matriz de distancias
+    # (Solo llenaremos la mitad no redundante de la matriz)
+    matrizDistancias = []
+
+    for i in range(datos.numInstanciasEntrenamiento):
+        matrizDistancias.append([])
+
+        for j in range(datos.numInstanciasEntrenamiento):
+            matrizDistancias[i].append(None)
+
+    for i in range(1, datos.numInstanciasEntrenamiento):
+        for j in range(0, i):
+            matrizDistancias[i][j] = calcularDistancia(x[i], x[j], datos)
+
+    return matrizDistancias
 
 def hacerMapaMultiClase(y, datos):
     pass
