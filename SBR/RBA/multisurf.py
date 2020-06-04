@@ -249,7 +249,12 @@ def obtenerDesviacionEstandar(vectorDistancias, promedio):
     pass
 
 def obtenerPromedio(vectorDistancias):
-    pass
+    suma = 0
+
+    for i in range(len(vectorDistancias)):
+        suma += vectorDistancias[i]
+
+    return suma / float(len(vectorDistancias))
 
 def obtenerDistanciasIndividuales(i, datos, matrizDistancias):
     D = []
