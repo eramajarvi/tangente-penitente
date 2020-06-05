@@ -17,7 +17,22 @@ características relevantes.
 """
 
 def EjecutarSURF(datos, fraccionMuestreoRelief):
-    pass
+    """ Llamado para ejecutar el algoritmo SURF 
+    #PARAM x - es una matriz que contiene los atributos de todas las instancias en el conjunto de datos
+    #PARAM y - es una matriz que contiene la clase de una instancia de datos """
+
+    x = [ row[0] for row in datos.entrenamientoFormateados]
+    y = [ row[1] for row in datos.entrenamientoFormateados]
+
+    print("Ejecutando algoritmo SURF...")
+
+    # Parametro m-numero de iteracion a ejecutar durante el procedimiento de relieff
+    instMax = int(float(fraccionMuestreoRelief) * len(x))
+    puntajes = SURF(x, y, instMax, datos, fraccionMuestreoRelief)
+
+    print("Ejecucion de SURF completada.")
+
+    return puntajes
 
 def SURF(x, y, instMax, datos, fraccionMuestreoRelief):
     pass
