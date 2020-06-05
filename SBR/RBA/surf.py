@@ -67,7 +67,28 @@ def SURF(x, y, instMax, datos, fraccionMuestreoRelief):
     return listaPuntajes
 
 def calcularMatrizDistancias(x, datos, instMax):
-    pass
+    """ En SURF este metodo precalcula la matriz de distancias y la distancia promedio """
+    # Hacer contenedor vacio de matriz de distancias
+    matrizDistancias = []
+    distanciaPromedio = 0
+    conteo = 0
+
+    for i in range(instMax):
+        matrizDistancias.append([])
+
+        for j in range(instMax):
+            matrizDistancias[i].append(None)
+
+    for i in range(1, instMax):
+        for j in range(0, i):
+            matrizDistancias[i][j] = calcularDistancia(x[i], x[j], datos)
+            conteo += 1
+            distanciaPromedio += matrizDistancias[i][j]
+
+    distanciaPromedio = distanciaPromedio / float(conteo)
+    objetoDevuelto = [matrizDistancias, distanciaPromedio]
+
+    return objetoDevuelto
 
 def hacerMapaMulticlases(y, instMax, datos):
     pass
