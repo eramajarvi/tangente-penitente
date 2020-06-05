@@ -313,7 +313,178 @@ def encontrarVecinosMasCercanos_ReliefFDiscreto(x, y, vecinos, inst, datos, matr
     return NN
 
 def evaluarReliefF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
-    pass
+    """ Metodo para evaluar el puntaje de un atributo 
+    #PARAM x - matriz con atributos de todas las instancias del conjunto de datos
+    #PARAM y - matriz con las etiquetas de clase de todas las instancias del conjunto de datos
+    #PARAM NN - matriz de vecinos mas cercanos para cada instancia en el conjunto de datos
+    #PARAM r - un indice de un dato de instancia seleccionado aleatoriamente
+    #PARAM caracteristica - un atributo que debe ser evaluado"""
+
+    diferencia = 0
+
+    # Si es un fenotipo continuo
+    if not datos.fenotipoDiscreto:
+        # Limite para determinas similaridad entre clases para atributos continuos
+        limiteMismaClase = datos.DEFenotipo
+
+    # Atributo continuo
+    if datos.infoAtributos[caracteristica][0]:
+        # Determinar limites para atributos continuos
+        limiteMin = datos.infoAtributos[caracteristica][1][0]
+        limiteMax = datos.infoAtributos[caracteristica][1][1]
+
+    # Inicializar el puntaje en 0
+    diferenciaCorrectos = 0
+    diferenciaFallidos = 0
+    diferenciaCalc = 0
+
+    conteoCorrectos = 0
+    conteoFallidos = 0
+
+    if datos.fenotipoDiscreto:
+        if len(datos.listaFenotipos) > 2:
+            # Endpoint multiclase
+            almacenClase = {}
+            sumaClasePFallida = 0
+
+            for each in mapaMulticlase:
+                # Guarda todas las clases fallidas
+                if each != y[inst]:
+                    almacenClase[each] = [0, 0] # Guarda conteoFallidos y diferenciaFallidos
+                    sumaClasePFallida += mapaMulticlase[each]
+
+            # Para todos los vecinos cercanos
+            for i in range(len(NN)):
+                # Agregar normalizacion apropiada
+                if x[inst][caracteristica] != datos.etiquetaDatosFaltantes and x[NN[i]][caracteristica] != datos.etiquetaDatosFaltantes:
+                    # Correctos
+                    if y[inst] == y [NN[i]]:
+                        conteoCorrectos += 1
+
+                        if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                            # Atributo continuo
+                            if datos.infoAtributos[caracteristica][0]:
+                                diferenciaCorrectos -= abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+                            
+                            # Atributo discreto
+                            else:
+                                diferenciaCorrectos -= 1
+                    # Fallidos
+                    else:
+                        for claseFallida in almacenClase:
+                            if y[NN[i]] == claseFallida:
+                                almacenClase[claseFallida][0] += 1
+
+                                if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                                    # Atributo continuo
+                                    if datos.infoAtributos[caracteristica][0]:
+                                        almacenClase[claseFallida][1] -= abs(x[inst][caracteristica] - x[NN][i][caracteristica]) / (limiteMaximo - limiteMinimo)
+
+                                    # Atributo discreto
+                                    else:
+                                        almacenClase[claseFallida][1] += 1
+
+            # Correctos para clases multiples y tambien datos faltantes
+            sumaFallidos = 0
+
+            for each in almacenClase:
+                sumaFallidos += almacenClase[each][0]
+
+            promedioFallidos = sumaFallidos / float(len(almacenClase))
+            proporcionCorrectos = conteoCorrectos / float(len(NN))
+
+            for each in almacenClase:
+                diferencia += (mapaMulticlase[each] / float(sumaClasePFallida)) * almacenClase[each][1]
+
+            diferencia = diferencia * proporcionCorrectos
+            
+            proporcionFallidos = promedioFallidos / float(len(NN))
+            diferencia += diferenciaCorrectos * proporcionCorrectos
+
+        # Problema de clasificacion binaria
+        else:
+            # Para todos los vecinos cercanos
+            for i in range(len(NN)):
+                # Agregar normalizacion apropiada
+                if x[inst][caracteristica] != datos.etiquetaDatosFaltantes and x[NN[i]][caracteristica] != datos.etiquetaDatosFaltantes:
+                    
+                    # Correctos
+                    if y[inst] == y[NN[i]]:
+                        conteoCorrectos += 1
+
+                        if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                            # Atributo continuo
+                            if datos.infoAtributos[caracteristica][0]:
+                                diferenciaCorrectos -= abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                            # Atributo discreto
+                            else:
+                                diferenciaCorrectos -= 1
+
+                    # Fallidos
+                    else:
+                        conteoFallidos += 1
+
+                        if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                            # Atributo continuo
+                            if datos.infoAtributos[caracteristica][0]:
+                                diferenciaFallidos += abs(x[inst][caracterostoca] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+                            
+                            # Atributo discreto
+                            else:
+                                diferenciaFallidos += 1
+
+            # Toma el imbalance de los correctos/fallidos en cuenta
+            # (que vienen de los datos faltantes) 
+            proporcionCorrectos = conteoCorrectos / float(len(NN))
+            proporcionFallidos = conteoFallidos / float(len(NN))
+
+            # Aplicando un esquema de pesaje para balancear los
+            # puntajes
+            diferencia = diferenciaCorrectos * proporcionFallidos + diferenciaFallidos * proporcionCorrectos
+
+    # Endpoint continuo
+    else:
+        # Para todos los vecinos mas cercanos
+        for i in range(len(NN)):
+            # Agregar normalizacion apropiada
+            if x[inst][caracteristica] != datos.etiquetaDatosFaltantes and x[NN[i]][caracteristica] != datos.etiquetaDatosFaltantes:
+
+                # Correctos
+                if abs(y[inst] - y[NN[i]]) < limiteMismaClase:
+                    conteoCorrectos += 1
+
+                    if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                        # Atributo continuo
+                        if datos.infoAtributos[caracteristica][0]:
+                            diferenciaCorrectos -= abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                        # Atributo discreto
+                        else:
+                            diferenciaCorrectos -=1
+
+                # Fallidos
+                else:
+                    conteoFallidos += 1
+
+                    if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                        # Atributo continuo
+                        if datos.infoAtributos[caracteristica][0]:
+                            diferenciaFallidos += abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                        # Atributo discreto
+                        else:
+                            diferenciaFallidos += 1
+
+        # Tomar en cuenta el imbalance de correctos/fallidos
+        proporcionCorrectos = conteoCorrectos / float(len(NN))
+        proporcionFallidos = conteoFallidos / float(len(NN))
+
+        # Se aplica un esquema de pesaje para balancear puntajes
+        diferencia = diferenciaCorrectos * proporcionFallidos + diferenciaFallidos * proporcionCorrectos
+
+        return diferencia
+
 
 def encontrarIndiceMax(matriz):
     valorMax = None
