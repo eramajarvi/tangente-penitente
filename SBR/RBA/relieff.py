@@ -485,7 +485,6 @@ def evaluarReliefF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMa
 
         return diferencia
 
-
 def encontrarIndiceMax(matriz):
     valorMax = None
     indiceMax = None
