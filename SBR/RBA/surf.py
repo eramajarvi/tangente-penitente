@@ -35,7 +35,36 @@ def EjecutarSURF(datos, fraccionMuestreoRelief):
     return puntajes
 
 def SURF(x, y, instMax, datos, fraccionMuestreoRelief):
-    pass
+    """ Controla el principal bucle del SURF """
+    listaPuntajes = []
+
+    for i in range(datos.numAtributos):
+        # Inicializando puntajes de los atributos en 0
+        listaPuntajes.append(0)
+
+    # Precalcular distancias entre pares unicos de instancias
+    # dentro del conjunto de datos
+    print("Precalculando matriz de distancias")
+    objetoDistancia = calcularMatrizDistancias(x, datos, instMax)
+    matrizDistancias = objetoDistancia[0]
+    distanciaPromedio = objetoDistancia[1]
+    print("Calculado.")
+
+    # Solo para matrices multiclases
+    mapaMulticlases = None
+
+    if datos.fenotipoDiscreto and len(datos.listaFenotipos) > 2:
+        mapaMulticlases = hacerMapaMulticlases(y, instMax, datos)
+
+    # Evaluar cada atributo sobre ejecucion
+    for inst in range(instMax):
+        NN = encontrarVecinosMasCercanos_SURF(distanciaPromedio, inst, matrizDistancias, instMax)
+
+        if len(NN) > 0:
+            for j in range(datos.numAtributos):
+                listaPuntajes[j] += evaluarSURF(x, y, NN, j, inst, datos, mapaMulticlases, instMax)
+
+    return listaPuntajes
 
 def calcularMatrizDistancias(x, datos, instMax):
     pass
