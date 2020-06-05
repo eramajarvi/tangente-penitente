@@ -308,7 +308,6 @@ def evaluarSURF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
 
     return diferencia
 
-
 def calcularDistancia(a, b, datos):
     """ Calcula la distancia entre dos intancias en el conjunto de
     datos. Maneja atributos discretos y continuos. Atributos continuos
