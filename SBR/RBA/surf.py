@@ -111,7 +111,30 @@ def hacerMapaMulticlases(y, instMax, datos):
     return mapaMulticlases
 
 def encontrarVecinosMasCercanos_SURF(distanciaPromedio, inst, matrizDistancias, instMax):
-    pass
+    """ Metodo para encontrar los vecinos mas cercanos en todo el conjunto de datos, basado
+    ya sea en una metrica de distancia o en una especificacion de los k-vecinos mas cercanos.
+    #PARAM x - matriz que contiene los atributos de todas las instancias de datos
+    #PARAM y - matriz que contiene las etiquetas de clases de todos las isntancias datos
+    #PARAM k - un numero entero que denota el numero de vecinos mas cercanos a considerar
+    #PARAM r - Ninguno si el suario quiere los vecinos mas cercanos de todas las instancias de datos
+    o  indice si es una instancia de datos que el usuario quiere considerar """
+
+    NN = []
+    indicesMin = []
+
+    for j in range(instMax):
+        if inst != j:
+            ubicador = [inst, j]
+            ubicador = sorted(ubicador, reverse = True)
+            d = matrizDistancias[ubicador[0]][ubicador[1]]
+
+            if d < distanciaPromedio:
+                indicesMin.append(j)
+
+    for j in range(len(indicesMin)):
+        NN.append(indicesMin[j])
+
+    return NN
 
 def evaluarSURF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
     pass
