@@ -140,4 +140,28 @@ def evaluarSURF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
     pass
 
 def calcularDistancia(a, b, datos):
-    pass
+    """ Calcula la distancia entre dos intancias en el conjunto de
+    datos. Maneja atributos discretos y continuos. Atributos continuos
+    son acomodados al escalar la diferencia de distancia dentro del contexto
+    del rango del atributo observado. Si un respectivo punto de datos
+    falta de cualquier instancia, se deja por fuera del calculo de distancia. """
+
+    # Distancia
+    d = 0
+
+    for i in range(datos.numAtributos):
+        if a[i] != datos.etiquetaDatosFaltantes and b[i] != datos.etiquetaDatosFaltantes:
+            # Atributo discreto
+            if not datos.infoAtributos[i][0]:
+                if a[i] != b[i]:
+                    d += 1
+
+            # Atributo continuo
+            else:
+                limiteMin = float(datos.infoAtributos[i][1][0])
+                limiteMax = float(datos.infoAtributos[i][1][1])
+                # Kira & Rendell, 1992
+                # "Handling continuous attributes"
+                d += abs(float(a[i]) - float(b[i])) / float(limiteMax - limiteMin)
+
+    return d
