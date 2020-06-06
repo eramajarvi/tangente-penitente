@@ -154,7 +154,6 @@ def encontrarInstanciasDatos(distanciaPromedio, inst, matrizDistancias, instMax)
 
     return (NN_cerca, NN_lejos)
 
-
 def evaluarSURF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
     """ Metodo que evalua el puntaje de un atributo
     #PARAM x - matriz con los atributos de todas las intancias del conjunto de datos
