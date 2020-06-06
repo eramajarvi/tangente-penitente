@@ -10,6 +10,10 @@ conocimiento experto. Aquí es también donde se controla la
 generación del conocimiento experto y sus respectivos pesos.
 """
 
+import copy
+import os
+import time
+
 class Constantes:
     def fijarConstantes(self, par):
         """ Toma los parámetros analizados como un diccionario 
@@ -315,15 +319,15 @@ class Constantes:
                     try:
                         if par['nombrearchivoSalidaCE'] == 'None' or par['nombrearchivoSalidaCE'] =='none':
                             self.nombrearchivoSalidaCE = nombreEntrenamiento
-                            self.nombreArchivoSalidaOriginal = nombreEntrenamiento
+                            self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
                         else:
                             self.nombrearchivoSalidaCE = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
-                            self.nombreArchivoSalidaOriginal = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
+                            self.nombreArchivoSalidaCEOriginal = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
 
                     except:
                         self.nombrearchivoSalidaCE = nombreEntrenamiento
-                        self.nombreArchivoSalidaOriginal = nombreEntrenamiento
+                        self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
                 else:
                     self.generacionInternaCE = False
@@ -342,15 +346,15 @@ class Constantes:
                 try:
                     if par['nombrearchivoSalidaCE'] == 'None' or par['nombrearchivoSalidaCE'] == 'none':
                         self.nombrearchivoSalidaCE = nombreEntrenamiento
-                        self.nombreArchivoSalidaOriginal = nombreEntrenamiento
+                        self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
                     else:
                         self.nombrearchivoSalidaCE = par['generacionExternaCE'] + nombreEntrenamiento
-                        self.nombreArchivoSalidaOriginal = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
+                        self.nombreArchivoSalidaCEOriginal = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
 
                 except:
                     self.nombrearchivoSalidaCE = nombreEntrenamiento
-                    self.nombreArchivoSalidaOriginal = nombreEntrenamiento
+                    self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
         # algoritmoFiltro
         try:
@@ -490,7 +494,18 @@ class Constantes:
             self.frecuenciaSeguimiento = self.amb.datosFormateados.numInstanciasEntrenamiento
 
     def actualizarNombreArchivos(self, part):
-        pass
+        """ Un metodo de actualizacion de nombres cuando la 
+        validacion cruzada es aplicada. """
+
+        nombreTemp = copy.deepcopy(self.archivoEntrenamientoOriginal)
+        nombreCarpeta = self.archivoEntrenamientoOriginal
+        nombreArchivo = nombreTemp.split('\\')
+        nombreArchivo = nombreArchivo[len(nombreArchivo) - 1]
+
+        self.archivoEntrenamiento = nombreCarpeta + '\\' + nombreArchivo + '_VC' + str(part) + '_Entrenamiento'
+        self.archivoPrueba = nombreCarpeta + '\\' + nombreArchivo + '_VC' + str(part) + '_Prueba'
+        self.nombreArchivoSalida = self.nombreArchivoSalidaOriginal + '_VC' + str(part) + '_TP'
+        self.nombrearchivoSalidaCE = self.nombreArchivoSalidaCEOriginal + '_VC' + str(part) + '_TP'
 
     def sobrescribirParametros(self):
         pass
