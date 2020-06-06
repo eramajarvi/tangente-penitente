@@ -29,8 +29,9 @@ class TurfEnvoltorio:
         self.fraccionMuestreoRelief = fraccionMuestreoRelief
         self.vecinosRelief = vecinosRelief
 
-        self.listaPuntajes = []
+        self.filtroPuntajes = []
         self.conservarMantenimiento = True
+        self.conservarAlgoritmosCorriendo = True
         self.porcentajeTurf = porcentajeTurf
         self.N = int(1/float(porcentajeTurf)) # Numero de iteraciones
 
@@ -42,4 +43,72 @@ class TurfEnvoltorio:
         amb.resetearRefDAtos(True)
 
     def EjecutarTurf(self):
-        pass
+        
+        i = 0
+
+        while i < self.N - 1 and self.conservarAlgoritmosCorriendo:
+            # Escoger y ejecutar el algoritmo deseado
+            if self.algoritmo == "multisurf_turf":
+                self.filtroPuntajes = Ejecutar_MultiSURF(self.datos)
+
+            elif self.algoritmo == "surfstar_turf":
+                self.filtroPuntajes = EjecutarSURFStar(self.datos, self.fraccionMuestreoRelief)
+
+            elif self.algoritmo == "surf_turf":
+                self.filtroPuntajes = EjecutarSURF(self.datos, self.fraccionMuestreoRelief)
+
+            elif self.algoritmo == "relieff_turf":
+                self.filtroPuntajes = EjecutarReliefF(self.datos, self.fraccionMuestreoRelief)
+
+            else:
+                print("ERROR: Algoritmo no encontrado.")
+
+            if not self.conservarMantenimiento:
+                self.conservarAlgoritmosCorriendo = False
+
+            # Filtrar los datos, todos menos la ultima iteracion
+            if self.conservarMantenimiento and not iter == (self.N - 1):
+                self.conservarMantenimiento = self.datos.gestionDatosTurf(self.filtroPuntajes, self.porcentajeTurf)
+
+            i += 1
+
+        # Encontrar puntaje bajo
+        puntajeBajo = min(self.filtroPuntajes)
+        puntajeMaximo = max(self.filtroPuntajes)
+
+        esteRango = puntajeMaximo - puntajeBajo
+
+        reduccionPuntajeEmpate = 0.01 * esteRango
+
+        # Definir puntajes de empate (puntaje unico para todos los atributos
+        # eliminados en un empate especifico)
+
+        puntajesEmpate = []
+
+        for k in range(len(self.datos.listaEmpates)):
+            puntajesEmpate.append(puntajeBajo - (reduccionPuntajeEmpate * (k + 1)))
+
+        # Se voltea porque el peor puntaje fue el primero en la lista de empates
+        puntajesEmpate.reverse()
+
+        # Ciclo a traves de la lista original de encabezados 
+        # (todos los atributos y construye un nuevo puntajefiltro 
+        # desde 0)
+        puntajesFinalesFiltro = []
+
+        # Todos los atributos originales
+        for j in range(len(self.datos.listaEncabezadosTurf)):
+            # Encontrar donde este atributo esta (lista puntaje final
+            # o uno de los empates eliminados)
+            if self.datos.listaEncabezadosTurf[j] in self.datos.listaEncabezadosEntrenamiento:
+                puntajeID = self.datos.listaEncabezadosEntrenamiento.index(self.datos.listaEncabezadosTurf[j])
+                puntajesFinalesFiltro.append(self.filtroPuntajes[puntajeID])
+
+            # Filtrados
+            else:
+                for k in range(len(self.datos.listaEmpates)):
+                    if self.datos.listaEncabezadosTurf[j] in self.datos.listaEmpates[k]:
+                        puntajesFinalesFiltro.append(puntajesEmpate[k])
+
+        print(puntajesFinalesFiltro)
+        self.filtroPuntajes = puntajesFinalesFiltro
