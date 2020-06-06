@@ -27,7 +27,24 @@ def calcularMatrizDistancia(x, datos, instMax):
     pass
 
 def hacerMapaMulticlases(y, instMax, datos):
-    pass
+    # Encontrar el numero de clases en el conjunto de datos y los
+    # guarda en el mapa
+
+    mapaMulticlases = {}
+
+    for i in range(instMax):
+        if (y[i] not in mapaMulticlases):
+            mapaMulticlases[y[i]] = 0
+
+        else:
+            mapaMulticlases[y[i]] += 1
+
+    # Para cada clase guardar la probabilidad de la ocurrencia de 
+    # la clase en el conjunto de datos
+    for each in datos.listaFenotipos:
+        mapaMulticlases[each] = mapaMulticlases[each] / float(instMax)
+
+    return mapaMulticlases
 
 def encontrarInstanciasDatos(distanciaPromedio, inst, matrizDistancias, instMax):
     pass
