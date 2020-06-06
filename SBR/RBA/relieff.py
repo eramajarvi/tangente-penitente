@@ -22,8 +22,8 @@ def EjecutarReliefF(datos, fraccionMuestreoRelief, vecinosRelief):
     #PARAM x - es una matriz que contiene los atributos de todas las instancias en el conjunto de datos
     #PARAM y - es una matriz que conteiene la clase de una instancia de datos """
 
-    x = [ row[0] for row in datos.entrenamientoFormateados]
-    y = [ row[1] for row in datos.entrenamientoFormateados]
+    x = [row[0] for row in datos.entrenamientoFormateados]
+    y = [row[1] for row in datos.entrenamientoFormateados]
 
     print("Ejecutando algoritmo ReliefF...")
 

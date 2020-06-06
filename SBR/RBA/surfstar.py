@@ -18,7 +18,19 @@ características relevantes.
 """
 
 def EjecutarSURFStar(datos, fraccionMuestreoRelief):
-    pass
+    """ LLamada a ejecutar el algoritmo SURFStar
+    #PARAM x - es una matriz que contiene los atributos de todas las instancias en el conjunto de datos
+    #PARAM y - es una matriz que contiene la clase de las instancias de datos """
+
+    x = [row[0] for row in datos.entrenamientoFormateados]
+    y = [row[1] for row in datos.entrenamientoFormateados]
+
+    print("Ejecutando algoritmo SURFStar ...")
+    instMax = int(float(fraccionMuestreoRelief) * len(x))
+    puntajes = SURFStar(x, y, instMax, datos, fraccionMuestreoRelief)
+    print("Ejecucion de SURFStar completada.")
+
+    return puntajes
 
 def SURFStar(x, y, instMax, datos, fraccionMuestreoRelief):
     pass
