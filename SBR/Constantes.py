@@ -508,6 +508,20 @@ class Constantes:
         self.nombrearchivoSalidaCE = self.nombreArchivoSalidaCEOriginal + '_VC' + str(part) + '_TP'
 
     def sobrescribirParametros(self):
-        pass
+        """ Sobreescribe parametros especificados por el usuario
+        para caracteristicas del algoritmo que no pueden ser
+        aplicadas a conjuntos de datos online. """
+        
+        self.hacerSeguimientoAtributos = False
+        self.hacerFeedbackAtributos = False
+        self.usarConocimientoExperto = False
+        self.usarConocimientoExperto = False
+        self.archivoPrueba = 'None'
+        self.archivoEntrenamiento = 'None'
+        self.hacerCompactacionReglas = False
+        self.soloCR = False
+
+        if self.frecuenciaSeguimiento == 0:
+            self.frecuenciaSeguimiento = 50
 
 cons = Constantes()
