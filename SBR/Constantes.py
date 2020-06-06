@@ -469,7 +469,25 @@ class Constantes:
         """ Formatea otros parametros de ejecucion importantes 
         (tales como: iteraciones maximas, puntos de control de evaluacion
         y frecuencia de seguimiento de evaluacion"""
-        pass
+
+        # Parse el string que especifica los puntos de control de
+        # evaluacion y el numero maximo de iteraciones de 
+        # aprendizaje
+        puntosControl = self.iteracionesAprendizaje.split('.')
+
+        for i in range(len(puntosControl)):
+            # Convierte las iteraciones del punto de control de string a ints
+            puntosControl[i] = int(puntosControl[i])
+
+        self.puntosControlAprendizaje = puntosControl
+
+        self.iteracionesAprendizajeMax = self.puntosControlAprendizaje[(self.puntosControlAprendizaje) - 1]
+
+        # Ajustar la frecuencia de seguimiento para que concuerde
+        # con el tamano de los datos de entrenamiento - aprendizaje
+        # ocurre en cada epoca
+        if self.frecuenciaSeguimiento == 0:
+            self.frecuenciaSeguimiento = self.amb.datosFormateados.numInstanciasEntrenamiento
 
     def actualizarNombreArchivos(self, part):
         pass
