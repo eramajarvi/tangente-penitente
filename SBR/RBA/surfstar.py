@@ -33,7 +33,41 @@ def EjecutarSURFStar(datos, fraccionMuestreoRelief):
     return puntajes
 
 def SURFStar(x, y, instMax, datos, fraccionMuestreoRelief):
-    pass
+    """ Contra el bucle principal de SURFStar """
+
+    listaPuntajes = []
+
+    # Inicializando los puntajes del atributos en 0
+    for i in range(datos.numAtributos):
+        listaPuntajes.append(0)
+
+    # Precalcular la distancia entre todos los pares de instancias
+    # unicas dentro del conjunto de datos
+    print("Precalculando la matriz de distancias")
+    objetoDistancia = calcularMatrizDistancia(x, datos, instMax)
+    matrizDistancia = objetoDistancia[0]
+    distanciaPromedio = objetoDistancia[1]
+    print("Calculado")
+
+    # Solo para matrices multiclases
+    mapaMulticlase = None
+
+    if datos.fenotipoDiscreto and len(datos.listaFenotipos) > 2:
+        mapaMulticlase = hacerMapaMulticlases(y, instMax, datos)
+
+    # Evaluar cada atributo sobre la ejecucion
+    for inst in range(instMax):
+        # Y encontrar sus vecinos mas cercanos
+        (NN_cerca, NN_lejos) = encontrarInstanciasDatos(distanciaPromedio, inst, matrizDistancia, instMax)
+
+        for j in range(datos.numAtributos):
+            if len(NN_cerca) > 0:
+                listaPuntajes[j] += evaluarSURF(x, y, NN_cerca, j, inst, datos, mapaMulticlase, instMax)
+
+            if len(NN_lejos) > 0:
+                listaPuntajes[j] -= evaluarSURF(x, y, NN_lejos, j, inst, datos, mapaMulticlase, instMax)
+
+    return listaPuntajes
 
 def calcularMatrizDistancia(x, datos, instMax):
     """ En SURF este metodo precalcula la matriz de distancias y la distancia promedio """
