@@ -32,8 +32,177 @@ def hacerMapaMulticlases(y, instMax, datos):
 def encontrarInstanciasDatos(distanciaPromedio, inst, matrizDistancias, instMax):
     pass
 
-def evaluarSURF(x, y, NN, caracteristica, inst, datos, hacerMapaMulticlases, instMax):
-    pass
+def evaluarSURF(x, y, NN, caracteristica, inst, datos, mapaMulticlase, instMax):
+    """ Metodo que evalua el puntaje de un atributo
+    #PARAM x - matriz con los atributos de todas las intancias del conjunto de datos
+    #PARAM y - matriz con las etiquetas de las clases de todas las intancias del conjunto de datos
+    #PARAM NN - matriz con los vecinos mas cercanos para cada instancia en el conjunto de datos
+    #PARAM r - el indice de una instancia de datos seleccionada al azar
+    #PARAM caracteristica - un atributo que debe ser evaluado """
+
+    diferencia = 0
+
+    # Si el fenotipo es continuo
+    if not datos.fenotipoDiscreto:
+        # Limite para determinar la similaridad entre clases de atributos contunuos
+        limiteMismaClase = datos.DEFenotipo
+
+    # Atributo continuo
+    if datos.infoAtributos[caracteristica][0]:
+        # Determinar los limites para atributos continuos
+        limiteMin = datos.infoAtributos[caracteristica][1][0]
+        limiteMax = datos.infoAtributos[caracteristica][1][1]
+
+    # Inicializando el puntaje en 0
+    diferenciaCorrectos = 0
+    diferenciaFallidos = 0
+
+    conteoCorrectos = 0
+    conteoFallidos = 0
+
+    if datos.fenotipoDiscreto:
+        # Endpoint multiclases
+        if len(datos.listaFenotipos) > 2:
+            almacenClases = {}
+            sumaClasesPFallidas = 0
+
+            for each in mapaMulticlase:
+                # Guarda todas las clases fallidas
+                if each != y[inst]:
+                    almacenClases[each] = [0, 0] # Guarda conteoFallidos y diferenciaFallidos
+                    sumaClasesPFallidas += mapaMulticlase[each]
+
+            # Para todos los vecinos cercanos
+            for i in range(len(NN)):
+                # Agregar normalizacion apropiada
+                if x[inst][caracteristica] != datos.etiquetaDatosFaltantes and x[NN[i]][caracteristica] != datos.etiquetaDatosFaltantes:
+                    # Correctos
+                    if y[inst] == y[NN[i]]:
+                        conteoCorrectos += 1
+
+                        if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                            # Atributo continuo
+                            if datos.infoAtributos[caracteristica][0]:
+                                diferenciaCorrectos -= abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                            # Atributo discreto
+                            else:
+                                diferenciaCorrectos -= 1
+                    
+                    # Fallidos
+                    else:
+                        for claseFallida in almacenClases:
+                            if y[NN[i]] == claseFallida:
+                                almacenClases[claseFallida][0] += 1
+
+                                if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                                    # Atributo continuo
+                                    if datos.infoAtributos[caracteristica][0]:
+                                        almacenClases[claseFallida][1] += abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                                    # Atributo discreto
+                                    else:
+                                        almacenClases[claseFallida][1] += 1
+
+            # Correcciones para multiples clases, asi como para datos faltantes
+            sumaFallidos = 0
+
+            for each in almacenClases:
+                sumaFallidos += almacenClases[each][0]
+
+            promedioFallidos = sumaFallidos / float(len(almacenClases))
+
+            # Correccion para datos faltantes
+            proporcionCorrectos = conteoCorrectos / float(len(NN))
+
+            for each in almacenClases:
+                diferenciaFallidos += (mapaMulticlase[each] / float(sumaClasesPFallidas)) * almacenClases[each][1]
+
+            diferencia = diferenciaFallidos * proporcionCorrectos
+            proporcionFallidos = promedioFallidos / float(len(NN))
+            diferencia += diferenciaCorrectos * proporcionFallidos
+
+        # Problema de clasificacion binaria
+        else:
+            # Para todos los vecinos mas cercanos
+            for i in range(len(NN)):
+                # Agregar normalizacion apropiada
+                if x[inst][caracteristica] != datos.etiquetaDatosFaltantes and x[NN[i]][caracteristica] != datos.etiquetaDatosFaltantes:
+                    
+                    # Correctos
+                    if y[inst] == y[NN[i]]:
+                        conteoCorrectos += 1
+
+                        if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                            # Atributo continuo
+                            if datos.infoAtributos[caracteristica][0]:
+                                diferenciaCorrectos -= abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                            # Atributo discreto
+                            else:
+                                diferenciaCorrectos -= 1
+
+                    # Fallidos
+                    else:
+                        conteoFallidos += 1
+
+                        if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                            # Atributo continuo
+                            if datos.infoAtributos[caracteristica][0]:
+                                diferenciaFallidos += abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                            # Atributo discreto
+                            else:
+                                diferenciaFallidos += 1
+
+                # Toma en cuenta el desbalance de correctos/fallidos
+                proporcionCorrectos = conteoCorrectos/float(len(NN))
+                proporcionFallidos = conteoFallidos/float(len(NN))
+                
+                # Aplicando un esquema de pesaje para balancear los puntajes
+                diferencia = diferenciaCorrectos * proporcionFallidos + diferenciaFallidos * proporcionCorrectos
+
+    # Endpoint continuo
+    else:
+        # Para todos los vecinos mas cercanos
+        for i in range(len(NN)):
+            # Agrega normalizacion apropiada
+            if x[inst][caracteristica] != datos.etiquetaDatosFaltantes and x[NN[i]] != datos.etiquetaDatosFaltantes:
+                
+                # Correcto
+                if abs(y[inst] - y[NN[i]]) < limiteMismaClase:
+                    conteoCorrectos += 1
+
+                    if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                        # Atributo continuo
+                        if datos.infoAtributos[caracteristica][0]:
+                            diferenciaCorrectos -= abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                        # Atributo discreto
+                        else:
+                            diferenciaCorrectos -= 1
+
+                # Fallido
+                else:
+                    conteoFallidos += 1
+
+                    if x[inst][caracteristica] != x[NN[i]][caracteristica]:
+                        # Atributo continuo
+                        if datos.infoAtributos[caracteristica][0]:
+                            diferenciaFallidos += abs(x[inst][caracteristica] - x[NN[i]][caracteristica]) / (limiteMax - limiteMin)
+
+                        # Atributo discreto
+                        else:
+                            diferenciaFallidos += 1
+
+        # Tener en cuenta el desbalance de correctos/fallidos
+        proporcionCorrectos = conteoCorrectos / float(len(NN))
+        proporcionFallidos = conteoFallidos / float(len(NN))
+
+        # Aplicando un esquema de pesaje para balancear los resultados
+        diferencia = diferenciaCorrectos * proporcionFallidos + diferenciaFallidos * proporcionCorrectos
+
+    return diferencia
 
 def calcularDistancia(a, b, datos):
     """ Calcula la distancia entre dos intancias en el conjunto de
