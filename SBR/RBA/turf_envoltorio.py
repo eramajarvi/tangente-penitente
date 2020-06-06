@@ -24,7 +24,22 @@ from multisurf import *
 
 class TurfEnvoltorio:
     def __init__(self, amb, algoritmo, porcentajeTurf, fraccionMuestreoRelief, vecinosRelief):
-        pass
+        self.datos = amb.datosFormateados
+        self.algoritmo = algoritmo
+        self.fraccionMuestreoRelief = fraccionMuestreoRelief
+        self.vecinosRelief = vecinosRelief
+
+        self.listaPuntajes = []
+        self.conservarMantenimiento = True
+        self.porcentajeTurf = porcentajeTurf
+        self.N = int(1/float(porcentajeTurf)) # Numero de iteraciones
+
+        print("Ejecutando turf para " + str(self.N) + " iteraciones.")
+
+        self.datos.guardarDatosTurf()
+        self.EjecutarTurf()
+        self.datos.devolverDatosCompletos()
+        amb.resetearRefDAtos(True)
 
     def EjecutarTurf(self):
         pass
