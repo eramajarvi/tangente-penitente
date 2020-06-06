@@ -39,7 +39,42 @@ class ConfigParseador:
             self.PartVC()
 
     def parsearConfiguracion(self, nombreArchivo):
-        pass
+        """ Parsear el archivo de configuracion """
+        parametros = {}
+
+        try:
+            a = open(nombreArchivo, 'rU')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', nombreArchivo)
+            raise
+            
+        else:
+            for linea in a:
+                # Primero eliminar los comentarios:
+                if self.carComentario in linea:
+                    # Separar el caracter de comentarios, guardar
+                    # solo la parte de despues
+                    linea, comentario = linea.split(self.carComentario, 1)
+
+                # Segundo encontrar lineas con un parametro = valor
+                if self.carParametro in linea:
+                    # Separar el caracter de parametro:
+                    parametro, valor = linea.split(self.carParametro, 1)
+
+                    # Eliminar espacios:
+                    parametro = parametro.strip()
+                    valor = valor.strip()
+
+                    # Guardar el diccionario:
+                    parametros[parametro] = valor
+
+            a.close()
+
+        return parametros
 
     def PartVC(self):
         pass
