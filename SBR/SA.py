@@ -16,7 +16,16 @@ import random
 
 class SeguimientoAtributos:
     def __init__(self, hacerSeguimientoAtributos):
-        super().__init__()
+        """ Inicializar el objeto de Seguimiento de Atributos """
+
+        self.porcentaje = 0.0
+
+        if hacerSeguimientoAtributos:
+            self.listaProbabilidad = []
+            self.sumaPrecisionAtributos = [[0] * cons.amb.datosFormateados.numAtributos for i in range(cons.amb.datosFormateados.numInstanciasEntrenamiento)]
+
+            if cons.hacerReinicioPoblacion:
+                self.reiniciarSA()
 
     def actualizarPorcentaje(self, iterExplora):
         pass
