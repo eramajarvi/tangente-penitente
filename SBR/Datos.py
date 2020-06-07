@@ -248,7 +248,47 @@ class GestionDatos:
             print("GestionDatos: Fenotipo detectado como discreto")    
 
     def discriminarClases(self, datosCrudos):
-        pass
+        """ Determina el numero de clases y sus identificadores. Solo
+        se usa si el fenotipo es discreto. Requiere el conjunto de datos
+        de prueba y de entrenamiento para poder estandarizar el formateo
+        en ambos. """
+
+        print("GestionDatos: Detectando clases...")
+        inst = 0
+
+        while inst < self.numInstanciasEntrenamiento:
+            objetivo = datosCrudos[inst][self.refFenotipo]
+
+            if objetivo in self.listaFenotipos:
+                self.conteoClases[objetivo] += 1
+                self.pesosPrediccionClases[objetivo] += 1
+
+            elif objetivo == cons.etiquetaDatosFaltantes:
+                pass
+
+            else:
+                self.listaFenotipos.append(objetivo)
+                self.conteoClases[objetivo] = 1
+                self.pesosPrediccionClases[objetivo] = 1
+
+            inst +=1 
+
+        print("GestionDatos: Se detectaron las siguientes clases:")
+        print(self.listaFenotipos)
+        total = 0
+
+        for each in list(self.conteoClases.keys()):
+            total += self.conteoClases[each]
+            print("Clase: " + str(each) + " conteo = " + str(self.conteoClases[each]))
+
+        for each in list(self.conteoClases.keys()):
+            self.pesosPrediccionClases[each] = 1 - (self.pesosPrediccionClases[each] / float(total))
+
+        print(self.pesosPrediccionClases)
+
+        # Determinacion de la seleccion aleatoria
+        # No esta especificamente adaptado para clases desbalanceadas
+        self.seleccionAleatoriaFenotipo = 1 / float(len(self.listaFenotipos))
 
     def compararConjuntoDatos(self, datosPruebaCrudos):
         pass
