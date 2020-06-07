@@ -33,7 +33,13 @@ class SeguimientoAtributos:
         self.porcentaje = iterExplora / float(cons.iteracionesAprendizajeMax)
 
     def actualizarSeguimientoAtributos(self, pob):
-        pass
+        """ Actualiza el seguimiento de los atributos """
+        refDatos = cons.env.refDatos
+
+        for ref in pob.conjuntoCorrecto:
+            for each in pob.conjuntoPoblacion[ref].listaAtributosEspecificados:
+                # Agregar precision de la regla
+                self.sumaPrecisionAtributos[refDatos][each] += (pob.conjuntoPoblacion[ref].precision)
 
     def obtenerProbSeguimiento(self):
         pass
