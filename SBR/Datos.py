@@ -217,7 +217,35 @@ class GestionDatos:
         print("GestionDatos: Numero de instancias = " + str(self.numInstanciasEntrenamiento))
 
     def discriminarFenotipo(self, datosCrudos):
-        pass
+        """ Determina si el fenotipo es discreto o continuo """
+
+        print("GestionDatos: Analizando fenotipo...")
+        inst = 0
+        diccionarioClases = {}
+
+        # Revisa que discrimina entre atirbutos discretos y continuos
+        while len(list(diccionarioClases.keys())) <= cons.limiteAtributoDiscreto and inst < self.numInstanciasEntrenamiento:
+            objetivo = datosCrudos[inst][self.refFenotipo]
+
+            # Revisa si este estado del atributo se ha visto antes
+            if objetivo in list(diccionarioClases.keys()):
+                diccionarioClases[objetivo] += 1
+
+            elif objetivo == cons.etiquetaDatosFaltantes:
+                self.listaEndpointsFaltantes.append(inst)
+
+            else:
+                diccionarioClases[objetivo] = 1
+
+            inst += 1
+
+        if len(list(diccionarioClases.keys())) > cons.limiteAtributoDiscreto:
+            self.fenotipoDiscreto = False
+            self.listaFenotipos = [float(objetivo), float(objetivo)]
+            print("GestionDatos: Fenotipo detectado como continuo.")
+
+        else:
+            print("GestionDatos: Fenotipo detectado como discreto")    
 
     def discriminarClases(self, datosCrudos):
         pass
