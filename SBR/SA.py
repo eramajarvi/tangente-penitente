@@ -47,7 +47,33 @@ class SeguimientoAtributos:
         return self.listaProbabilidad
 
     def generarProbSeguimiento(self):
-        pass
+        """ Calcula y regresa las probabilidades del atributo
+        basado en los puntajes del seguimiento de atributos """
+
+        # Escoge un puntaje de seguimiento de atributos de una 
+        # instancia de datos al azar
+        instanciaActual = random.randint(0, cons.amb.datosFormateados.numInstanciasEntrenamiento - 1)
+
+        # Obtiene una referencia al conjunto de datos
+        listaSeguimiento = copy.deepcopy(self.sumaPrecisionAtributos[instanciaActual])
+
+        valMin = min(listaSeguimiento)
+
+        for i in range(len(listaSeguimiento)):
+            listaSeguimiento[i] = listaSeguimiento[i] - valMin
+
+        valMax = max(listaSeguimiento)
+
+        listaProbabilidad = []
+
+        for i in range(cons.amb.datosFormateados.numAtributos):
+            if valMax == 0.0:
+                listaProbabilidad.append(0.5)
+
+            else:
+                listaProbabilidad.append(listaSeguimiento[i] / float(valMax + valMax * 0.01))
+
+        self.listaProbabilidad = listaProbabilidad
 
     def sumaSeguimientoAtributosGlobal(self):
         pass
