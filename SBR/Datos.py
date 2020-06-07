@@ -427,7 +427,23 @@ class GestionDatos:
         self.conteoEstadosPromedio = self.conteoEstadosPromedio / float(self.numAtributos)
 
     def calcularDE(self, listaFenotipos):
-        pass
+        """ Calcula la desviacion estandar para los puntajes
+        de fenotipos continuos. """
+
+        for i in range(len(listaFenotipos)):
+            listaFenotipos[i] = float(listaFenotipos[i])
+
+        prom = float(sum(listaFenotipos) / len(listaFenotipos))
+        desv = []
+
+        for x in listaFenotipos:
+            desv.append(x - prom)
+            cuad = []
+
+        for x in desv:
+            cuad.append(x * x)
+
+        return math.sqrt(sum(cuad) / (len(cuad) - 1))
 
     def formatearDatos(self, datosCrudos, entrenamiento):
         pass
