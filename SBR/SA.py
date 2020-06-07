@@ -76,7 +76,16 @@ class SeguimientoAtributos:
         self.listaProbabilidad = listaProbabilidad
 
     def sumaSeguimientoAtributosGlobal(self):
-        pass
+        """ Para cada atributo, suma los puntajes del seguimiento
+        de atributos para toda todas las instancias. """
+
+        seguimientoGlobalAtributo = [0.0 for i in range(cons.amb.datosFormateados.numAtributos)]
+
+        for i in range(cons.amb.datosFormateados.numAtributos):
+            for j in range(cons.amb.datosFormateados.numInstanciasEntrenamiento):
+                seguimientoGlobalAtributo[i] += self.sumaPrecisionAtributos[j][i]
+
+        return seguimientoGlobalAtributo
 
     def reiniciarSA(self):
         pass
