@@ -316,7 +316,59 @@ class GestionDatos:
         print("GestionDatos: Numero de instancias = " + str(self.numInstanciasPrueba))
 
     def discriminarAtributos(self, datosCrudos):
-        pass
+        """ Determina si el atributo es discreto o continuo."""
+
+        print("GestionDatos: Detectando atributos...")
+        self.conteoDiscreto = 0
+        self.conteoContinuo = 0
+
+        for atributo in range(len(datosCrudos[0])):
+            # Obtener solo las columnas de atributos (ignora las
+            # columnas del fenotipo y de IDInstancia)
+            if atributo != self.refIDInstancia and atributo != self.refFenotipo:
+                atirbutoEsDiscreto = True
+                inst = 0
+                diccionarioEstados = {}
+
+                # Revisa que discrimina entre atributos continuos y discretos
+                while len(list(diccionarioEstados.keys())) <= cons.limiteAtributoDiscreto and inst < self.numInstanciasEntrenamiento:
+                    # No usar instancias de entrenamiento que no tengan
+                    # endpoint definido
+                    if inst in self.listaEndpointsFaltantes:
+                        inst += 1
+                        pass
+
+                    else:
+                        objetivo = datosCrudos[inst][atributo]
+
+                        # Revisar si ya se ha visto este estado de atributo
+                        # antes
+                        if objetivo in list(diccionarioEstados.keys()):
+                            diccionarioEstados[objetivo] += 1
+
+                        # Ignorar datos faltantes
+                        elif objetivo == cons.etiquetaDatosFaltantes:
+                            pass
+
+                        # Nuevo estado observado
+                        else:
+                            diccionarioEstados[objetivo] = 1
+
+                        inst += 1
+
+                if len(list(diccionarioEstados.keys())) > cons.limiteAtributoDiscreto:
+                    atirbutoEsDiscreto = False
+
+                if atirbutoEsDiscreto:
+                    self.infoAtributos.append([0, []])
+                    self.conteoDiscreto += 1
+
+                else:
+                    # Valores minimos y maximos de cada instancia
+                    self.infoAtributos.append([1, [float(objetivo), float(objetivo)]])
+                    self.conteoContinuo += 1
+
+        print("GestionDatos: Se identificaron " + str(self.conteoDiscreto) + " atributos discretos y " + str(self.conteoContinuo) + " continuos.")
 
     def caracterizarAtributos(self, datosCrudos):
         pass
