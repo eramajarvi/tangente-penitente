@@ -177,7 +177,44 @@ class GestionDatos:
         return listaConjuntoDatos
 
     def caracterizarConjuntoDatos(self, datosEntrenamientoCrudos):
-        pass
+        """ Detecta parametros basicos del conjunto de datos"""
+
+        # Detecta IDs de instancias y guarda su ubicacion si existen
+        if cons.etiquetaIDInstancia in self.listaEncabezadoEntrenamiento:
+            self.sonIDsIntancia = True
+            self.refIDInstancia = self.listaEncabezadoEntrenamiento.index(cons.etiquetaIDInstancia)
+            print("GestionDatos: Ubicacion de la columna de IDs de instancia = " + str(self.refIDInstancia))
+
+            # Una columna para IDs de instancia y otra para el fenotipo
+            self.numAtributos = len(self.listaEncabezadoEntrenamiento) - 2
+
+        else:
+            self.numAtributos = len(self.listaEncabezadoEntrenamiento) - 1
+
+        if cons.etiquetaFenotipo in self.listaEncabezadoEntrenamiento:
+            self.refFenotipo = self.listaEncabezadoEntrenamiento.index(cons.etiquetaFenotipo)
+
+            print("GestionDatos: Ubicacion de la columna del fenotipo = " + str(self.refFenotipo))
+
+        else:
+            print("GesitonDatos - Error: No se encontro la columna del fenotipo. Revisa el conjunto de datos para asegurarse que exista una etiqueta de columna de fenotipo correcta.")
+
+        if self.sonIDsIntancia:
+            if self.refFenotipo > self.refIDInstancia:
+                self.listaEncabezadoEntrenamiento.pop(self.refFenotipo)
+                self.listaEncabezadoEntrenamiento.pop(self.refIDInstancia)
+
+            else:
+                self.listaEncabezadoEntrenamiento.pop(self.refIDInstancia)
+                self.listaEncabezadoEntrenamiento.pop(self.refFenotipo)
+
+        else:
+            self.listaEncabezadoEntrenamiento.pop(self.refFenotipo)
+
+        self.numInstanciasEntrenamiento = len(datosEntrenamientoCrudos)
+
+        print("GestionDatos: Numero de atributos = " + str(self.numAtributos))
+        print("GestionDatos: Numero de instancias = " + str(self.numInstanciasEntrenamiento))
 
     def discriminarFenotipo(self, datosCrudos):
         pass
