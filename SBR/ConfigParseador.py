@@ -208,4 +208,60 @@ class ConfigParseador:
                 self.hacerParticiones(listaVC, numParticiones, rutaArchivo, listaEncabezados)
 
     def hacerParticiones(self, listaVC, numParticiones, rutaArchivo, listaEncabezados):
-        pass
+        # Construye archivos de VC
+        for part in range(numParticiones):
+            if not os.path.exists(rutaArchivo + '_VC_' + str(part) + '_Entrenamiento.txt') or not os.path.exists(rutaArchivo + '_VC_' + str(part) + '_Prueba.txt'):
+                print("Haciendo nuevos archivos de VC: " + rutaArchivo + '_VC_' + str(part))
+                archivoEntrenamiento = open(rutaArchivo + '_VC_' + str(part) + '_Entrenamiento.txt', 'w')
+                archivoPrueba = open(rutaArchivo + '_VC_' + str(part) + '_Prueba.txt', 'w')
+
+                for i in range(len(listaEncabezados)):
+                    if i < len(listaEncabezados) - 1:
+                        archivoPrueba.write(listaEncabezados[i] + "\t")
+                        archivoEntrenamiento.write(listaEncabezados[i] + "\t")
+
+                    else:
+                        archivoPrueba.write(listaEncabezados[i] + "\n")
+                        archivoEntrenamiento.write(listaEncabezados[i] + "\n")
+
+                listaPrueba = listaVC[part]
+                listaEntrenamiento = []
+                listaTemp = []
+
+                for x in range(numParticiones):
+                    listaTemp.append(x)
+
+                listaTemp.pop(part)
+
+                # Para cada iteracion de aprendizaje
+                for v in listaTemp:
+                    listaEntrenamiento.extend(listaVC[v])
+
+                # Escribir a un archivo de Prueba
+                for i in listaPrueba:
+                    stringTemp = ''
+
+                    for punto in range(len(i)):
+                        if punto < len(i) - 1:
+                            stringTemp = stringTemp + str(i[punto]) + "\t"
+
+                        else:
+                            stringTemp = stringTemp + str(i[punto]) + "\n"
+
+                    archivoPrueba.write(stringTemp)
+
+                # Escribir a un archivo de Entrenamiento
+                for i in listaEntrenamiento:
+                    stringTemp = ''
+
+                    for punto in range(len(i)):
+                        if punto < len(i) - 1:
+                            stringTemp = stringTemp + str(i[punto]) + "\t"
+
+                        else:
+                            stringTemp = stringTemp + str(i[punto]) + "\n"
+
+                    archivoEntrenamiento.write(stringTemp)
+
+                archivoEntrenamiento.close()
+                archivoPrueba.close()
