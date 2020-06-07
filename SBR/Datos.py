@@ -446,7 +446,90 @@ class GestionDatos:
         return math.sqrt(sum(cuad) / (len(cuad) - 1))
 
     def formatearDatos(self, datosCrudos, entrenamiento):
-        pass
+        """ Formatea los datos en una manera conveniente para
+        que el algoritmo pueda interactuar con ellos. Este formato
+        es consistente con nuestra representacion de reglas, es decir, 
+        representacion de conocimiento en listas de atributos. """
+
+        formateados = []
+        endpointsPruebaFaltantes = []
+
+        # Inicializar el formateo de datos
+        for i in range(len(datosCrudos)):
+            # [Estados atributo, Fenotipo, IDInstancia]
+            formateados.append([None, None, None])
+
+        for inst in range(len(datosCrudos)):
+            listaEstados = []
+            IDAtributo = 0
+
+            for atributo in range(len(datosCrudos[0])):
+                if atributo != self.refIDInstancia and atributo != self.refFenotipo:
+                    objetivo = datosCrudos[inst][atributo]
+
+                    # Si el atributo es continuo
+                    if self.infoAtributos[IDAtributo][0]:
+                        if objetivo == cons.etiquetaDatosFaltantes:
+                            listaEstados.append(objetivo)
+
+                        else:
+                            listaEstados.append(float(objetivo))
+
+                    # Si el atributo es discreto - Formatear los datos para que
+                    # correspondan con el GABIL (DeJong 1991)
+                    else:
+                        listaEstados.append(objetivo)
+
+                    IDAtributo += 1
+
+            # Formato final
+            formateados[inst][0] = listaEstados
+            if self.fenotipoDiscreto:
+                if not entrenamiento:
+                    if datosCrudos[inst][self.refFenotipo] == self.etiquetaDatosFaltantes:
+                        endpointsPruebaFaltantes.append(inst)
+
+                # Fenotipo se guarda aqui
+                formateados[inst][1] = datosCrudos[inst][self.refFenotipo]
+
+            else:
+                print("GestionDatos - Error: Tangente Penitente no puede manejar endpoints continuos.")
+
+            if self.sonIDsIntancia:
+                # IDs de instancia se guardan aqui
+                formateados[inst][2] = datosCrudos[inst][self.refIDInstancia]
+
+            else:
+                # Un ID de instancia se requiere para amarrar las instancias
+                # a los puntajes de seguimiento de los atributos.
+                # Los IDs se asignan aqui antes de ser barajeados 
+                formateados[inst][2] = inst
+
+        if entrenamiento:
+            if len(self.listaEndpointsFaltantes) > 0:
+                self.listaEndpointsFaltantes.reverse()
+
+                for each in self.listaEndpointsFaltantes:
+                    formateados.pop(each)
+
+                self.numInstanciasEntrenamiento = self.numInstanciasEntrenamiento - len(self.listaEndpointsFaltantes)
+
+                print("GestionDatos: Numero ajustado de instancias de entrenamiento = " + str(self.numInstanciasEntrenamiento))
+
+            # Aleatorizacion de las instancias de los datos, de tal
+            # forma que si los datos fueron ordenados por el fenotipo,
+            # este potencial sesgo (basado en el ordenamiento de las 
+            # instancias) es eliminado
+            random.shuffle(formateados)
+
+        else:
+            if len(endpointsPruebaFaltantes) > 0:
+                endpointsPruebaFaltantes.reverse()
+
+                for each in endpointsPruebaFaltantes:
+                    formateados.pop(each)
+
+                self.numInstancias 
 
     def guardarDatosTurfTemp(self):
         pass
