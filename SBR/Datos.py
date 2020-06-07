@@ -535,7 +535,13 @@ class GestionDatos:
         return formateados
 
     def guardarDatosTurfTemp(self):
-        pass
+        """ Guarda y preserva el formateo original del conjunto de
+        datos para generacion de CE Turf. """
+
+        self.turfformateado = copy.deepcopy(self.entrenamientoFormateados)
+        self.turfListaEncabezados = copy.deepcopy(self.listaEncabezadoEntrenamiento)
+        self.turfNumAtributos = copy.deepcopy(self.numAtributos)
+        self.listaEmpates = [] # Guardara los nombres de los atributos de la lista de encabezados
 
     def regresarDatosCompletos(self):
         pass
