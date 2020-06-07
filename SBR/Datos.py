@@ -371,7 +371,60 @@ class GestionDatos:
         print("GestionDatos: Se identificaron " + str(self.conteoDiscreto) + " atributos discretos y " + str(self.conteoContinuo) + " continuos.")
 
     def caracterizarAtributos(self, datosCrudos):
-        pass
+        """ Determina el rango o estados de cada atributo. """
+
+        print("GestionDatos: Caracterizando atributos...")
+        IDAtributo = 0
+
+        self.conteoEstadosPromedio = 0
+
+        for atributo in range(len(datosCrudos[0])):
+            # Obtener solo las columnas de atributos
+            if atributo != self.refIDInstancia and atributo != self.refFenotipo:
+                for inst in range(len(datosCrudos)):
+                    # No usar instancias de entrenamiento sin informacion
+                    # del endpoint
+                    if inst in self.listaEndpointsFaltantes:
+                        pass
+
+                    else:
+                        objetivo = datosCrudos[inst][atributo]
+
+                        # Si el atributo es discreto
+                        if not self.infoAtributos[IDAtributo][0]:
+                            if objetivo in self.infoAtributos[IDAtributo][1] or objetivo == cons.etiquetaDatosFaltantes:
+                                pass
+
+                            else:
+                                self.infoAtributos[IDAtributo][1].append(objetivo)
+                                self.conteoEstadosPromedio += 1
+
+                        # Si el atributo es continuo
+                        else:
+                            # Encuentra valores minimos y maximos del atributo,
+                            # de esta forma conocemos el rango
+                            if objetivo == cons.etiquetaDatosFaltantes:
+                                pass
+
+                            elif float(objetivo) > self.infoAtributos[IDAtributo][1][1]:
+                                self.infoAtributos[IDAtributo][1][1] = float(objetivo)
+
+                            elif float(objetivo) < self.infoAtributos[IDAtributo][1][0]:
+                                self.infoAtributos[IDAtributo][1][0] = float(objetivo)
+
+                            else:
+                                pass
+
+                # Si el atributo es continuo
+                if self.infoAtributos[IDAtributo][0]:
+                    # Se simplifican los atributos continuos para que
+                    # sean contados como variables de dos estados
+                    # (max / min) para calculos de limiteEspec
+                    self.conteoEstadosPromedio += 2
+
+                IDAtributo += 1
+
+        self.conteoEstadosPromedio = self.conteoEstadosPromedio / float(self.numAtributos)
 
     def calcularDE(self, listaFenotipos):
         pass
