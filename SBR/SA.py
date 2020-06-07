@@ -42,7 +42,9 @@ class SeguimientoAtributos:
                 self.sumaPrecisionAtributos[refDatos][each] += (pob.conjuntoPoblacion[ref].precision)
 
     def obtenerProbSeguimiento(self):
-        pass
+        """ Devuelve la lista de probabilidad de seguimiento """
+
+        return self.listaProbabilidad
 
     def generarProbSeguimiento(self):
         pass
