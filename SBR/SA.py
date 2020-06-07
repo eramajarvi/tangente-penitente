@@ -28,7 +28,9 @@ class SeguimientoAtributos:
                 self.reiniciarSA()
 
     def actualizarPorcentaje(self, iterExplora):
-        pass
+        """ Determina la frecuencia en la que el feeback de atributos
+        es aplicado dentro del AG. """
+        self.porcentaje = iterExplora / float(cons.iteracionesAprendizajeMax)
 
     def actualizarSeguimientoAtributos(self, pob):
         pass
