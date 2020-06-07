@@ -291,7 +291,29 @@ class GestionDatos:
         self.seleccionAleatoriaFenotipo = 1 / float(len(self.listaFenotipos))
 
     def compararConjuntoDatos(self, datosPruebaCrudos):
-        pass
+        """ Se asegura que los parametros principales del conjunto
+        de datos son los mismos para los conjuntos de datos de
+        entrenamiento y de prueba"""
+        
+        if self.sonIDsIntancia:
+            if self.refFenotipo > self.refIDInstancia:
+                self.listaEncabezadoPrueba.pop(self.refFenotipo)
+                self.listaEncabezadoPrueba.pop(self.refIDInstancia)
+
+            else:
+                self.listaEncabezadoPrueba.pop(self.refIDInstancia)
+                self.listaEncabezadoPrueba.pop(self.refFenotipo)
+
+        else:
+            self.listaEncabezadoPrueba.pop(self.refFenotipo)
+
+        if self.listaEncabezadoEntrenamiento != self.listaEncabezadoPrueba:
+            print("GestionDatos - Error: Los encabezados del conjunto de datos de prueba y de entrenamiento no son equivalentes")
+
+        self.numInstanciasPrueba = len(datosPruebaCrudos)
+
+        print("GestionDatos: Numero de atributos = " + str(self.numAtributos))
+        print("GestionDatos: Numero de instancias = " + str(self.numInstanciasPrueba))
 
     def discriminarAtributos(self, datosCrudos):
         pass
