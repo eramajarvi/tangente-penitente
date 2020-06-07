@@ -529,7 +529,10 @@ class GestionDatos:
                 for each in endpointsPruebaFaltantes:
                     formateados.pop(each)
 
-                self.numInstancias 
+                self.numInstanciasPrueba = self.numInstanciasPrueba - len(endpointsPruebaFaltantes)
+                print("GestionDatos: Numero ajustado de instancias de prueba = " + str(self.numInstanciasPrueba))
+
+        return formateados
 
     def guardarDatosTurfTemp(self):
         pass
