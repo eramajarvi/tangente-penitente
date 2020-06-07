@@ -145,7 +145,36 @@ class GestionDatos:
             self.limiteEspec = 7
 
     def cargarDatos(self, archivoDatos, hacerEntrenamiento):
-        pass
+        """ Carga el archivo de datos. """
+
+        print("GestionDatos: Cargando datos... " + str(archivoDatos))
+        listaConjuntoDatos = []
+
+        try:
+            a = open(archivoDatos, 'rU')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', archivoDatos)
+
+            raise
+
+        else:
+            if hacerEntrenamiento:
+                self.listaEncabezadoEntrenamiento = a.readline().rstrip('\n').split(' ')
+
+            else:
+                self.listaEncabezadoPrueba = a.readline().rstrip('\n').split(' ')
+
+            for linea in a:
+                listaLineas = linea.strip('\n').split(' ')
+                listaConjuntoDatos.append(listaLineas)
+
+            a.close()
+
+        return listaConjuntoDatos
 
     def caracterizarConjuntoDatos(self, datosEntrenamientoCrudos):
         pass
