@@ -88,4 +88,45 @@ class SeguimientoAtributos:
         return seguimientoGlobalAtributo
 
     def reiniciarSA(self):
-        pass
+        """ Reconstruye puntajes del seguimiento de atributos de
+        ejecuciones previamente guardadas. """
+
+        # Obtener seguimiento de atributos existente
+        try:
+            a = open(cons.rutaReinicioPob + "_SeguimientoAtributos.txt", 'rU')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', cons.rutaReinicioPob + "_SeguimientoAtributos.txt")
+
+            raise
+
+        else:
+            listaBasura = a.readline().rstrip('\n').split('\t')
+            listaSA = []
+
+            for linea in a:
+                listaLinea = linea.strip('\n').split('\t')
+                listaSA.append(listaLinea)
+
+            a.close()
+
+            # Reordenar valores antiguos del seguimiento de atributos
+            # para que coincidan con nuevos datos
+
+            enlaceDatos = cons.amb.datosFormateados
+
+            for i in range(enlaceDatos.numInstanciasEntrenamiento):
+                # Obtiene cada ID de instancia
+                IDObjetivo = enlaceDatos.entrenamientoFormateado[1][2]
+                noEncontrado = True
+                j = 0
+
+                while noEncontrado and j < enlaceDatos.numInstanciasEntrenamiento:
+                    if str(IDObjetivo) == str(listaSA[j][0]):
+                        for m in range(enlaceDatos.numAtributos):
+                            self.sumaPrecisionAtributos[i][w] = float(listaSA[j][m + 1])
+
+                    j += 1
