@@ -35,7 +35,8 @@ class AmbienteOffline:
             self.fenotipoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][1]
 
     def obtenerInstanciaEntrenamiento(self):
-        pass
+        """ Devuelve la instancia de entrenamiento actual """
+        return [self.estadoEntrenamientoActual, self. fenotipoEntrenamientoActual]
 
     def obtenerInstanciaPrueba(self):
         pass
