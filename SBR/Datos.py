@@ -595,4 +595,62 @@ class GestionDatos:
         return seguir
 
     def hacerConjuntoDatosFiltrado(self, atributosEnDatos, nombreArchivo, puntajesFiltro):
-        pass
+        """ Hace un nuevo conjunto de datos, que tiene filtrados
+        los atributos con puntajes mas bajos. """
+
+        if atributosEnDatos > self.numAtributos:
+            print("NOTA: El numero solicitado de atributos ( " + str(atributosEnDatos) + " en el conjunto de datos no esta disponible. Regresando al numero total de numero de atributos disponibles. (" + str(self.numAtributos) + ")")
+            atributosEnDatos = self.numAtributos
+
+        try:
+            salidaDatos = open(nombreArchivo + '_filtrado.txt', 'w')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', nombreArchivo + '_filtrado.txt')
+
+            raise
+
+        if atributosEnDatos < self.numAtributos:
+            numEliminados = self.numAtributos - atributosEnDatos
+
+        else:
+            numEliminados = 0
+
+        # Iterar a traves de los datos eliminando el mas bajo cada vez
+        for i in range(0, numEliminados):
+            refBajo = 0
+            valorBajo = puntajesFiltro[0]
+
+            for j in range(1, self.numAtributos):
+                if puntajesFiltro[j] < valorBajo:
+                    valorBajo = puntajesFiltro[j]
+                    refBajo = j
+
+            # Valor mas bajo encontrado
+            self.listaEncabezadoEntrenamiento.pop(refBajo)
+            self.listaEncabezadoPrueba.pop(refBajo)
+            self.infoAtributos.pop(refBajo)
+            self.numAtributos -= 1
+
+            for k in range(self.numInstanciasEntrenamiento):
+                self.entrenamientoFormateados[k][0].pop(refBajo)
+
+            for k in range(self.numInstanciasPrueba):
+                self.pruebaFormateados[k][0].pop(refBajo)
+
+        # numAtributos ahora es igual al numero de atributos filtrados
+        for i in range(self.numAtributos):
+            salidaDatos.write(self.listaEncabezadoEntrenamiento[i] + '\t')
+        
+        salidaDatos.write('Clase' + '\n')
+
+        for i in range(self.numInstanciasEntrenamiento):
+            for j in range(self.numAtributos):
+                salidaDatos.write(str(self.entrenamientoFormateados[i][0][j]) + '\t')
+
+            salidaDatos.write(str(self.entrenamientoFormateados[i][1]) + '\n')
+
+        salidaDatos.close()
