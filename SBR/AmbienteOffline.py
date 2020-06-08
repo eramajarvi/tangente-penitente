@@ -84,4 +84,7 @@ class AmbienteOffline:
         self.guardarRefDatos = self.refDatos
 
     def detenerModoEvaluacion(self):
-        pass
+        """ Apaga el modo de evaluacion. 
+        Reestablece los lugares en el conjunto de datos. """
+
+        self.refDatos = self.guardarRefDatos
