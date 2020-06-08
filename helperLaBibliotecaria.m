@@ -10,44 +10,31 @@ tic
 fprintf('La Bibliotecaria está organizando los datos de los perfiles óptimos... \n\n');
 
 cantidadDias = 516;
-
-datasetTodosDias = zeros(cantidadDias * 720, 4);
+datasetTodosDias = zeros(cantidadDias * 143, 4);
 
 % Rutas para importar los perfiles optimos de forma recursiva con los datos
 % de todos los dias y guardar los datasets generados
-rutaCargaPerfiles = 'C:\Users\james\Documents\Github\tp-legacy\perfiles\';
+load('MatricesDelArca.mat');
 rutaGuardadoDatasets = 'C:\Users\james\Documents\Github\tangente-penitente\datasets\';
 
 % Funciones anonimas
 % Usadas para controlar el indice de asignacion de la matriz dataset que 
 % contiene el total de los datos
-limiteSuperior = @(n) 720 * n + 1;
-limiteInferior = @(m) 720 * m;
+limiteSuperior = @(n) 143 * n + 1;
+limiteInferior = @(m) 143 * m;
+
+% Matriz de 'control' vacia
+control = zeros(1, 143);
 
 for i = 1 : 1 : cantidadDias
     
     numeroDia = i;
-        
-    nombreArchivo = ['perfil_Dia', num2str(i)];
-        
-    ruta = [rutaCargaPerfiles, nombreArchivo, '.mat'];
-    load(ruta);
     
-    activado = find(control == 15); % Encuentra la posicion cuando se activa la irrigacion
-    noActivado = find(control == 0);
-    horasActivacion = tiempo./3600 + 6; % El rango es de 6:00h a 18:00h, se encuentra la hora exacta de activacion
+    Irradiancia = Irradiancia_Matriz(i, :);
+    TemperaturaAmbiente = TemperaturaAmbiente_Matriz(i, :);
+    VelocidadViento = VelocidadViento_Matriz(i, :);
     
-    % Valores de las variables de interes cuando hay activacion de la irrigacion
-    entradasDia = [irradiancia(1:length(Pben));...
-        temperaturaAmbiente(1:length(Pben)); ...
-        velocidadViento(1:length(Pben))];
-    
-    % dayTargets guarda el control de la irrigacion con dos valores:
-    % 0 es cuando el sistema NO esta irrigado
-    % 1 cuando SI esta irrigado
-    salidasDia = zeros(1, length(Pben));
-    salidasDia(1, noActivado) = 0;
-    salidasDia(1, activado) = 1;
+    entradasDia = [Irradiancia; TemperaturaAmbiente; VelocidadViento];
     
     % Indice de columnas de la matriz de activacion:
     % 1-Irradiancia
@@ -56,7 +43,7 @@ for i = 1 : 1 : cantidadDias
     
     % Transpone la matriz individual del dia
     entradasDia = entradasDia';
-    salidasDia = salidasDia';
+    salidasDia = control';
     
     datasetTodosDias(limiteSuperior(i - 1) : limiteInferior(i), :) = [entradasDia salidasDia];
     
@@ -74,43 +61,37 @@ end
 % Editar las siguientes dos lineas la cantidad de dias deseados en el
 % conjunto de datos resultante:
 cantidadDiasEntrenamiento = 1;
-cantidadDiasPrueba = 2;
+cantidadDiasPrueba = 1;
 
 cantidadDiasExportar = cantidadDiasEntrenamiento + cantidadDiasPrueba;
-
 diasExportar = randperm(cantidadDias, cantidadDiasExportar);
 
 diasEntrenamiento = diasExportar(1 : cantidadDiasEntrenamiento);
 diasPrueba = diasExportar(cantidadDiasEntrenamiento + 1 : end);
 
+% Exportar dias especificos de prueba: descomentar la siguiente linea
+%diasPrueba = [1];
+
 datasetEntrenamiento = seleccionDias(diasEntrenamiento, datasetTodosDias);
 datasetPrueba = seleccionDias(diasPrueba, datasetTodosDias);
 
-% Conjunto de datos de entrenamiento balanceado
-activado = datasetTodosDias(datasetTodosDias(:, 4) == 1, :);
-noactivado = datasetTodosDias(datasetTodosDias(:, 4) == 0, :);
-
-tamanoDatasetEntrenamientoBalanceado = cantidadDiasEntrenamiento * 720;
-activado = activado(randperm(length(activado), tamanoDatasetEntrenamientoBalanceado/2), :);
-noactivado = noactivado(randperm(length(noactivado), tamanoDatasetEntrenamientoBalanceado/2), :);
-
-% Llamada a las funciones de exportacion
+% -------------------------------------------------------------------------
+%% Llamada a las funciones de exportacion
 %exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias);
 
 %exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
 exportarDatasetPrueba(rutaGuardadoDatasets, datasetPrueba, diasPrueba);
-%exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
-
+% -------------------------------------------------------------------------
 fprintf('La Bibliotecaria ha terminado de analizar %d perfiles óptimos en %f segundos \n\n', cantidadDias, toc);
 
 %% Seleccion de dias de entrenamiento/prueba desde el conjunto de datos
 function dataset = seleccionDias(dias, datasetTodosDias)
 
-    limiteSuperior = @(n) 720 * n + 1;
-    limiteInferior = @(m) 720 * m;
+    limiteSuperior = @(n) 143 * n + 1;
+    limiteInferior = @(m) 143 * m;
 
     cantidadDias = length(dias);
-    dataset = zeros(cantidadDias * 720, 4);
+    dataset = zeros(cantidadDias * 143, 4);
 
     for i = 1 : cantidadDias
         dataset(limiteSuperior(i - 1) : limiteInferior(i), :) = datasetTodosDias(limiteSuperior(dias(i) - 1) : limiteInferior(dias(i)), :);
@@ -120,7 +101,7 @@ end
 
 %% Exportar conjuntos de datos
 function exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias)
-%% exportarDataset
+%%exportarDatasetCompleto
 % Exporta todos los datos disponibles en un unico archivo
 
     fileID = fopen([rutaGuardadoDatasets, 'datasetsPerfiles.txt'], 'w');
@@ -168,20 +149,3 @@ function exportarDatasetPrueba(rutaGuardadoDatasets, datasetDiasPrueba, diasPrue
     disp(diasPrueba);
 end
 
-function exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado)
-%% exportarDatasetEntrenamientoBalanceado
-% Exporta solo los dias de entrenamiento (balanceados) indicados en un archivo
-
-    datasetDiasEntrenamiento = [activado; noactivado];
-
-    fileID = fopen([rutaGuardadoDatasets, 'datasetTP.txt'], 'w');
-    formatoEncabezado = ['%s %1s %1s %1s\r\n'];
-    formatoDatos = ['%.4f %1.4f %1.4f %1.0f\r\n'];
-    
-    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'Class');
-    fprintf(fileID, formatoDatos, datasetDiasEntrenamiento');
-    fclose(fileID);
-    
-    fprintf('La Bibliotecaria ha exportado los perfiles de entrenamiento (balanceados) en un conjunto de datos en %s \n', rutaGuardadoDatasets);
-
-end
