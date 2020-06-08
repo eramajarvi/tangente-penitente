@@ -552,7 +552,47 @@ class GestionDatos:
         self.numAtributos = self.turfNumAtributos
 
     def gestionDatosTurf(self, puntajesFiltro, porcentajeTurf):
-        pass
+        """ Agrega el envoltorio 'Turf' a cualquier algoritmo
+        basado en Relief, de tal forma que el respectivo algorimo
+        es ejecutado iterativamente, en cada iteracion se elimina
+        un porcentaje de atributos a consideracion, para 
+        recalculacion de puntajes de atributos que quedan. Por ejemplo,
+        el algorimo ReliefF con este envoltorio se llama Turf, el
+        algoritmo SURF con este envoltorio es llamado SURFTurf. """
+
+        numEliminados = int(self.numAtributos * porcentajeTurf)
+        print("Eliminado " + str(numEliminados) + " atributo(s). ")
+
+        listaFiltradaActual = []
+
+        for i in range(0, numEliminados):
+            valorBajo = min(puntajesFiltro)
+            refBajo = puntajesFiltro.index(valorBajo)
+
+            listaFiltradaActual.append(self.listaEncabezadoEntrenamiento.pop(refBajo))
+            self.numAtributos -= 1
+
+            for k in range(self.numInstanciasEntrenamiento):
+                self.entrenamientoFormateados[k][0].pop(refBajo)
+
+            puntajesFiltro.pop(refBajo)
+
+        # Guarda atributos filtrados como lista de niveles eliminados
+        self.listaEmpates.append(listaFiltradaActual)
+        # Solo hace la diferencia si un subconjunto de instancias es
+        # usada para calculos, de esta forma un subconjunto diferente
+        # es usado cada vez.
+        random.shuffle(self.entrenamientoFormateados)
+
+        print("Quedan " + str(self.numAtributos) + " atributos despues de iteraciones Turf.")
+
+        if self.numAtributos * float(porcentajeTurf) < 1:
+            seguir = False
+
+        else:
+            seguir - True
+
+        return seguir
 
     def hacerConjuntoDatosFiltrado(self, atributosEnDatos, nombreArchivo, puntajesFiltro):
         pass
