@@ -39,7 +39,8 @@ class AmbienteOffline:
         return [self.estadoEntrenamientoActual, self. fenotipoEntrenamientoActual]
 
     def obtenerInstanciaPrueba(self):
-        pass
+        """ Devuelve la instancia de prueba actual """
+        return [self.estadoPruebaActual, self.fenotipoPruebaActual]
 
     def nuevaInstancia(self, estaEntrenando):
         pass
