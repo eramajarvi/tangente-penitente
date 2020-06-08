@@ -79,7 +79,9 @@ class AmbienteOffline:
             self.fenotipoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][1]
 
     def iniciarModoEvaluacion(self):
-        pass
+        """ Enciende el modo de evaluacion. Guarda la instancia que
+        se dejo en los datos de entrenamiento. """
+        self.guardarRefDatos = self.refDatos
 
     def detenerModoEvaluacion(self):
         pass
