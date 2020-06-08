@@ -43,7 +43,27 @@ class AmbienteOffline:
         return [self.estadoPruebaActual, self.fenotipoPruebaActual]
 
     def nuevaInstancia(self, estaEntrenando):
-        pass
+        """ Hace que el ambiente vaya a la siguiente instancia
+        en los datos. """
+
+        # Datos de entrenamiento
+        if estaEntrenando:
+            if self.refDatos < (self.datosFormateados.numInstanciasEntrenamiento - 1):
+                self.refDatos += 1
+                self.estadoEntrenamientoActual = self.datosFormateados.entrenamientoFormateados[self.refDatos][0]
+                self.fenotipoEntrenamientoActual = self.datosFormateados.entrenamientoFormateados[self.refDatos][1]
+
+            # Una vez el aprendizaje ha completado una epoca, empieza
+            # de nueva en la primera instancia en los datos
+            else:
+                self.resetearRefDatos(estaEntrenando)
+
+        # Datos de prueba
+        else:
+            if self.refDatos < (self.datosFormateados.numInstanciasPrueba - 1):
+                self.refDatos += 1
+                self.estadoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][0]
+                self.fenotipoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][1]
 
     def resetearRefDatos(self, estaEntrenando):
         pass
