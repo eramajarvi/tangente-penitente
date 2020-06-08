@@ -19,7 +19,20 @@ import sys
 
 class AmbienteOffline:
     def __init__(self):
-        pass
+        # Inicializar variables globales
+        self.refDatos = 0
+        self.guardarRefDatos = 0
+        self.datosFormateados = GestionDatos(cons.archivoEntrenamiento, cons.archivoPrueba)
+
+        self.estadoEntrenamientoActual = self.datosFormateados.entrenamientoFormateados[self.refDatos][0]
+        self.fenotipoEntrenamientoActual = self.datosFormateados.entrenamientoFormateados[self.refDatos][1]
+
+        if cons.archivoPrueba == 'None':
+            pass
+
+        else:
+            self.estadoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][0]
+            self.fenotipoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][1]
 
     def obtenerInstanciaEntrenamiento(self):
         pass
