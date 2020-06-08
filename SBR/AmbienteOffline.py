@@ -66,7 +66,17 @@ class AmbienteOffline:
                 self.fenotipoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][1]
 
     def resetearRefDatos(self, estaEntrenando):
-        pass
+        """ Resetea el conteo de iteraciones a traves del
+        conjunto de datos actual. """
+        self.refDatos = 0
+
+        if estaEntrenando:
+            self.estadoEntrenamientoActual = self.datosFormateados.entrenamientoFormateados[self.refDatos][0]
+            self.fenotipoEntrenamientoActual = self.datosFormateados.entrenamientoFormateados[self.refDatos][1]
+
+        else:
+            self.estadoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][0]
+            self.fenotipoPruebaActual = self.datosFormateados.pruebaFormateados[self.refDatos][1]
 
     def iniciarModoEvaluacion(self):
         pass
