@@ -13,4 +13,28 @@ pasar del aprendizaje a la evaluación de un conjunto de datos de
 entrenamiento.
 """
 
+from Datos import GestionDatos
+from Constantes import *
+import sys
 
+class AmbienteOffline:
+    def __init__(self):
+        pass
+
+    def obtenerInstanciaEntrenamiento(self):
+        pass
+
+    def obtenerInstanciaPrueba(self):
+        pass
+
+    def nuevaInstancia(self, estaEntrenando):
+        pass
+
+    def resetearRefDatos(self, estaEntrenando):
+        pass
+
+    def iniciarModoEvaluacion(self):
+        pass
+
+    def detenerModoEvaluacion(self):
+        pass
