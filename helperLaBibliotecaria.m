@@ -13,7 +13,7 @@ fprintf('La Bibliotecaria está organizando los datos de los perfiles óptimos..
 % Rutas para importar los perfiles optimos de forma recursiva con los datos
 % de todos los dias y guardar los datasets generados
 
-rutaCargaPerfiles = 'C:\Users\james\Documents\Github\tangente-penitente\perfiles\';
+rutaCargaPerfiles = 'C:\Users\james\Documents\Github\chispa-culpable\perfiles\';
 rutaGuardadoDatasets = 'C:\Users\james\Documents\Github\tangente-penitente\datasets\';
 rutaCargaArca = 'C:\Users\james\Documents\Github\tangente-penitente\';
 
@@ -89,7 +89,7 @@ end
 %% Preparacion para exportar
 % Editar las siguientes dos lineas la cantidad de dias deseados en el
 % conjunto de datos resultante:
-cantidadDiasEntrenamiento = 140;
+cantidadDiasEntrenamiento = 53;
 cantidadDiasPrueba = 1;
 
 rng('shuffle'); % Aleatorizar la semilla
