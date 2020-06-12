@@ -24,7 +24,11 @@ load([rutaCargaArca, 'MatricesDelArca.mat']);
 [cantidadDias, cantidadDatosPorDia] = size(Irradiancia_Matriz);
 cantidadDatosPorDia = cantidadDatosPorDia - 1;
 
-datasetTodosDias = zeros(cantidadDias * cantidadDatosPorDia, 4);
+datasetTodosDias = zeros(cantidadDias * cantidadDatosPorDia, 5);
+
+% Ruta es el nombre del archivo donde están los datos a importar
+ruta = 'Datos-10minutos.xlsx';
+horas = xlsread(ruta, 'Dia1', 'B37:B109')';
 
 % Limpia los datos cargados
 clear Irradiancia_Matriz TemperaturaAmbiente_Matriz VelocidadViento_Matriz
@@ -53,7 +57,7 @@ for i = 1 : 1 : cantidadDias
     horasActivacion = tiempo./3600 + 6; % El rango es de 6:00h a 18:00h, se encuentra la hora exacta de activacion
     
     % Valores de las variables de interes cuando hay activacion de la irrigacion
-    entradasDia = [irradiancia; temperaturaAmbiente; velocidadViento];
+    entradasDia = [horas; irradiancia; temperaturaAmbiente; velocidadViento];
     entradasDia = entradasDia(:, 1:cantidadDatosPorDia);
     
     % Guarda el control de la irrigacion con dos valores:
@@ -69,9 +73,10 @@ for i = 1 : 1 : cantidadDias
     salidasDia = salidasDia';
     
     % Indice de columnas de la matriz de entradasDia:
-    % 1-Irradiancia
-    % 2-Temperatura ambiente
-    % 3-Velocidad del viento
+    % 1-Horas
+    % 2-Irradiancia
+    % 3-Temperatura ambiente
+    % 4-Velocidad del viento
     
     datasetTodosDias(limiteSuperior(i - 1) : limiteInferior(i), :) = [entradasDia salidasDia];
     
@@ -106,8 +111,8 @@ datasetEntrenamiento = seleccionDias(diasEntrenamiento, datasetTodosDias, cantid
 datasetPrueba = seleccionDias(diasPrueba, datasetTodosDias, cantidadDatosPorDia);
 
 % Conjunto de datos de entrenamiento balanceado
-activado = datasetTodosDias(datasetTodosDias(:, 4) == 1, :);
-noactivado = datasetTodosDias(datasetTodosDias(:, 4) == 0, :);
+activado = datasetTodosDias(datasetTodosDias(:, 5) == 1, :);
+noactivado = datasetTodosDias(datasetTodosDias(:, 5) == 0, :);
 
 tamanoDatasetEntrenamientoBalanceado = cantidadDiasEntrenamiento * cantidadDatosPorDia;
 %activado = activado(randperm(length(activado), tamanoDatasetEntrenamientoBalanceado/2), :);
@@ -115,10 +120,10 @@ tamanoDatasetEntrenamientoBalanceado = cantidadDiasEntrenamiento * cantidadDatos
 
 % Llamada a las funciones de exportacion, en formato .txt
 % Comentar y descomentar segun se necesiten las funciones:
-%exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias);
+exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias);
 
-exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
-exportarDatasetPrueba(rutaGuardadoDatasets, datasetPrueba, diasPrueba);
+%exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetEntrenamiento, diasEntrenamiento);
+%exportarDatasetPrueba(rutaGuardadoDatasets, datasetPrueba, diasPrueba);
 %exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, noactivado);
 
 fprintf('La Bibliotecaria ha terminado de analizar %d perfiles óptimos en %f segundos \n\n', cantidadDias, toc);
@@ -130,7 +135,7 @@ function dataset = seleccionDias(dias, datasetTodosDias, cantidadDatosPorDia)
     limiteInferior = @(m) cantidadDatosPorDia * m;
 
     cantidadDias = length(dias);
-    dataset = zeros(cantidadDias * cantidadDatosPorDia, 4);
+    dataset = zeros(cantidadDias * cantidadDatosPorDia, 5);
 
     for i = 1 : cantidadDias
         dataset(limiteSuperior(i - 1) : limiteInferior(i), :) = datasetTodosDias(limiteSuperior(dias(i) - 1) : limiteInferior(dias(i)), :);
@@ -144,10 +149,13 @@ function exportarDatasetCompleto(rutaGuardadoDatasets, datasetTodosDias)
 % Exporta todos los datos disponibles en un unico archivo
 
     fileID = fopen([rutaGuardadoDatasets, 'datasetsPerfiles.txt'], 'w');
-    formatoEncabezado = ['%s %12s %12s %12s \r\n'];
-    formatoDatos = ['%.4f %12.4f %12.4f %12.0f\r\n'];
+    %formatoEncabezado = ['%s %12s %12s %12s %12s \r\n'];
+    formatoEncabezado = ['%s %1s %1s %1s %1s\r\n'];
+    %formatoDatos = ['%.4f %12.4f %12.4f %12.4f %12.0f\r\n'];
+    formatoDatos = ['%.4f %1.4f %1.4f %1.4f %1.0f\r\n'];
 
-    fprintf(fileID, formatoEncabezado, 'irrad', 'Tamb', 'vient', 'Irrig');
+    %fprintf(fileID, formatoEncabezado, 'hora', 'irrad', 'Tamb', 'vient', 'Irrig');
+    fprintf(fileID, formatoEncabezado, 'R_0', 'R_1', 'R_2', 'R_3', 'Class');
     fprintf(fileID, formatoDatos, datasetTodosDias');
     fclose(fileID);
     
@@ -160,10 +168,10 @@ function exportarDatasetEntrenamiento(rutaGuardadoDatasets, datasetDiasEntrenami
 % Exporta solo los dias de entrenamiento indicados en un archivo
 
     fileID = fopen([rutaGuardadoDatasets, 'datasetTP.txt'], 'w');
-    formatoEncabezado = ['%s %1s %1s %1s\r\n'];
-    formatoDatos = ['%.4f %1.4f %1.4f %1.0f\r\n'];
+    formatoEncabezado = ['%s %1s %1s %1s %1s\r\n'];
+    formatoDatos = ['%.4f %1.4f %1.4f %1.4f %1.0f\r\n'];
     
-    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'Class');
+    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'R_3', 'Class');
     fprintf(fileID, formatoDatos, datasetDiasEntrenamiento');
     fclose(fileID);
     
@@ -177,10 +185,10 @@ function exportarDatasetPrueba(rutaGuardadoDatasets, datasetDiasPrueba, diasPrue
 % Exporta solo los dias de prueba indicados en un archivo
 
     fileID = fopen([rutaGuardadoDatasets, 'datasetTP_PRUEBA.txt'], 'w');
-    formatoEncabezado = ['%s %1s %1s %1s\r\n'];
-    formatoDatos = ['%.4f %1.4f %1.4f %1.0f\r\n'];
+    formatoEncabezado = ['%s %1s %1s %1s %1s\r\n'];
+    formatoDatos = ['%.4f %1.4f %1.4f %1.4f %1.0f\r\n'];
     
-    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'Class');
+    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'R_3', 'Class');
     fprintf(fileID, formatoDatos, datasetDiasPrueba');
     fclose(fileID);
     
@@ -195,10 +203,10 @@ function exportarDatasetEntrenamientoBalanceado(rutaGuardadoDatasets, activado, 
     datasetDiasEntrenamiento = [activado; noactivado];
 
     fileID = fopen([rutaGuardadoDatasets, 'datasetTP.txt'], 'w');
-    formatoEncabezado = ['%s %1s %1s %1s\r\n'];
-    formatoDatos = ['%.4f %1.4f %1.4f %1.0f\r\n'];
+    formatoEncabezado = ['%s %1s %1s %1s %1s\r\n'];
+    formatoDatos = ['%.4f %1.4f %1.4f %1.4f %1.0f\r\n'];
     
-    fprintf(fileID, formatoEncabezado, 'R_0','R_1', 'R_2', 'Class');
+    fprintf(fileID, formatoEncabezado, 'R_0', 'R_1', 'R_2', 'R_3', 'Class');
     fprintf(fileID, formatoDatos, datasetDiasEntrenamiento');
     fclose(fileID);
     
