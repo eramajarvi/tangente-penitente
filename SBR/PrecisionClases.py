@@ -36,4 +36,10 @@ class PrecisionClases:
             self.F_otraClase += 1
 
     def reportarPrecisionClases(self):
-        pass
+        """ Imprime el resumen de la precision de las clases """
+        print(" ----------------------------------------------- ")
+        print("VP = " + str(self.V_miClase))
+        print("VN = " + str(self.V_otraClase))
+        print("FP = " + str(self.F_miClase))
+        print("FN = " + str(self.F_otraClase))
+        print(" ----------------------------------------------- ")
