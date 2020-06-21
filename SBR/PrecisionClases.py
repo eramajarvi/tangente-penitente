@@ -20,7 +20,20 @@ class PrecisionClases:
         self.F_otraClase = 0
 
     def actualizarPrecision(self, soyYo, clasePrecisa):
-        pass
+        """ Incrementa la celula apropiada
+        de la matriz de confusion """
+
+        if soyYo and clasePrecisa:
+            self.V_miClase += 1
+
+        elif clasePrecisa:
+            self.V_otraClase += 1
+
+        elif soyYo:
+            self.F_miClase += 1
+
+        else:
+            self.F_otraClase += 1
 
     def reportarPrecisionClases(self):
         pass
