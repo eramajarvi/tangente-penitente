@@ -87,7 +87,18 @@ class Prediccion:
                 print("Prediccion - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def obtenerSumaAptitud(self, poblacion, bajo, alto):
-        pass
+        """Obtiene la suma de aptitud de reglas en el conjunto de
+        reglas. Para prediccion de fenotipo continuo. """
+
+        sumaApt = 0
+
+        for ref in poblacion.conjuntoCoincidencias:
+            cl = poblacion.conjuntoPoblacion[ref]
+
+            if cl.fenotipo[0] <= bajo and cl.fenotipo[1] >= alto:
+                sumaApt += cl.aptitud
+
+        return sumaApt
 
     def obtenerDecision(self):
         pass
