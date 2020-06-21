@@ -163,6 +163,33 @@ class GestorSalida:
         else:
             pass
 
+    def escribirPob(self, archivoSalida, iterExploracion, pob):
+        """ Escribe un archivo de texto especificando la poblacion 
+        de reglas evolucionada, incluyendo condiciones, fenotipos
+        y todos los parametros de las reglas"""
 
+        if cons.salidaPoblacion:
+            try:
+                salidaPoblacion = open(archivoSalida + '_' + str(iterExploracion) + '_PoblacionReglas.txt', 'w')
 
+            except Exception as inst:
+                print(type(inst))
+                print(inst.args)
+                print(inst)
+                print('No se pudo abrir', archivoSalida + '_' + str(iterExploracion) + '_PoblacionReglas.txt')
+                raise
+
+            else:
+                print("Escribiendo poblacion como archivo de texto...")
+
+            salidaPoblacion.write("Especificado\tCondicion\tFenotipo\tAptitud\tNumerosidad\tTamanoPromConjuntoCoinc\tEstampaTiempoAG\tEstampaTiempoInic\tEspecificacion\tProbEliminacion\tConteoCorrectos\tCubrimientoCorrecto\tCubrimientoCoinc\tEpocaCompletada\n")
+
+            # Escribir cada clasificador
+            for cl in pob.conjuntoPob:
+                salidaPoblacion.write(str(cl.imprimirClasificador()))
+
+            salidaPoblacion.close()
+
+        else:
+            pass
         
