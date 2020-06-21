@@ -105,4 +105,5 @@ class Prediccion:
         return self.decision
 
     def obtenerConjunto(self):
-        pass
+        """ Devuelve la decision de la prediccion """
+        return self.voto
