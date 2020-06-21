@@ -101,7 +101,8 @@ class Prediccion:
         return sumaApt
 
     def obtenerDecision(self):
-        pass
+        """ Devuelve la decision de la prediccion """
+        return self.decision
 
     def obtenerConjunto(self):
         pass
