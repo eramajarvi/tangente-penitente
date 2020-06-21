@@ -365,4 +365,54 @@ class GestorSalida:
             a.write('\n')
         
         a.close()
+
+    def editarEstadisticasPoblacion(self, evalPrueba):
+        """ Toma un archivo existente de estadisticas de poblacion
+        y lo edita para reportar el rendimiento de la precision de
+        prueba """
+
+        try:
+            a = open(cons.rutaReinicioPob + "_EstadisticasPoblacion.txt", 'rU')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', cons.rutaReinicioPob + "_EstadisticasPoblacion.txt")
+            raise
+
+        almacenamientoArchivo = []
+
+        for each in almacenamientoArchivo:
+            almacenamientoArchivo.append(each)
+
+        a.close()
+
+        try:
+            salidaEstadisticasPoblacion = open(cons.rutaReinicioPob + '_EstadisticasPoblacion_Prueba.txt', 'w')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', cons.rutaReinicioPob + '_EstadisticasPoblacion_Prueba.txt')
+            raise
+
+        else:
+            print("Escribiendo archivo de resumen de estadisticos de la poblacion...")
+
+        for i in range(2):
+            salidaEstadisticasPoblacion.write(almacenamientoArchivo[i])
+
+        listaTemp = almacenamientoArchivo[2].strip().split('\t')
+        salidaEstadisticasPoblacion.write(str(listaTemp[0]) + "\t")
+        salidaEstadisticasPoblacion.write(str(evalPrueba[0]) + "\t")
+        salidaEstadisticasPoblacion.write(str(listaTemp[2]) + "\t")
+        salidaEstadisticasPoblacion.write(str(evalPrueba[1]) + "\n\n")
+
+        for i in range (4, 36):
+            salidaEstadisticasPoblacion.write(almacenamientoArchivo[i])
+
+        salidaEstadisticasPoblacion.close()
+
         
