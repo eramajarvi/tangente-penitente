@@ -243,46 +243,85 @@ class GestorSalida:
                     listaCombo[conteo][0] = enlaceDatos.listaEncabezadosEntrenamiento[listaAtributos[j]]
                     conteo += 1
 
-                for cl in pob.conjuntoPob:
-                    conteo = 0
+            for cl in pob.conjuntoPob:
+                conteo = 0
 
-                    for i in range(len(listaAtributos) - 1):
-                        for j in range(i + 1, len(listaAtributos)):
-                            if listaAtributos[i] in cl.listaEspecAtributo and listaAtributos[j] in cl.listaEspecAtributo:
-                                listaCombo[conteo][2] += cl.numerosidad
-                                listaCombo[conteo][3] += cl.numerosidad * cl.precision
+                for i in range(len(listaAtributos) - 1):
+                    for j in range(i + 1, len(listaAtributos)):
+                        if listaAtributos[i] in cl.listaEspecAtributo and listaAtributos[j] in cl.listaEspecAtributo:
+                            listaCombo[conteo][2] += cl.numerosidad
+                            listaCombo[conteo][3] += cl.numerosidad * cl.precision
 
-                            conteo += 1
+                        conteo += 1
 
-                listaTuplas = []
+            listaTuplas = []
 
-                for i in listaCombo:
-                    listaTuplas.append((i[0], i[1], i[2], i[3]))
+            for i in listaCombo:
+                listaTuplas.append((i[0], i[1], i[2], i[3]))
 
-                listaComboOrganizada = sorted(listaTuplas, key = lambda test: test[3], reverse = True)
+            listaComboOrganizada = sorted(listaTuplas, key = lambda test: test[3], reverse = True)
 
-                print("Escribiendo puntajes de co-ocurrencia como archivo de texto...")
+            print("Escribiendo puntajes de co-ocurrencia como archivo de texto...")
 
-                try:
-                    a = open(archivoSalida + '_' + str(iterExploracion) + '_CO.txt', 'w')
+            try:
+                a = open(archivoSalida + '_' + str(iterExploracion) + '_CO.txt', 'w')
 
-                except Exception as inst:
-                    print(type(inst))
-                    print(inst.args)
-                    print(inst)
-                    print('No se pudo abrir', archivoSalida + '_' + str(iterExploracion) + '_CO.txt')
-
-                else:
-                    for i in range(len(listaComboOrganizada)):
-                        for j in range(len(listaComboOrganizada[0])):
-                            if j < len(listaComboOrganizada[0]) - 1:
-                                a.write(str(listaComboOrganizada[i][j]) + '\t')
-
-                            else:
-                                a.write(str(listaComboOrganizada[i][j]) + '\n')
-
-                    a.close()
+            except Exception as inst:
+                print(type(inst))
+                print(inst.args)
+                print(inst)
+                print('No se pudo abrir', archivoSalida + '_' + str(iterExploracion) + '_CO.txt')
 
             else:
-                pass
+                for i in range(len(listaComboOrganizada)):
+                    for j in range(len(listaComboOrganizada[0])):
+                        if j < len(listaComboOrganizada[0]) - 1:
+                            a.write(str(listaComboOrganizada[i][j]) + '\t')
+
+                        else:
+                            a.write(str(listaComboOrganizada[i][j]) + '\n')
+
+                a.close()
+
+        else:
+            pass
+
+    def guardarSeguimiento(self, iterExploracion, archivoSalida):
+        """" Imprime los puntajes del seguimiento de atributos en
+        un archivo de texto"""
+
+        if cons.hacerSeguimientoAtributos:
+            try:
+                a = open(archivoSalida + '_' + str(iterExploracion + 1) + '_SeguimientoAtributos.txt', 'w')
+
+            except Exception as inst:
+                print(type(inst))
+                print(inst.args)
+                print(inst)
+                print('No se pudo abrir', archivoSalida + '_' + str(iterExploracion + 1) + '_SeguimientoAtributos.txt')
+                raise
+
+            else:
+                print("Escribiendo seguimiento de atributos como archivo de texto...")
+
+            sumasSeguimiento = cons.SA.sumaPrecisionAtributos
+
+            a.write(str(cons.etiquetaIDInstancia) + '\t')
+
+            for att in cons.amb.datosFormateados.listaEncabezadosEntrenamiento:
+                a.write(str(att) + '\t')
+
+            a.write(str(cons.etiquetaFenotipo) + '\n')
+
+            for i in range(len(sumasSeguimiento)):
+                listaSeguimiento = sumasSeguimiento[i]
+
+                a.write(str(cons.amb.datosFormateados.entrenamientoFormateado[i][2]) + '\t')
+
+                for att in listaSeguimiento:
+                    a.write(str(att) + '\t')
+
+                a.write(str(cons.amb.datosFormateados.entrenamientoFormateado[i][1]) + '\n')
+
+            a.close()
         
