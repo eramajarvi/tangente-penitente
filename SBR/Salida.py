@@ -192,4 +192,97 @@ class GestorSalida:
 
         else:
             pass
+
+    def coocurrenciaAtt(self, archivoSalida, iterExploracion, pob):
+        """ Calcula la co-ocurrencia de los atributos en toda
+        la poblacion de reglas. """
+
+        if cons.salidaAttCoOccur:
+            print("Calculando puntajes de co-ocurrencia de los atributos... ")
+            enlaceDatos = cons.amb.datosFormateados
+            dim = enlaceDatos.numAtributos
+            atributosMax = 50
+            listaAtributos = []
+
+            # Identifica los atributos para evaluacion de co-ocurrencia
+            if dim <= atributosMax:
+                for i in range(0, dim):
+                    listaAtributos.append(i)
+
+            else:
+                listaTemp = copy.deepcopy(pob.listaEspecAtributo)
+                listaTemp = sorted(listaTemp, reverse = True)
+
+                valorMax = listaTemp[atributosMax]
+                sobrecarga = []
+
+                for i in range(0, dim):
+                    if pob.listaEspecAtributo[i] >= valorMax:
+                        listaAtributos.append(i)
+
+                        if pob.listaEspecAtributo[i] == valorMax:
+                            sobrecarga.append(i)
+
+                while len(listaAtributos) > atributosMax:
+                    objetivo = random.choice(sobrecarga)
+                    listaAtributos.remove(objetivo)
+                    sobrecarga.remove(objetivo)
+
+            # Evaluacion de la co-ocurrencia
+            listaCombo = []
+            # Atrib1, Atrib2, Especificacion, EspecificacionPrecisionBalanceada
+            listaCast = [None, None, 0, 0]
+            conteo = 0
+            dim = enlaceDatos.numAtributos
+
+            # Especificar todos los pares de atributos
+            for i in range(0, len(listaAtributos) - 1):
+                for j in range(i + 1, len(listaAtributos)):
+                    listaCombo.append(copy.deepcopy(listaCast))
+                    listaCombo[conteo][0] = enlaceDatos.listaEncabezadosEntrenamiento[listaAtributos[i]]
+                    listaCombo[conteo][0] = enlaceDatos.listaEncabezadosEntrenamiento[listaAtributos[j]]
+                    conteo += 1
+
+                for cl in pob.conjuntoPob:
+                    conteo = 0
+
+                    for i in range(len(listaAtributos) - 1):
+                        for j in range(i + 1, len(listaAtributos)):
+                            if listaAtributos[i] in cl.listaEspecAtributo and listaAtributos[j] in cl.listaEspecAtributo:
+                                listaCombo[conteo][2] += cl.numerosidad
+                                listaCombo[conteo][3] += cl.numerosidad * cl.precision
+
+                            conteo += 1
+
+                listaTuplas = []
+
+                for i in listaCombo:
+                    listaTuplas.append((i[0], i[1], i[2], i[3]))
+
+                listaComboOrganizada = sorted(listaTuplas, key = lambda test: test[3], reverse = True)
+
+                print("Escribiendo puntajes de co-ocurrencia como archivo de texto...")
+
+                try:
+                    a = open(archivoSalida + '_' + str(iterExploracion) + '_CO.txt', 'w')
+
+                except Exception as inst:
+                    print(type(inst))
+                    print(inst.args)
+                    print(inst)
+                    print('No se pudo abrir', archivoSalida + '_' + str(iterExploracion) + '_CO.txt')
+
+                else:
+                    for i in range(len(listaComboOrganizada)):
+                        for j in range(len(listaComboOrganizada[0])):
+                            if j < len(listaComboOrganizada[0]) - 1:
+                                a.write(str(listaComboOrganizada[i][j]) + '\t')
+
+                            else:
+                                a.write(str(listaComboOrganizada[i][j]) + '\n')
+
+                    a.close()
+
+            else:
+                pass
         
