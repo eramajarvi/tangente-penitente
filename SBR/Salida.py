@@ -324,4 +324,45 @@ class GestorSalida:
                 a.write(str(cons.amb.datosFormateados.entrenamientoFormateado[i][1]) + '\n')
 
             a.close()
+
+    def escribirPredicciones(self, iterExploracion, archivoSalida, listaPredicciones, listaReal, conjuntosPrediccion):
+        """ Imprime las predicciones de prueba en un archivo de texto """
+
+        try:
+            a = open(archivoSalida + '_' + str(iterExploracion + 1) + '_Predicciones.txt', 'w')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', archivoSalida+ '_' + str(iterExploracion + 1) + '_Predicciones.txt')
+            raise
+
+        else:
+            print("Escribiendo predicciones al archivo...")
+
+        a.write(str(cons.etiquetaIDInstancia) + '\t' + 'Prediccion de clase' + '\t' + 'Clase real')
+        
+        if cons.amb.datosFormateados.fenotipoDiscreto:
+            for cadaClase in cons.amb.datosFormateados.listaFenotipos:
+                a.write('\t' + str(cadaClase))
+
+        a.write('\n')
+
+        for i in range(len(listaPredicciones)):
+            a.write(str(cons.amb.datosFormateados.pruebaFormateado[i][2]) + '\t')
+            a.write(str(listaPredicciones[i]) + '\t' + str(listaReal[i]))
+
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                listaProb = []
+
+                for cadaClase in cons.amb.datosFormateados.listaFenotipos:
+                    listaProb.append(conjuntosPrediccion[i][cadaClase])
+
+                for each in listaProb:
+                    a.write('\t' + str(each))
+
+            a.write('\n')
+        
+        a.close()
         
