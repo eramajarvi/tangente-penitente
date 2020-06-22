@@ -911,8 +911,22 @@ class Clasificador:
 
         return True
 
+    # -----------------------------------------------------
+    # METODO DE ELIMINACION
+    # -----------------------------------------------------
     def obtenerProbEliminacion(self, aptitudMedia):
-        pass
+        """Devuelve el voto de eliminacion de un clasificador """
+
+        if self.aptitud/self.numerosidad >= cons.delta * aptitudMedia or self.conteoCoincidencia < cons.theta_del:
+            self.votoEliminacion = self.tamanoPromedioConjuntoCoincidencia * self.numerosidad
+
+        elif self.aptitud == 0.0:
+            self.votoEliminacion = self.tamanoPromedioConjuntoCoincidencia * self.numerosidad * aptitudMedia / (cons.aptitudInicial/self.numerosidad)
+
+        else:
+            self.votoEliminacion = self.tamanoPromedioConjuntoCoincidencia * self.numerosidad * aptitudMedia / (self.aptitud/self.numerosidad)
+
+        return self.votoEliminacion
 
     def construirCoincidencia(self, refAtt, estado):
         pass
