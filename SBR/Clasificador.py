@@ -1058,7 +1058,8 @@ class Clasificador:
         self.precision = self.conteoCorrecto / float(self.conteoCoincidencia)
 
     def fijarPrecision(self, precision):
-        pass
+        """ Fija la precision de un clasificador """
+        self.precision = precision
 
     def fijarAptitud(self, apt):
         pass
