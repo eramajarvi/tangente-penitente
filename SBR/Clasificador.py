@@ -1036,8 +1036,10 @@ class Clasificador:
         else:
             self.cubrimientoCorrecto += 1
 
-    def actualizarNumerosidad(self):
-        pass
+    def actualizarNumerosidad(self, num):
+        """ Altera el numero de numerosidad de un clasificador.
+        La numerosidad no puede ser negativa"""
+        self.numerosidad += num
 
     def actualizarTamanoConjuntoCoincidencia(self, tamanoConjuntoCoincidencia):
         pass
