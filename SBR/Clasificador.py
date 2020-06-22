@@ -964,7 +964,30 @@ class Clasificador:
         return listaCondicion
 
     def equivalente(self, cl):
-        pass
+        """ Devuelve si dos clasificadores son identicos en
+        condicion y fenotipo. Esto funciona para atributos o fenotipos
+        discretos y continuos. 
+        """
+
+        # ¿Son los fenotipos los mismos y tienen el mismo numero de
+        # atributos especificados? - revision rapida
+        if cl.fenotipo == self.fenotipo and len(cl.listaAtributosEspecificados) == len(self.listaAtributosEspecificados):
+            refsCl = sorted(cl.listaAtributosEspecificados)
+            refsSelf = sorted(self.listaAtributosEspecificados)
+
+            if refsCl == refsSelf:
+                for i in range(len(cl.listaAtributosEspecificados)):
+                    indiceTemp = self.listaAtributosEspecificados.index(cl.listaAtributosEspecificados[i])
+
+                    if cl.condicion[i] == self.condicion[indiceTemp]:
+                        pass
+
+                    else:
+                        return False
+                
+                return True
+            
+        return False
 
     def actualizarEstadoEpoca(self, iterExploracion):
         pass
