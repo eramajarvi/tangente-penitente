@@ -149,7 +149,30 @@ class Clasificador:
                     self.condicion.append(self.construirCoincidencia(refAtt, estado))
 
     def seleccionarAtributoRW(self, especificar):
-        pass
+        """ Selecciona atributos a ser especificados en el covering
+        del clasificador usando pesos del conocimiento experto y
+        seleccion de ruleta (Roulette Wheel). """
+        # Conjunto correcto es una lista de IDs de referencia
+        listaPuntajesRef = copy.deepcopy(cons.CE.listaRef)
+        listaSeleccion = []
+        conteoActual = 0
+        sumaTotal = copy.deepcopy(cons.CE.SumaCE)
+
+        while conteoActual < especificar:
+            puntoOpcion = random.random() * sumaTotal
+            i = 0
+            puntajeSuma = cons.CE.puntajes[listaPuntajesRef[i]]
+
+            while puntoOpcion > puntajeSuma:
+                i = i + 1
+                puntajeSuma += cons.CE.puntajes[listaPuntajesRef[i]]
+
+            listaSeleccion.append(listaPuntajesRef[i])
+            sumaTotal -= cons.EK.puntajes[listaPuntajesRef[i]]
+            listaPuntajesRef.remove(listaPuntajesRef[i])
+            conteoActual -= 1
+
+        return listaSeleccion
 
     def copiarClasificador(self, clAntiguo, iterExploracion):
         pass
