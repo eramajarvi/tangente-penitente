@@ -1042,7 +1042,12 @@ class Clasificador:
         self.numerosidad += num
 
     def actualizarTamanoConjuntoCoincidencia(self, tamanoConjuntoCoincidencia):
-        pass
+        """ Actualiza el tamano del conjunto de coincidencias promedio """
+        if self.conteoCoincidencia < 1.0 / cons.beta:
+            self.tamanoPromedioConjuntoCoincidencia = (self.tamanoPromedioConjuntoCoincidencia * (self.conteoCoincidencia - 1) + tamanoConjuntoCoincidencia) / float(self.conteoCoincidencia)
+
+        else:
+            self.tamanoPromedioConjuntoCoincidencia = self.tamanoPromedioConjuntoCoincidencia + cons.beta * (tamanoConjuntoCoincidencia - self.tamanoPromedioConjuntoCoincidencia)
 
     def actualizarEstampaTiempo(self, ts):
         pass
