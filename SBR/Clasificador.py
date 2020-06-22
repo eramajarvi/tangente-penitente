@@ -1062,7 +1062,8 @@ class Clasificador:
         self.precision = precision
 
     def fijarAptitud(self, apt):
-        pass
+        """ Fija la aptitud de un clasificador """
+        self.aptitud = apt
 
     def imprimirClasificador(self):
         pass
