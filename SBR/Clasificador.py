@@ -506,7 +506,184 @@ class Clasificador:
                 cl.condicion.pop(i)
 
     def mutacion(self, estado, fenotipo):
-        pass
+        """ Muta la condicion del clasificador. Tambien maneja 
+        mutacion del fenotipo. Esto es una mutacion de niche, lo
+        que significa que el clasificador resultante todavia
+        coincidira con la instancia actual. """
+
+        # Probabilidad de que si el CE es activado, entonces
+        # sea aplicado
+        probPresion = 0.5
+        usarSA = False
+
+        if cons.hacerFeedbackAtributos and random.random() < cons.SA.porcentaje:
+            usarSA = True
+
+        cambio = False
+
+        # -----------------------------------------------------
+        # CONDICION DE MUTACION
+        # Ratio de mutacion (upsilon) usado para probabilisticamente
+        # determinar el numero de atributos que deberan ser mutados
+        # en el clasificador
+        # -----------------------------------------------------
+
+        pasos = 0
+        continuar = True
+
+        while continuar:
+            if random.random() < cons.upsilon:
+                pasos += 1
+
+            else:
+                continuar = False
+
+        # Definir limites de especificacion
+        if (len(self.listaAtributosEspecificados) - pasos) <= 1:
+            limiteBajo = 1
+
+        else:
+            limiteBajo = len(self.listaAtributosEspecificados) - pasos
+
+        if (len(self.listaAtributosEspecificados) + pasos) >= cons.amb.datosFormateados.limiteEspec:
+            limiteAlto = cons.amb.datosFormateados.limiteEspec
+
+        else:
+            limiteAlto = len(self.listaAtributosEspecificados) + pasos
+
+        if len(self.listaAtributosEspecificados) == 0:
+            limiteAlto = 1
+
+        # Obtener una nueva especificacion de regla
+        nuevaEspecRegla = random.randint(limiteBajo, limiteAlto)
+
+        # -----------------------------------------------------
+        # MANTENER ESPECIFICACION
+        # -----------------------------------------------------
+        # Selecciona una tributo para generlizar y otro para
+        # especificar. Mantiene la especificacion de las reglas iguales
+        if nuevaEspecRegla == len(self.listaAtributosEspecificados) and random.random() < (1 - cons.upsilon):
+            # Identificar objetivo generalizante
+            if not cons.usarConocimientoExperto or random.random() > probPresion:
+                objetivoGen = random.sample(self.listaAtributosEspecificados, 1)
+
+            else:
+                objetivoGen = self.selecGeneralizarRW(1)
+
+            infoAtributo = cons.amb.datosFormateados.infoAtributo[objetivoGen[0]]
+
+            if not infoAtributo[0] or random.random() > 0.5:
+                # Generalizar objetivo
+                if not usarSA or random.random() > cons.SA.obtenerProbSeguimiento()[objetivoGen[0]]:
+                    # Referencia a la posicion del atributo en la representacion de reglas
+                    i = self.listaAtributosEspecificados.index(objetivoGen[0])
+                    self.listaAtributosEspecificados.remove(objetivoGen[0])
+                    # constuirCoincidencia maneja atributos discretos y continuos
+                    self.condicion.pop(i)
+                    cambio = True
+
+            else:
+                self.mutarAtributosContinuos(usarSA, objetivoGen[0])
+
+            # Identificar objetivo especificador
+            # Revision para conjuntos de datos pequenos, si todos
+            # los atributos han sido especificados en este punto
+            if len(self.listaAtributosEspecificados) >= len(estado):
+                pass
+
+            else:
+                if not cons.usarConocimientoExperto or random.random() > probPresion:
+                    listaOpciones = list(range(cons.amb.datosFormateados.numAtributos))
+
+                    # Hace una lista con todos los atributos no especificados
+                    for i in self.listaAtributosEspecificados:
+                        listaOpciones.remove(i)
+
+                    objetivoEspec = random.sample(listaOpciones, 1)
+
+                else:
+                    objetivoEspec = self.selecGeneralizarRW(1)
+
+                if estado[objetivoEspec[0]] != cons.etiquetaDatosFaltantes and (not usarSA or random.random() < cons.SA.obtenerProbSeguimiento()[objetivoEspec[0]]):
+                    # Objetivo especificacion
+                    self.listaAtributosEspecificados.append(objetivoEspec[0])
+                    self.condicion.append(self.construirCoincidencia(objetivoEspec[0], estado))
+                    cambio = True
+
+                if len(self.listaAtributosEspecificados) > cons.amb.datosFormateados.limiteEspec:
+                    self.arregloLimiteEspec(self)
+
+        # -----------------------------------------------------
+        # INCREMENTA ESPECIFICACION
+        # -----------------------------------------------------
+        elif nuevaEspecRegla > len(self.listaAtributosEspecificados):
+            # Especifica mas atributos
+            cambio = nuevaEspecRegla - len(self.listaAtributosEspecificados)
+            
+            if not cons.usarConocimientoExperto or random.random() > probPresion:
+                listaOpciones = list(range(cons.amb.datosFormateados.numAtributos))
+
+                for i in self.listaAtributosEspecificados:
+                    # Hacer lista con todos los atributos no especificados
+                    listaOpciones.remove(i)
+
+                objetivoEspec = random.sample(listaOpciones, cambio)
+
+            else:
+                objetivoEspec = self.selecGeneralizarRW(cambio)
+
+            for j in objetivoEspec:
+                if estado[j] != cons.etiquetaDatosFaltantes and (not usarSA or random.random() < cons.SA.obtenerProbSeguimiento()[j]):
+                    self.listaAtributosEspecificados.append(j)
+                    self.condicion.append(self.construirCoincidencia(j, estado))
+                    cambio = True
+
+        # -----------------------------------------------------
+        # DECREMENTA ESPECIFICACION
+        # -----------------------------------------------------
+        elif nuevaEspecRegla < len(self.listaAtributosEspecificados):
+            cambio = len(self.listaAtributosEspecificados) - nuevaEspecRegla
+
+            if not cons.usarConocimientoExperto or random.random() > probPresion:
+                objetivoGen = random.sample(self.listaAtributosEspecificados, cambio)
+
+            else:
+                objetivoGen = self.selecGeneralizarRW(cambio)
+
+            # -----------------------------------------------------
+            # ATRIBUTO CONTINUO O DISCRETO
+            # Elimina la especificacion del atributo con un 50% de
+            # probabilidad si tenemos atributos continuos o 100%
+            # si es un atributo discreto
+            # -----------------------------------------------------
+            for j in objetivoGen:
+                infoAtributo = cons.amb.datosFormateados.infoAtributo[j]
+
+                if not infoAtributo[0] or random.random() > 0.5:
+                    if not usarSA or random.random() > cons.SA.obtenerProbSeguimiento()[j]:
+                        i = self.listaAtributosEspecificados.index(j)
+                        self.listaAtributosEspecificados.remove(j)
+                        self.condicion.pop(i)
+                        cambio = True
+
+                else:
+                    self.mutarAtributosContinuos(usarSA, j)
+        
+        else:
+            # No especificar ni generalizar
+            pass
+
+        # -----------------------------------------------------
+        # MUTAR FENOTIPO
+        # -----------------------------------------------------
+        if cons.amb.datosFormateados.fenotipoDiscreto:
+            pass
+
+        else:
+            print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos")
+
+        if cambio:
+            return True
 
     def selecGeneralizarRW(self, conteo):
         pass
