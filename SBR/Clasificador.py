@@ -852,8 +852,26 @@ class Clasificador:
                 else:
                     pass
 
+    # -----------------------------------------------------
+    # METODOS DE SUBSUNCION
+    # -----------------------------------------------------
     def subsumir(self, cl):
-        pass
+        """ Devuelve si el clasificador (self) subsume a cl """
+        # -----------------------------------------------------
+        # FENOTIPO DISCRETO
+        # -----------------------------------------------------
+        if cons.amb.datosFormateados.fenotipoDiscreto:
+            if cl.fenotipo == self.fenotipo:
+                if self.esSubsumidor() and self.esMasGeneral(cl):
+                    return True
+            
+            return False
+
+        # -----------------------------------------------------
+        # FENOTIPO CONTINUO
+        # -----------------------------------------------------
+        else:
+            print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def esSubsumidor(self):
         pass
