@@ -175,7 +175,20 @@ class Clasificador:
         return listaSeleccion
 
     def copiarClasificador(self, clAntiguo, iterExploracion):
-        pass
+        """ Construye un clasificador identico. Sin embargo, la
+        experiencia de la copia se fija en 0 y la numerosidad se
+        fija en 1 dado que es un nuevo individuo en la poblacion.
+        Usado por el algoritmo genetico para generar descendencia
+        basada en clasificadores padres """
+
+        self.listaAtributosEspecificados = copy.deepcopy(clAntiguo.listaAtributosEspecificados)
+        self.condicion = copy.deepcopy(clAntiguo.condicion)
+        self.fenotipo = copy.deepcopy(clAntiguo.fenotipo)
+        self.estampaTiempoAG = iterExploracion
+        self.estampaTiempoInic = iterExploracion
+        self.tamanoPromedioConjuntoCoincidencia = copy.deepcopy(clAntiguo.tamanoPromedioConjuntoCoincidencia)
+        self.aptitud = clAntiguo.aptitud
+        self.precision = clAntiguo.precision
 
     def reiniciarClasicicador(self, listaClasificador):
         pass
