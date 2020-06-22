@@ -1001,7 +1001,13 @@ class Clasificador:
             self.epocaCompletada = True
 
     def actualizarAptitud(self):
-        pass
+        """ Actualiza el parametro de aptitud """
+
+        if cons.amb.datosFormateados.fenotipoDiscreto or (self.fenotipo[1] - self.fenotipo[0])/cons.amb.datosFormateados.rangoFenotipo < 0.5:
+            self.aptitud = pow(self.precision, cons.nu)
+
+        else:
+            print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def actualizarExperiencia(self):
         pass
