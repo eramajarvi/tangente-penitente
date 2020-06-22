@@ -1050,7 +1050,8 @@ class Clasificador:
             self.tamanoPromedioConjuntoCoincidencia = self.tamanoPromedioConjuntoCoincidencia + cons.beta * (tamanoConjuntoCoincidencia - self.tamanoPromedioConjuntoCoincidencia)
 
     def actualizarEstampaTiempo(self, ts):
-        pass
+        """ Fija la estampa de tiempo del clasificador """
+        self.estampaTiempoAG = ts
 
     def actualizarPrecision(self):
         pass
