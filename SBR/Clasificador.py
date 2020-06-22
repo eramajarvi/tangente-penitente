@@ -191,7 +191,46 @@ class Clasificador:
         self.precision = clAntiguo.precision
 
     def reiniciarClasicicador(self, listaClasificador):
-        pass
+        """ Reconstruye un clasificador guardado como parte
+        de un reinicio de la poblacion"""
+
+        self.listaAtributosEspecificados = ast.literal_eval(listaClasificador[0])
+        self.condicion = ast.literal_eval(listaClasificador[1])
+
+        # -----------------------------------------------------
+        # FENOTIPO DISCRETO
+        # -----------------------------------------------------
+        if cons.amb.datosFormateados.fenotipoDiscreto:
+            self.fenotipo = str(listaClasificador[2])
+
+        # -----------------------------------------------------
+        # FENOTIPO CONTINUO
+        # -----------------------------------------------------
+        else:
+            print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos")
+
+        self.aptitud = float(listaClasificador[3])
+        self.precision = float(listaClasificador[4])
+        self.numerosidad = int(listaClasificador[5])
+        self.tamanoPromedioConjuntoCoincidencia = float(listaClasificador[6])
+        self.estampaTiempoAG = int(listaClasificador[7])
+        self.estampaTiempoInic = int(listaClasificador[8])
+
+        if str(listaClasificador[10]) == 'None':
+            self.votoEliminacion = None
+
+        else:
+            self.votoEliminacion = float(listaClasificador[10])
+
+        self.conteoCorrecto = int(listaClasificador[11])
+        self.conteoCoincidencia = int(listaClasificador[12])
+        self.cubrimientoCorrecto = int(listaClasificador[13])
+        self.cubrimientoCoincidencia = int(listaClasificador[14])
+        self.epocaCompletada = bool(listaClasificador[15])
+
+    # -----------------------------------------------------
+    # CUBRIMIENTO / MATCHING
+    # -----------------------------------------------------
 
     def coincidencia(self, estado):
         pass
