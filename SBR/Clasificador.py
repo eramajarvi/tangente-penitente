@@ -1025,7 +1025,16 @@ class Clasificador:
             self.cubrimientoCoincidencia += 1
 
     def actualizarCorrectos(self):
-        pass
+        """ Incrementa el seguimiento de fenotipo correcto en uno.
+        Al completar una epoca, la precision de la regla no puede cambiar. """
+
+        self.conteoCorrecto += 1
+
+        if self.epocaCompletada:
+            pass
+
+        else:
+            self.cubrimientoCorrecto += 1
 
     def actualizarNumerosidad(self):
         pass
