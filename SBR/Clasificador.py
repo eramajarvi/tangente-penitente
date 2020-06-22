@@ -823,7 +823,34 @@ class Clasificador:
             pass
 
     def revisarRangos(self):
-        pass
+        """Revisa y previene el escenario donde atributos continuos
+        especificados en una regla tengan un rango tal que encierren
+        completamente el conjunto de entrenamiento para ese atributo
+        """
+
+        for refAtt in self.listaAtributosEspecificados:
+            if cons.amb.datosFormateados.infoAtributo[refAtt][0]:
+                verdaderoMin = cons.amb.datosFormateados.infoAtributo[refAtt][1][0]
+                verdaderoMax = cons.amb.datosFormateados.infoAtributo[refAtt][1][1]
+
+                i = self.listaAtributosEspecificados.index(refAtt)
+
+                valorBuffer = (verdaderoMax - verdaderoMin) * 0.1
+
+                # El rango de la regla encierra el rango entero de entrenamiento
+                if self.condicion[i][0] <= verdaderoMin and self.condicion[i][1] >= verdaderoMax:
+                    self.listaAtributosEspecificados.remove(refAtt)
+                    self.condicion.pop(i)
+                    return
+
+                elif self.condicion[i][0] + valorBuffer < verdaderoMin:
+                    self.condicion[i][0] = verdaderoMin - valorBuffer
+
+                elif self.condicion[i][1] - valorBuffer > verdaderoMax:
+                    self.condicion[i][1] = verdaderoMin + valorBuffer
+
+                else:
+                    pass
 
     def subsumir(self, cl):
         pass
