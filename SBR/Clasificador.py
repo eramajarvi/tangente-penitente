@@ -686,7 +686,33 @@ class Clasificador:
             return True
 
     def selecGeneralizarRW(self, conteo):
-        pass
+        """ CE es aplicado a la seleccion de un atributo
+        para generalizar la mutacion """
+        sumaPuntajeCE = 0
+        listaSeleccion = []
+        conteoActual = 0
+        listaAtributosEspecificados = copy.deepcopy(self.listaAtributosEspecificados)
+
+        for i in self.listaAtributosEspecificados:
+            # Cuando se generaliza, el CE es inversamente proporcional
+            # a la probabilidad de seleccion 
+            sumaPuntajeCE += 1 / float(cons.CE.puntajes[i] + 1)
+
+        while conteoActual < conteo:
+            puntoOpcion = random.random() * sumaPuntajeCE
+            i = 0
+            sumaPuntaje = 1 / float(cons.CE.puntajes[listaAtributosEspecificados[i]] + 1)
+
+            while puntoOpcion > sumaPuntaje:
+                i = i + 1
+                sumaPuntaje += 1 / float(cons.CE.puntajes[listaAtributosEspecificados[i]] + 1)
+            
+            listaSeleccion.append(listaAtributosEspecificados[i])
+            sumaPuntajeCE -= 1 / float(cons.CE.puntajes[listaAtributosEspecificados[i]] + 1)
+            listaAtributosEspecificados.pop(i)
+            conteoActual += 1
+
+        return listaSeleccion
 
     def mutarAtributosContinuos(self, usarSA, j):
         pass
