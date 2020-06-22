@@ -715,7 +715,79 @@ class Clasificador:
         return listaSeleccion
 
     def mutarAtributosContinuos(self, usarSA, j):
-        pass
+        # -----------------------------------------------------
+        # MUTAR ATRIBUTOS CONTINUOS
+        # -----------------------------------------------------
+
+        if usarSA:
+            # Alta probabilidad de seguimiento de atributos lleva a una
+            # alta probabilidad de mutacion
+            if random.random() < cons.SA.obtenerProbSeguimiento()[j]:
+                rangoAtt = float(cons.amb.datosFormateados.infoAtributo[j][1][1]) - float(cons.amb.datosFormateados.infoAtributo[j][1][0])
+                # Referencia a la posicion del atributo en la representacion de reglas
+                i = self.listaAtributosEspecificados.index(j)
+
+                rangoMutacion = random.random() * 0.5 * rangoAtt
+
+                # Mutacion minima
+                if random.random() > 0.5:
+                    # Sumar
+                    if random.random() > 0.5:
+                        self.condicion[i][0] += rangoMutacion
+
+                    # Restar
+                    else:
+                        self.condicion[i][0] -= rangoMutacion
+
+                # Mutacion maxima
+                else:
+                    # Sumar
+                    if random.random() > 0.5:
+                        self.condicion[i][1] += rangoMutacion
+
+                    # Restar
+                    else:
+                        self.condicion[i][1] -= rangoMutacion
+
+                # Reparar rango de tal forma que primero viene el minimo
+                # especificado y el maximo despues
+                self.condicion[i].sort()
+                cambio = True
+        
+        elif random.random() > 0.5:
+            # Mutar rango continuo
+            # Basado en Bacardit 2009 - Selecciona un limite con probabilidad
+            # uniforme y suma o resta un offset generado aleatoriamente al limite
+            # de un tamano entre 0 al 50% del dominio del atributo
+            rangoAtt = float(cons.amb.datosFormateados.infoAtributo[j][1][1]) - float(cons.amb.datosFormateados.infoAtributo[j][1][0])
+            i = self.listaAtributosEspecificados.index(j)
+            rangoMutacion = random.random() * 0.5 * rangoAtt
+
+            # Maxima mutacion
+            if random.random() > 0.5:
+                # Sumar
+                if random.random() > 0.5:
+                    self.condicion[i][0] += rangoMutacion
+
+                # Restar
+                else:
+                    self.condicion[i][0] -= rangoMutacion
+
+            # Minima mutacion
+            else:
+                # Sumar
+                if random.random() > 0.5:
+                    self.condicion[i][1] += rangoMutacion
+
+                # Restar
+                else:
+                    self.condicion[i][1] -= rangoMutacion
+
+            self.condicion[i].sort()
+            cambio = True
+
+        else:
+            pass
 
     def revisarRangos(self):
         pass
