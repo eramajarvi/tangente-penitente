@@ -1065,5 +1065,34 @@ class Clasificador:
         """ Fija la aptitud de un clasificador """
         self.aptitud = apt
 
+    # -----------------------------------------------------
+    # IMPRIME LOS CLASIFICADOR EN UN ARCHIVO DE POBLACION
+    # -----------------------------------------------------
     def imprimirClasificador(self):
-        pass
+        """ Formatea y devuelve un string de salida
+        describiendo este clasificador"""
+
+        stringClasificador = ""
+        stringClasificador += str(self.listaAtributosEspecificados) + "\t"
+        stringClasificador += str(self.condicion) + "\t"
+
+        # -----------------------------------------------------
+        especificacion = len(self.condicion) / float(cons.amb.datosFormateados.numAtributos)
+
+        epoca = 0
+
+        if self.epocaCompletada:
+            epoca = 1
+
+        if cons.amb.datosFormateados.fenotipoDiscreto:
+            stringClasificador += str(self.fenotipo) + "\t"
+
+        else:
+            print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos")
+
+        # -----------------------------------------------------
+        stringClasificador += str(self.aptitud) + "\t" +str(self.precision) + "\t" + str(self.numerosidad) + "\t" + str(self.tamanoPromedioConjuntoCoincidencia) + "\t" + str(self.estampaTiempoAG) + "\t" + str(self.estampaTiempoInic) + "\t" + str(especificacion) + "\t"
+        stringClasificador += str(self.votoEliminacion) + "\t" + str(self.conteoCorrecto) + "\t" + str(self.conteoCoincidencia) + "\t" + str(self.cubrimientoCorrecto) + "\t" + str(self.cubrimientoCoincidencia) + "\t" + str(epoca) + "\n"
+
+        # -----------------------------------------------------
+        return stringClasificador
