@@ -1054,7 +1054,8 @@ class Clasificador:
         self.estampaTiempoAG = ts
 
     def actualizarPrecision(self):
-        pass
+        """ Actualiza el seguimiento de la precision """
+        self.precision = self.conteoCorrecto / float(self.conteoCoincidencia)
 
     def fijarPrecision(self, precision):
         pass
