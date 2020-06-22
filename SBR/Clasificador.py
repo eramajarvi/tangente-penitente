@@ -884,7 +884,32 @@ class Clasificador:
         return False
 
     def esMasGeneral(self, cl):
-        pass
+        """ Devuelve si es clasificador (self) es mas general que
+        cl. Revisa que todos los atributos especificados en self
+        tambien esten especificados en cl. """
+        if len(self.listaAtributosEspecificados) >= len(cl.listaAtributosEspecificados):
+            return False
+
+        # Revisar cada atributo especificado en self.condicion
+        for i in range(len(self.listaAtributosEspecificados)):
+            infoAtributo = cons.amb.datosFormateados.infoAtributo[self.listaAtributosEspecificados[i]]
+
+            if self.listaAtributosEspecificados[i] not in cl.listaAtributosEspecificados:
+                return False
+
+            # -----------------------------------------------------
+            # ATRIBUTO CONTINUO
+            # -----------------------------------------------------
+            if infoAtributo[0]:
+                otraRef = cl.listaAtributosEspecificados.index(self.listaAtributosEspecificados[i])
+                # Si self tiene un rango mas angosto que los valores que trata de subsumir
+                if self.condicion[i][0] < cl.condicion[otraRef][0]:
+                    return False
+
+                if self.condicion[i][1] > cl.condicion[otraRef][1]:
+                    return False
+
+        return True
 
     def obtenerProbEliminacion(self, aptitudMedia):
         pass
