@@ -469,7 +469,41 @@ class Clasificador:
             print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def arregloLimiteEspec(self, cl):
-        pass
+        """ 
+        Baja la especificacion del clasificador al limite de especificacion 
+        """
+        # Identifica atributos a 'eliminar' con los puntajes de SA
+        # mas bajos
+        if cons.hacerFeedbackAtributos:
+            while len(cl.listaAtributosEspecificados) > cons.amb.datosFormateados.limiteEspec:
+                valorMin = cons.SA.obtenerProbSeguimiento()[cl.listaAtributosEspecificados[0]]
+                atributoMin = cl.listaAtributosEspecificados[0]
+
+                for j in cl.listaAtributosEspecificados:
+                    if cons.SA.obtenerProbSeguimiento()[j] < valorMin:
+                        valorMin = cons.SA.obtenerProbSeguimiento()[j]
+                        atributoMin = j
+
+                # Referencia a la posicion del atributo en la
+                # representacion de reglas
+                i = cl.listaAtributosEspecificados.index(atributoMin)
+                cl.listaAtributosEspecificados.remove(atributoMin)
+                # construirCoincidencia maneja atributos continuos y discretos
+                cl.condicion.pop(i)
+
+        # Aleatoriamente selecciona atributos a 'eliminar'
+        # para que sean generalizados
+        else:
+            eliminar = len(cl.listaAtributosEspecificados) - cons.amb.datosFormateados.limiteEspec
+            objetivoGen = random.sample(cl.listaAtributosEspecificados, eliminar)
+
+            for j in objetivoGen:
+                # Referencia a la posicion del atributo en la
+                # representacion de reglas
+                i = cl.listaAtributosEspecificados.index(j)
+                cl.listaAtributosEspecificados.remove(j)
+                # construirCoincidencia maneja atributos continuos y discretos
+                cl.condicion.pop(i)
 
     def mutacion(self, estado, fenotipo):
         pass
