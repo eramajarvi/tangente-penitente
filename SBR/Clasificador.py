@@ -874,7 +874,14 @@ class Clasificador:
             print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def esSubsumidor(self):
-        pass
+        """ Devuelve si el clasificador (self) es un posible
+        subsumidor. Un clasificador debe tener suficiente experiencia
+        (una epoca) y tambien debe ser igual o mas preciso que el 
+        clasificador que esta tratando de subsumir. """
+        if self.conteoCoincidencia > cons.theta_sub and self.precision > cons.acc_sub:
+            return True
+
+        return False
 
     def esMasGeneral(self, cl):
         pass
