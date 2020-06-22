@@ -989,8 +989,16 @@ class Clasificador:
             
         return False
 
+    # -----------------------------------------------------
+    # ACTUALIZACION DE PARAMETROS
+    # -----------------------------------------------------
     def actualizarEstadoEpoca(self, iterExploracion):
-        pass
+        """ Determina cuando una epoca de aprendizaje ha
+        sido completada (un ciclo a travez de los datos de
+        entrenamiento). """
+
+        if not self.epocaCompletada and (iterExploracion - self.estampaTiempoInic - 1) >= cons.amb.datosFormateados.numInstanciasEntrenamiento and cons.datosOffline:
+            self.epocaCompletada = True
 
     def actualizarAptitud(self):
         pass
