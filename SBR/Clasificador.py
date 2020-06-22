@@ -714,6 +714,39 @@ class Clasificador:
 
         return listaSeleccion
 
+    def selectEspecificoRW(self, conteo):
+        """ CE aplicado a la seleccion de un atributo
+        para especificar para mutacion. """
+
+        listaOpciones = list(range(cons.amb.datosFormateados.numAtributos))
+
+        # Hacer lista con atributos no especificados
+        for i in self.listaAtributosEspecificados:
+            listaOpciones.remove(i)
+
+        sumaPuntajesCE = 0
+        listaSeleccion = []
+        conteoActual = 0
+
+        for i in listaOpciones:
+            sumaPuntajesCE += cons.CE.puntajes[i]
+
+        while conteoActual < conteo:
+            puntoOpcion = random.random() * sumaPuntajesCE
+            i = 0
+            sumaPuntaje = cons.CE.puntajes[listaOpciones[i]]
+
+            while puntoOpcion > sumaPuntaje:
+                i = i + 1
+                sumaPuntaje += cons.CE.puntajes[listaOpciones[i]]
+
+            listaSeleccion.append(listaOpciones[i])
+            sumaPuntajesCE -= cons.CE.puntajes[listaOpciones[i]]
+            listaOpciones.pop(i)
+            conteoActual += 1
+
+        return listaSeleccion
+
     def mutarAtributosContinuos(self, usarSA, j):
         # -----------------------------------------------------
         # MUTAR ATRIBUTOS CONTINUOS
