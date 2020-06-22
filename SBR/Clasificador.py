@@ -1010,7 +1010,19 @@ class Clasificador:
             print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def actualizarExperiencia(self):
-        pass
+        """ Incrementa la experiencia de un clasificador en uno.
+        Una vez se completa una epoca, la precision de la regla
+        no puede cambiar. """
+        self.conteoCoincidencia += 1
+
+        # Al completar una epica, el numero de coincidencias
+        # de una regla unica no cambiara, asi que se repite
+        # el calculo
+        if self.epocaCompletada:
+            pass
+
+        else:
+            self.cubrimientoCoincidencia += 1
 
     def actualizarCorrectos(self):
         pass
