@@ -264,8 +264,209 @@ class Clasificador:
 
         return True
 
+    # -----------------------------------------------------
+    # MECANISMOS DE ALGORITMOS GENETICOS
+    # -----------------------------------------------------
+    
     def cruzamientoUniforme(self, cl):
-        pass
+        """ Aplica cruzamiento uniforme y devuelve si el 
+        clasificador ha cambiado. Maneja atributos discretos
+        y continuos.
+        #SWARTZ: self. Es donde para los mejores atributos son mas
+        probables de ser especificados
+        #DEVITO: cl. Es donde los atributos menos utiles son mas
+        propensos a ser especificados 
+        """
+
+        # Siempre es una condicion de cruzamiento si es fenotipo es discreto
+        # (si el fenotipo es continuo, la mitad del tiempo el cruzamiento
+        # del fenotipo se lleva a cabo)
+        if cons.amb.datosFormateados.fenotipoDiscreto or random.random() < 0.5:
+            p_self_listaAtributosEspecificados = copy.deepcopy(self.listaAtributosEspecificados)
+            p_cl_listaAtributosEspecificados = copy.deepcopy(cl.listaAtributosEspecificados)
+
+            usarSA = False
+
+            if cons.hacerFeedbackAtributos and random.random() < cons.SA.porcentaje:
+                usarSA = True
+
+            # Hacer que la lista de referencias de atributos 
+            # aparezca en al menos uno de los padres
+            listaAtributosCombo = []
+
+            for i in p_self_listaAtributosEspecificados:
+                listaAtributosCombo.append(i)
+
+            for i in p_cl_listaAtributosEspecificados:
+                if i not in listaAtributosCombo:
+                    listaAtributosCombo.append(i)
+
+                # El atributo esta especificado en ambos padres y
+                # el atributo es discreto (no hay razon para hacer
+                # cruzamiento)
+                elif not cons.amb.datosFormateados.infoAtributo[i][0]:
+                    listaAtributosCombo.remove(i)
+
+            listaAtributosCombo.sort()
+            # -----------------------------------------------------
+            cambio = False
+
+            for refAtt in listaAtributosCombo:
+                infoAtributo = cons.amb.datosFormateados.infoAtributo[refAtt]
+
+                # -----------------------------------------------------
+                # PROBABILIDAD DE CRUZAMIENTO DEL ATRIBUTO
+                # Feedback del atributo
+                # -----------------------------------------------------
+                if usarSA:
+                    probabilidad = cons.SA.obtenerProbSeguimiento()[refAtt]
+
+                # -----------------------------------------------------
+                # PROBABILIDAD DE CRUZAMIENTO DEL ATRIBUTO
+                # Cruzamiento normal
+                # -----------------------------------------------------
+                else:
+                    # Probabilidad igual para alelos de atributos
+                    # que se intercambiaran
+                    probabilidad = 0.5
+
+                # -----------------------------------------------------
+                ref = 0
+
+                if refAtt in p_self_listaAtributosEspecificados:
+                    ref += 1
+
+                if refAtt in p_cl_listaAtributosEspecificados:
+                    ref += 1
+
+                if ref == 0:
+                    # Esto nunca deberia pasar: todos los atributos en 
+                    # listaAtributosCombo deberian ser especificados en
+                    # al menos un clasificador.
+                    print("Error: CruzamientoUniforme")
+                    pass
+
+                # -----------------------------------------------------
+                # CRUZAMIENTO
+                # -----------------------------------------------------
+                elif ref == 1:
+                    # El atributo se ha especificado en una sola condicion
+                    # Se hace un cambio probabilistico de todo el estado
+                    # del atributo (El tipo del atributo no hace la diferencia)
+                    if refAtt in p_self_listaAtributosEspecificados and random.random() > probabilidad:
+                        # Si el atributo se ha especificado en SWARTZ y hay alta 
+                        # probabilidad de que sea valioso, entonces es menos probable
+                        # que se haga intercambio.
+                        
+                        # Referencia a la posicion del atributo en la representacion de reglas
+                        i = self.listaAtributosEspecificados.index(refAtt)
+                        # Toma el atributo desde self y lo agrega al cl
+                        cl.condicion.append(self.condicion.pop(i))
+                        cl.listaAtributosEspecificados.append(refAtt)
+                        self.listaAtributosEspecificados.remove(refAtt)
+                        # Elimina el atributo de self y lo agrega a cl
+                        cambio = True
+
+                    if refAtt in p_cl_listaAtributosEspecificados and random.random() < probabilidad:
+                        # Si el atributo se ha especificado en DEVITO y hay alta
+                        # probabilidad de que sea valioso, entonces es mas probable
+                        # que se haga intercamio
+                        
+                        # Referencia a la posicion del atributo en la representacion de reglas
+                        i = cl.listaAtributosEspecificados.index(refAtt)
+                        # Toma el atributo de cl y lo agrega al self
+                        self.condicion.append(cl.condicion.pop(i))
+                        self.listaAtributosEspecificados.append(refAtt)
+                        cl.listaAtributosEspecificados.remove(refAtt)
+                        # Elimina el atributo de cl y lo agrega a self
+                        cambio = True
+
+                else:
+                    # El atributo se ha especificado en ambas condiciones
+                    # se hace cruzamiento aleatorio entre alelos de estados
+                    # Importante: El feedback de atributos no se debe usar
+                    # para juntar alelos con un estado de atributo
+                    
+                    # El mismo atributo debe ser especificado en diferentes
+                    # posiciones dentro de cualquier clasificador
+                    # -----------------------------------------------------
+                    # ATRIBUTO CONTINUO
+                    # -----------------------------------------------------
+                    if infoAtributo[0]:
+                        # Empareja con self (clasificador 1)
+                        i_cl1 = self.listaAtributosEspecificados.index(refAtt)
+                        # Empereja con cl (clasificador 2)
+                        i_cl2 = cl.listaAtributosEspecificados.index(refAtt)
+                        # Se hace una seleccion aleatoria entre 4 escenarios,
+                        # cambiar maximos, cambiar minimos, self absorbe cl
+                        # o cl absorbe self
+                        llaveTemp = random.randint(0, 3)
+
+                        if llaveTemp == 0:
+                            # Cambiar minimos
+                            temp = self.condicion[i_cl1][0]
+                            self.condicion[i_cl1][0] = cl.condicion[i_cl2][0]
+                            cl.condicion[i_cl2][0] = temp
+
+                        elif llaveTemp == 1:
+                            # Cambiar maximos
+                            temp = self.condicion[i_cl1][1]
+                            self.condicion[i_cl1][1] = cl.condicion[i_cl2][1]
+                            cl.condicion[i_cl2][1] = temp
+
+                        else:
+                            # Se realiza la absorcion
+                            todasListas = self.condicion[i_cl1] + cl.condicion[i_cl2]
+                            nuevoMin = min(todasListas)
+                            nuevoMax = max(todasListas)
+
+                            # self absorbe cl
+                            if llaveTemp == 2:
+                                self.condicion[i_cl1] = [nuevoMin, nuevoMax]
+                                # eliminar cl
+                                cl.condicion.pop(i_cl2)
+                                cl.listaAtributosEspecificados.remove(refAtt)
+
+                            # cl absorve self
+                            else:
+                                cl.condicion[i_cl2] = [nuevoMin, nuevoMax]
+                                # eliminar self
+                                self.condicion.pop(i_cl1)
+                                self.listaAtributosEspecificados.remove(refAtt)
+
+                    # -----------------------------------------------------
+                    # ATRIBUTO DISCRETO
+                    # -----------------------------------------------------
+                    else:
+                        pass
+
+            # -----------------------------------------------------
+            # REVISAR EL LIMITE DE ESPECIFICACION
+            # Devuelve la especificacion al limite. Notar que esto es
+            # posible para reglas completamente generales que resultan
+            # del cruzamiento (la mutacion se asegura que algunos
+            # atributos se vuelvan especificados)
+            # -----------------------------------------------------
+            if len(self.listaAtributosEspecificados) > cons.amb.datosFormateados.limiteEspec:
+                self.arregloLimiteEspec(self)
+
+            if len(cl.listaAtributosEspecificados) > cons.amb.datosFormateados.limiteEspec:
+                self.arregloLimiteEspec(cl)
+
+            listaTemp1 = copy.deepcopy(p_self_listaAtributosEspecificados)
+            listaTemp2 = copy.deepcopy(cl.listaAtributosEspecificados)
+            listaTemp1.sort()
+            listaTemp2.sort()
+
+            if cambio and (listaTemp1 == listaTemp2):
+                cambio = False
+
+            return cambio
+        # -----------------------------------------------------
+        # CRUZAMIENTO DE FENTOIPO CONTINUO
+        # -----------------------------------------------------
+        else:
+            print("Clasificador - Error: Tangente Penitente no puede manejar endpoints continuos.")
 
     def arregloLimiteEspec(self, cl):
         pass
