@@ -928,8 +928,40 @@ class Clasificador:
 
         return self.votoEliminacion
 
+    # -----------------------------------------------------
+    # OTROS METODOS
+    # -----------------------------------------------------
     def construirCoincidencia(self, refAtt, estado):
-        pass
+        """ Cosntruye un elemento de condicion de coincidencia
+        dado un atributo para ser especificado para el metodo 
+        coveringClasificador"""
+
+        infoAtributo = cons.amb.datosFormateados.infoAtributo[refAtt]
+
+        # -----------------------------------------------------
+        # ATRIBUTO CONTINUO
+        # -----------------------------------------------------
+        if infoAtributo[0]:
+            rangoAtt = infoAtributo[1][1] - infoAtributo[1][0]
+            # Inicializacion continua del radio del dominio
+            radioRango = random.randint(25, 75) * 0.01 * rangoAtt / 2.0
+
+            bajo = estado[refAtt] - radioRango
+            alto = estado[refAtt] + radioRango
+
+            # Representacion ALKR
+            # Inicializacion centrada en una instancia de entrenamiento
+            # con un rango entre 25% y 75% del tamano del dominio
+            listaCondicion = [bajo, alto]
+
+        # -----------------------------------------------------
+        # ATRIBUTO DISCRETO
+        # -----------------------------------------------------
+        else:
+            # El estado ya esta formateado como GABIL en GestionDatos
+            listaCondicion = estado[refAtt]
+
+        return listaCondicion
 
     def equivalente(self, cl):
         pass
