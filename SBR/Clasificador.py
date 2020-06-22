@@ -233,7 +233,36 @@ class Clasificador:
     # -----------------------------------------------------
 
     def coincidencia(self, estado):
-        pass
+        """ Devuelve si el clasificador coincide con la situacion
+        actual """
+
+        for i in range(len(self.condicion)):
+            infoAtributo = cons.amb.datosFormateados.infoAtributo[self.listaAtributosEspecificados[i]]
+
+            # -----------------------------------------------------
+            # ATRIBUTO CONTINUO
+            # -----------------------------------------------------
+            if infoAtributo[0]:
+                valorInstancia = estado[self.listaAtributosEspecificados[i]]
+
+                if self.condicion[i][0] < valorInstancia < self.condicion[i][1] or valorInstancia == cons.etiquetaDatosFaltantes:
+                    pass
+
+                else:
+                    return False
+
+            # -----------------------------------------------------
+            # ATRIBUTO DISCRETO
+            # -----------------------------------------------------
+            else:
+                estadoRep = estado[self.listaAtributosEspecificados[i]]
+
+                if estadoRep == self.condicion[i] or estadoRep == cons.etiquetaDatosFaltantes:
+                    pass
+                else:
+                    return False
+
+        return True
 
     def cruzamientoUniforme(self, cl):
         pass
