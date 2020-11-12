@@ -73,7 +73,12 @@ class ConocimientoExperto:
 
     def ajustarPuntajes(self, cons):
         """ Se asegura que el valor del puntaje minimo sea cero """
-        pass
+        CEmin = min(self.puntajes)
+
+        if CEmin < 0:
+            for i in range(len(self.puntajes)):
+                # Adicionar 0.01 previene que el atributo con el puntaje mas bajo no tenga un peso nulo
+                self.puntajes[i] = self.puntajes[i] - CEmin + cons.aptitudInicial
 
     def ejecutarFiltros(self, cons):
         pass
