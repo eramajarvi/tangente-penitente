@@ -317,16 +317,16 @@ class Constantes:
                     self.generacionInternaCE = True
 
                     try:
-                        if par['nombrearchivoSalidaCE'] == 'None' or par['nombrearchivoSalidaCE'] =='none':
-                            self.nombrearchivoSalidaCE = nombreEntrenamiento
+                        if par['nombreArchivoSalidaCE'] == 'None' or par['nombreArchivoSalidaCE'] =='none':
+                            self.nombreArchivoSalidaCE = nombreEntrenamiento
                             self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
                         else:
-                            self.nombrearchivoSalidaCE = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
-                            self.nombreArchivoSalidaCEOriginal = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
+                            self.nombreArchivoSalidaCE = par['nombreArchivoSalidaCE'] + nombreEntrenamiento
+                            self.nombreArchivoSalidaCEOriginal = par['nombreArchivoSalidaCE'] + nombreEntrenamiento
 
                     except:
-                        self.nombrearchivoSalidaCE = nombreEntrenamiento
+                        self.nombreArchivoSalidaCE = nombreEntrenamiento
                         self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
                 else:
@@ -344,16 +344,16 @@ class Constantes:
                 self.generacionInternaCE = True
 
                 try:
-                    if par['nombrearchivoSalidaCE'] == 'None' or par['nombrearchivoSalidaCE'] == 'none':
-                        self.nombrearchivoSalidaCE = nombreEntrenamiento
+                    if par['nombreArchivoSalidaCE'] == 'None' or par['nombreArchivoSalidaCE'] == 'none':
+                        self.nombreArchivoSalidaCE = nombreEntrenamiento
                         self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
                     else:
-                        self.nombrearchivoSalidaCE = par['generacionExternaCE'] + nombreEntrenamiento
-                        self.nombreArchivoSalidaCEOriginal = par['nombrearchivoSalidaCE'] + nombreEntrenamiento
+                        self.nombreArchivoSalidaCE = par['generacionExternaCE'] + nombreEntrenamiento
+                        self.nombreArchivoSalidaCEOriginal = par['nombreArchivoSalidaCE'] + nombreEntrenamiento
 
                 except:
-                    self.nombrearchivoSalidaCE = nombreEntrenamiento
+                    self.nombreArchivoSalidaCE = nombreEntrenamiento
                     self.nombreArchivoSalidaCEOriginal = nombreEntrenamiento
 
         # algoritmoFiltro
@@ -505,7 +505,7 @@ class Constantes:
         self.archivoEntrenamiento = nombreCarpeta + '\\' + nombreArchivo + '_VC' + str(part) + '_Entrenamiento'
         self.archivoPrueba = nombreCarpeta + '\\' + nombreArchivo + '_VC' + str(part) + '_Prueba'
         self.nombreArchivoSalida = self.nombreArchivoSalidaOriginal + '_VC' + str(part) + '_TP'
-        self.nombrearchivoSalidaCE = self.nombreArchivoSalidaCEOriginal + '_VC' + str(part) + '_TP'
+        self.nombreArchivoSalidaCE = self.nombreArchivoSalidaCEOriginal + '_VC' + str(part) + '_TP'
 
     def sobrescribirParametros(self):
         """ Sobreescribe parametros especificados por el usuario
