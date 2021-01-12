@@ -52,8 +52,12 @@ class ConjuntoClasificadores:
         else:
             print("ConjuntoClasificadores: Hubo un error al construir la poblacion.")
 
+    # ------------------------------------------------------------
+    # METODOS CONSTRUCTORES DE POBLACION
+    # ------------------------------------------------------------
     def crearPoblacion(self):
-        pass
+        """ Inicializa la poblacion de reglas """
+        self.conjuntoPob = []
 
     def reiniciarPoblacion(self, archivoReinicio):
         pass
