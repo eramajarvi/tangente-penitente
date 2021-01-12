@@ -7,7 +7,7 @@ pasando sus valores a Constantes. También incluye un método para
 generar conjuntos de datos para la validación cruzada.
 """
 
-from Constantes import *
+from SBR.constantes import *
 import os
 import copy
 import random

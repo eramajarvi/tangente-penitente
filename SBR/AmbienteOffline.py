@@ -13,8 +13,8 @@ pasar del aprendizaje a la evaluación de un conjunto de datos de
 entrenamiento.
 """
 
-from Datos import GestionDatos
-from Constantes import *
+from SBR.datos import GestionDatos
+from SBR.constantes import *
 import sys
 
 class AmbienteOffline:

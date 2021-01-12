@@ -9,8 +9,8 @@ cada punto de control de aprendizaje, y en la última iteración. Estos incluyen
     attCo_Ocurrence: Calcula y produce puntuaciones de co-ocurrencia para cada par de atributos en el conjunto de datos.
 """
 
-from Constantes import *
-from SA import *
+from SBR.constantes import *
+from SBR.SA import *
 import copy
 
 class GestorSalida:

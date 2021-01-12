@@ -10,7 +10,7 @@ subsunción, el cruce y la mutación. También se incluyen métodos
 de actualización de parámetros.
 """
 
-from Constantes import *
+from SBR.constantes import *
 import random
 import copy
 import math
