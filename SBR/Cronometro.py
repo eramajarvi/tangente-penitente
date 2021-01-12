@@ -13,7 +13,7 @@ y 'cons.cronometro.detenerXXXX' están comentados dentro de TangentePenitente_Ma
 Algoritmo, y ConjuntoClasificadores.
 """
 
-from Constantes import *
+from SBR.constantes import *
 import time
 
 class Cronometro:

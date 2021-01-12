@@ -6,7 +6,7 @@ Basándose en un determinado conjunto de coincidencias, este módulo utiliza un 
 Tangente Penitente.
 """
 
-from Constantes import *
+from SBR.constantes import *
 import random
 
 class Prediccion:

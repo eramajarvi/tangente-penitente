@@ -13,7 +13,7 @@ Tangente Penitente.
 import math
 import random
 import sys
-from Constantes import *
+from SBR.constantes import *
 
 class GestionDatos:
     def __init__(self, archivoEntrenamiento, archivoPrueba, listaInfo = None):

@@ -10,7 +10,7 @@ Attribute Tracking and Feedback for Michigan-Style Supervised
 Learning Classifier Systems". [2012].
 """
 
-from Constantes import *
+from SBR.constantes import *
 import copy
 import random
 
