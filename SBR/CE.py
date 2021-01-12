@@ -15,11 +15,6 @@ from SBR.RBA.turf_envoltorio import TurfEnvoltorio
 import os
 import copy
 import time
-from RBA.multisurf import *
-from RBA.relieff import *
-from RBA.surf import *
-from RBA.surfstar import *
-from RBA.turf_envoltorio import *
 
 class ConocimientoExperto:
     def __init__(self, cons):
