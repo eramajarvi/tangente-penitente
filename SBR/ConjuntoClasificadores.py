@@ -15,8 +15,42 @@ import sys
 
 class ConjuntoClasificadores:
     def __init__(self, a = None):
-        
-        pass
+        """ Inicializacion sobrecargada: maneja la creacion de una nueva poblacion o de una poblacion reiniciada (esto es, una poblacion previamente guardada). """
+
+        # Parametros principales --------------------------------
+
+        # Lista de clasificadores / reglas
+        self.conjuntoPob = []
+
+        # Lista de referencias a reglas en la poblacion que coinciden
+        self.conjuntoCoincidencia = []
+
+        # Lista de referencias a reglas en la poblacion que coinciden y que tienen el fenotipo correcto
+        self.conjuntoCorrectos = []
+
+        # Sigue el tamano de la micropoblacion actual, esto es, el tamano de la poblacion que toma en cuenta la numerosidad de la regla
+        self.tamanoMicropob = 0
+
+        # Parametros de evaluacion --------------------------------
+        self.GeneralidadProm = 0.0
+        self.reglasExp = 0.0
+        self.listaAtributosEspec = []
+        self.listaAtributosPrec = []
+        self.rangoPromFenotipo = 0.0
+
+        # Constructores de los conjuntos --------------------------
+        if a == None:
+
+            # Inicializa una nueva poblacion
+            self.crearPoblacion()
+
+        elif isinstance(a, str):
+
+            # Inicializa una nueva poblacion basada en una poblacion de reglas guardadas existente
+            self.reiniciarPoblacion(a)
+
+        else:
+            print("ConjuntoClasificadores: Hubo un error al construir la poblacion.")
 
     def crearPoblacion(self):
         pass
