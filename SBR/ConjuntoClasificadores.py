@@ -52,16 +52,57 @@ class ConjuntoClasificadores:
         else:
             print("ConjuntoClasificadores: Hubo un error al construir la poblacion.")
 
-    # ------------------------------------------------------------
+    # -----------------------------------------------------------
     # METODOS CONSTRUCTORES DE POBLACION
-    # ------------------------------------------------------------
+    # -----------------------------------------------------------
     def crearPoblacion(self):
         """ Inicializa la poblacion de reglas """
         self.conjuntoPob = []
 
     def reiniciarPoblacion(self, archivoReinicio):
-        pass
+        """ Rehace una poblacion previamente evolucionada de un archivo de texto guardado. """
 
+        print("Reiniciando la siguiente poblacion: " + str(archivoReinicio) + "_PoblacionReglas.txt")
+
+        # Manipulacion inicial del archivo
+        listaConjuntoDatos = []
+
+        try:
+            f = open(archivoReinicio + "_PoblacionReglas.txt", 'rU')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', archivoReinicio + "_PoblacionReglas.txt")
+            raise
+
+        else:
+            
+            # Elimina la primera linea
+            self.listaEncabezados = f.readline().rstrip('\n').split('\t')
+
+            for line in f:
+                listaLinea = line.strip('\n').split('\t')
+                listaConjuntoDatos.append(listaLinea)
+
+            f.close()
+
+        # -------------------------------------------------------
+        for each in listaConjuntoDatos:
+            cl = Clasificador(each)
+
+            # Agrega el clasificador a la poblacion
+            self.conjuntoPob.append(cl)
+
+            # Ubicacion de la numerosidad variables en el archivo de poblacion
+            refNumerosidad = 5
+
+            self.tamanoMicropob += int(each[refNumerosidad])
+
+    # -----------------------------------------------------------
+    # METODOS CONSTRUCTORES DE CONJUNTOS DE CLASIFICADORES
+    # -----------------------------------------------------------
     def hacerConjuntoCoincidencias(self, estadoFenotipo, iterExplor):
         pass
 
