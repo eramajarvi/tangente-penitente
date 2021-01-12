@@ -181,4 +181,41 @@ class ConocimientoExperto:
 
 
     def cargarCE(self, nombreRuta, cons):
-        pass
+        """ Carga un archivo de Conocimiento Experto existente en el formato Relief. """
+
+        try:
+            # Abre cada archivo de datos para leerlo
+            objetoArchivo = open(nombreRuta, 'rU')
+
+        except Exception as inst:
+            print(type(inst))
+            print(inst.args)
+            print(inst)
+            print('No se pudo abrir', nombreRuta)
+            print("Hubo un error al cargar el archivo de Conocimiento Experto: Revise el contenido del archivo de CE o revise si hay errores de formateo.")
+            raise
+
+        else:
+            print("Archivo de CE cargado")
+            lineaTemp = None
+
+            for i in range(3):
+                lineaTemp = objetoArchivo.readline()
+
+            diccEncab = {}
+            for i in range(cons.amb.datosFormateados.numeroAtributos):
+                lineaTemp = objetoArchivo.readline()
+                listaTemp = lineaTemp.strip().split('\t')
+
+                # Todos los atributos y sus correspondientes puntajes de CE son guardados en un diccionario
+                diccEncab[listaTemp[0]] = float(listaTemp[1])
+
+            # Se ordena la lista por ID
+            listaValoresOrdenados = []
+
+            for i in range(cons.amb.datosFormateados.numeroAtributos):
+                # Se ordena la lista por el orden de los atributos en el conjunto de datos
+                listaValoresOrdenados.append(float(diccEncab[cons.amb.datosFormateados.listaEncabezadoEntrenamiento[i]]))
+
+        return listaValoresOrdenados
+
