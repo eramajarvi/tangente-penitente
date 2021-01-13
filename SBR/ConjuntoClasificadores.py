@@ -169,7 +169,23 @@ class ConjuntoClasificadores:
             cons.cronometro.detenerTiempoCovering()
 
     def hacerConjuntoCorrectos(self, fenotipo):
-        pass
+        """ Construye un conjunto correcto a partir del conjunto de coincidencias dado. """
+
+        for i in range(len(self.conjuntoCoincidencia)):
+            ref = self.conjuntoCoincidencia[i]
+
+            # ---------------------------------------------------
+            # FENOTIPO DISCRETO
+            # ---------------------------------------------------
+            if cons.amb.datosFormateados.fenotipoDiscreto:
+                if self.conjuntoPob[ref].fenotipo == fenotipo:
+                    self.conjuntoCorrectos.append(ref)
+
+            # ---------------------------------------------------
+            # FENOTIPO CONTINUO
+            # ---------------------------------------------------
+            else:
+                print("ConjuntoClasificadores - Error: Tangente Penitente no puede manipular fenotipos continuos.")
 
     def hacerEvalConjuntoCoincidencias(self, estado):
         pass
