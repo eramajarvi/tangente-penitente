@@ -104,7 +104,69 @@ class ConjuntoClasificadores:
     # METODOS CONSTRUCTORES DE CONJUNTOS DE CLASIFICADORES
     # -----------------------------------------------------------
     def hacerConjuntoCoincidencias(self, estadoFenotipo, iterExplor):
-        pass
+        """ Construye un conjunto de coincidencias desde la poblacion. El covering es iniciado si el conjunto de coincidencias esta vacio o una regla con el fenotipo correcto actual esta ausente. """
+
+        # Valores iniciales -------------------------------------
+        estado = estadoFenotipo[0]
+        fenotipo = estadoFenotipo[1]
+
+        # Revision del covering: se hace dos veces que haya al menos una coincidencia presente y que al menos una coincidencia dicte el fenotipo correcto
+        hacerCovering = True
+
+        fijarSumaNumerosidad = 0
+
+        # -------------------------------------------------------
+        # COINCIDENCIAS
+        # -------------------------------------------------------
+        cons.cronometro.iniciarTiempoCoincidencias()
+
+        # Pasar a traves de la poblacion
+        for i in range(len(self.conjuntoPob)):
+            
+            cl = self.conjuntoPob[i]
+
+            # Un clasificador a la vez
+            cl.actualizarEstadoEpoca(iterExplor)
+            # Se sabe si el clasificador ha sido visto en este punto en todos los datos de entrenamiento.
+
+            # Revisa si hay coincidencia
+            if cl.coincidencia(estado):
+
+                # Si hay coincidencia, se agrega el clasificador al conjunto de coincidencias
+                self.conjuntoCoincidencia.append(i)
+
+                # Se incrementa la suma de numerosidad del conjunto
+                fijarSumaNumerosidad += cl.numerosidad
+
+                # Revision del covering -------------------------
+                # Si el fenotipo es discreto
+                if cons.amb.datosFormateados.fenotipoDiscreto:
+                    
+                    # Se revisa el cubrimiento del fenotipo
+                    if cl.fenotipo == fenotipo:
+                        hacerCovering = False
+
+                # Fenotipo continuo
+                else:
+                    print("ConjuntoClasificadores - Error: Tangente Penitente no puede manipular datos continuos.")
+
+        cons.cronometro.detenerTiempoCoincidencias()
+
+        # -------------------------------------------------------
+        # COVERING
+        # -------------------------------------------------------
+        while hacerCovering:
+            cons.cronometro.iniciarTiempoCovering()
+
+            nuevoCl = Clasificador(fijarSumaNumerosidad + 1, iterExplor, estado, fenotipo)
+            self.agregarClasificadorAPoblacion(nuevoCl, True)
+            
+            # Se agrega el clasificador cubierto al conjunto de coincidencias
+            self.conjuntoCoincidencia.append(len(self.conjuntoPob) - 1)
+
+            hacerCovering = False
+
+            cons.cronometro.detenerTiempoCovering()
 
     def hacerConjuntoCorrectos(self, fenotipo):
         pass
