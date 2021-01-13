@@ -188,8 +188,23 @@ class ConjuntoClasificadores:
                 print("ConjuntoClasificadores - Error: Tangente Penitente no puede manipular fenotipos continuos.")
 
     def hacerEvalConjuntoCoincidencias(self, estado):
-        pass
+        """ Construye un conjunto de coincidencias con fines de evaluacion en el cual no se activa el covering ni la eliminacion. """
 
+        # Se pasa a traves de toda la poblacion
+        for i in range(len(self.conjuntoPob)):
+            
+            # Se toma un solo clasificador
+            cl = self.conjuntoPob[i]
+
+            # Se revisa si hay coincidencia
+            if cl.coincidencia(estado):
+                
+                # Se agrega el clasificador al conjunto de coincidencias
+                self.conjuntoCoincidencia.append(i)
+
+    # -----------------------------------------------------------
+    # METODOS DE ELIMINACION DE CLASIFICADORES
+    # -----------------------------------------------------------
     def eliminacion(self, iterExplor):
         pass
 
