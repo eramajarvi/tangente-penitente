@@ -206,7 +206,14 @@ class ConjuntoClasificadores:
     # METODOS DE ELIMINACION DE CLASIFICADORES
     # -----------------------------------------------------------
     def eliminacion(self, iterExplor):
-        pass
+        """ Cambia el tamano de la poblacion al tamano maximo establecido por el usuario al eliminar reglas. """
+
+        cons.cronometro.iniciarTiempoEliminacion()
+
+        while self.tamanoMicropob > cons.N:
+            self.eliminarDePoblacion()
+
+        cons.timer.detenerTiempoEliminacion()
 
     def eliminarDePoblacion(self):
         pass
