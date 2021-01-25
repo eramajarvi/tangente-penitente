@@ -216,7 +216,47 @@ class ConjuntoClasificadores:
         cons.timer.detenerTiempoEliminacion()
 
     def eliminarDePoblacion(self):
-        pass
+        """ Elimina un clasificador en la poblacion. El clasificador que sera eliminado es escogido por seleccion de la ruleta considerando el voto de eliminacion. Devuelve el macroclasificador que fue decrementado por un microclasificador. """
+
+        aptitudMedia = self.obtenerSumaAptitudPoblacion()/float(self.tamanoMicropob)
+        
+        # Calcular tamano total de la ruleta --------------------
+        sumaCl = 0.0
+        listaVotos = []
+
+        for cl in self.conjuntoPob:
+            voto = cl.obtenerProbEliminacion(aptitudMedia)
+            sumaCl += voto
+            listaVotos.append(voto)
+
+        # -------------------------------------------------------
+
+        # Determina el punto de eleccion
+        puntoEleccion = sumaCl * random.random()
+
+        nuevaSuma = 0.0
+
+        for i in range(len(listaVotos)):
+            cl = self.conjuntoPob[i]
+            nuevaSuma = nuevaSuma + listaVotos[i]
+
+            # Seleccionar el clasificador para eliminar
+            if nuevaSuma > puntoEleccion:
+                
+                # Elimina el clasificador
+                cl.actualizarNumerosidad(-1)
+
+                # Esto se da cuando todos los microclasificadores para un clasificador dado se han agotado
+                if cl.numerosidad < 1:
+                    self.eliminarMacroClasificador(i)
+                    self.eliminarDelConjuntoCoincidencias(i)
+                    self.eliminarDelConjuntoCorrectos(i)
+
+                return
+
+        print("ConjuntoClasificadores: No se encontraron reglas elegibles para ser eliminadas de la poblacion.")
+
+        return
 
     def eliminarMacroClasificador(self, ref):
         pass
