@@ -259,7 +259,9 @@ class ConjuntoClasificadores:
         return
 
     def eliminarMacroClasificador(self, ref):
-        pass
+        """ Elimina el macroclasificador o el clasificador especificado de la poblacion """
+
+        self.conjuntoPob.pop(ref)
 
     def eliminarDelConjuntoCoincidencias(self, refEliminar):
         pass
